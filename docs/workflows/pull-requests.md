@@ -135,7 +135,7 @@ Plain text (not markdown `##` headings). Required blocks in order:
 
 1. **Summary** — one or two sentences on why this merged (from PR Overview).
 2. **`Changes:`** — bullets: `path or area — what changed` (major files or release artifacts, not every diff hunk).
-3. **`Commits merged:`** — bullets: each commit subject on the branch (`git log BASE_BRANCH..HEAD --oneline`), in merge order.
+3. **`Commits merged:`** — bullets: each feature commit on the branch, **oldest first** (how the branch was built). Omit merge commits that only sync `BASE_BRANCH` into the branch (e.g. `Merge branch 'main' into …`). Gather with `git log BASE_BRANCH..HEAD --oneline --reverse --no-merges`.
 4. **`Post-merge:`** — one line: tag, deploy, notify operators, or `none` if nothing is required.
 
 Template: [templates/pr-merge-extended-description.template.md](../../templates/pr-merge-extended-description.template.md).  

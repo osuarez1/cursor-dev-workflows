@@ -25,10 +25,10 @@ Commits merged:
 Post-merge: <tag, deploy, notify, or "none" if nothing required>
 ```
 
-Gather branch commits:
+Gather branch commits (oldest first; omit sync merges from `BASE_BRANCH`):
 
 ```bash
-git log BASE_BRANCH..HEAD --oneline
+git log BASE_BRANCH..HEAD --oneline --reverse --no-merges
 ```
 
 Example: [examples/pr-merge-commit-good-vs-weak.md](../examples/pr-merge-commit-good-vs-weak.md).
