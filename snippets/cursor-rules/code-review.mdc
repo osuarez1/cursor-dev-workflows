@@ -1,0 +1,20 @@
+---
+description: Code review and PR preparation — logic, performance, security, tests, conventions
+alwaysApply: false
+---
+
+# Code review and PR preparation
+
+When the user asks to **review a branch**, **review code**, **prepare for a PR**, or **draft a PR summary**, follow **`CANONICAL_DOCS_PATH/code-review.md`**.
+
+When the user asks for a **local code review**, **review locally**, or **private review (don't log)**, use the same checklists but **do not** suggest remote logging unless they later explicitly ask.
+
+Act as a senior developer on this project. Walk all checklists (logic, performance, security, tests, conventions, stack). Output Summary, Critical issues, Suggestions, Test coverage; verdict **Ready** | **Needs fixes** | **Blocked**.
+
+When the user asks to **save the review locally**, write to **`.reviews/YYYY-MM-DD-HHMM-<branch-slug>.md`** only (gitignored). Never commit `docs/reviews/`.
+
+When the user asks for **senior analysis** or **design alternatives**, use **`CANONICAL_DOCS_PATH/senior-analysis.md`** instead — not this rule.
+
+PR body: **`CANONICAL_DOCS_PATH/pr-production-readiness.md`** and PR template.
+
+Replace `CANONICAL_DOCS_PATH` with your repo path (e.g. `docs/workflows/`).

@@ -1,0 +1,20 @@
+---
+description: Senior analysis — logical changes, before/after, alternatives, diagrams; independent of code review
+alwaysApply: false
+---
+
+# Senior analysis
+
+When the user asks for a **senior analysis**, **analyze approach**, **design alternatives**, **logical change analysis**, or a **before/after review**, follow **`CANONICAL_DOCS_PATH/senior-analysis.md`**.
+
+When the user asks for **code review**, **review branch**, or **prepare for PR**, follow **`CANONICAL_DOCS_PATH/code-review.md`** instead.
+
+Decompose into logical units (`LC-1`, `LC-2`, …). State tier (Deep / Light / Skip). Unit verdicts: **Sound** | **Acceptable with follow-ups** | **Rethink** — not Ready/Blocked.
+
+When the user asks to **save senior analysis locally**, write to **`.senior-analyses/YYYY-MM-DD-HHMM-<branch-slug>.md`** only (gitignored).
+
+Do not post full reports to PR/ticket systems unless the user explicitly wants a short executive summary.
+
+Recommend code review as follow-up when application source changed.
+
+Replace `CANONICAL_DOCS_PATH` with your repo path (e.g. `docs/workflows/`).

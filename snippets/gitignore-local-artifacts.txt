@@ -1,0 +1,5 @@
+# Append to the target application repository .gitignore
+# Local agent review archives — never commit
+
+.reviews/
+.senior-analyses/

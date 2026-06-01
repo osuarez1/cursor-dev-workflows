@@ -1,0 +1,18 @@
+---
+description: Generate ticket card type, title, and description when user asks to draft a task card or tracker CLI prompts
+alwaysApply: false
+---
+
+# Ticket card info
+
+When the user asks to **create**, **draft**, or **fill in** a task card — including tracker CLI prompts (e.g. **`git ts`**), task type/title/description, or help before branching — follow **`CANONICAL_DOCS_PATH/ticket-card-info.md`** (or your adopted copy from cursor-dev-workflows).
+
+Do **not** run tracker CLI commands or create remote cards unless they explicitly ask. Output three copy-paste fields in **separate** fenced code blocks:
+
+1. **Task type** — team allowed set (default: feature, bugfix, hotfix, chore, release)
+2. **Task title** — **`TITLE_PREFIX`** + imperative title; under 60 characters total
+3. **Task description** — Context/Goal, Acceptance Criteria (`- [ ]`), Technical Notes
+
+Do not implement on protected branches. See **`CANONICAL_DOCS_PATH/branch-workflow.md`**.
+
+Examples: cursor-dev-workflows `examples/ticket-good-vs-weak.md`.
