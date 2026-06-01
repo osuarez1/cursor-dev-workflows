@@ -8,18 +8,22 @@ Copy this file to **`MAINTAINER.md`** in the bundle root. `MAINTAINER.md` is git
 |-------|------------|
 | `WORKFLOWS_BUNDLE_PATH` | e.g. `~/Repos/lsi/current/cursor-dev-workflows` |
 | Internal source repo (if any) | `ORG/internal-cursor-dev-workflows` |
-| Default adoption target(s) | App repo name(s) and `CANONICAL_DOCS_PATH` |
+| Default adoption target(s) | App repo name(s), `CANONICAL_DOCS_PATH`, `ADOPTION_PROFILE` (A or B) |
+| Default profile | **A — mirror bundle** (see [docs/adoption-layout.md](docs/adoption-layout.md)) |
 
 ## Sync mapping
 
-Bundle path → adopted path in application repo(s):
+Bundle path → adopted path in application repo(s). Default is **Profile A** ([docs/adoption-layout.md](docs/adoption-layout.md)):
 
-| Bundle | Adopted in `<APP_REPO>` |
-|--------|-------------------------|
-| `docs/workflows/*.md` | `docs/workflows/*.md` |
+| Bundle | Adopted in `<APP_REPO>` (Profile A) |
+|--------|-------------------------------------|
+| `docs/workflows/*.md` | `docs/workflows/*.md` (or your `CANONICAL_DOCS_PATH`) |
+| `which-workflow.md` | **app repo root** |
+| `templates/`, `examples/` | **app repo root** |
 | `snippets/cursor-rules/*.mdc` | `.cursor/rules/*.mdc` |
 | `AGENTS.md` | `AGENTS.md` (merge or replace per team) |
-| `which-workflow.md` | repo root or `docs/` per team |
+
+Profile **B** (flatten): router, templates, and examples under `CANONICAL_DOCS_PATH` with mandatory link rewrites — document in this table if a target uses B.
 
 Add rows for any team-specific overrides.
 
@@ -30,7 +34,8 @@ Before bumping [VERSION](VERSION) or tagging:
 - [ ] Diff `docs/workflows/`, `snippets/cursor-rules/`, `templates/`, `examples/` against last release
 - [ ] Classify changes per [docs/versioning.md](docs/versioning.md) (MAJOR / MINOR / PATCH)
 - [ ] Update `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) with **Adopter action** bullets for MAJOR changes
-- [ ] Run [adoption-checklist.md](adoption-checklist.md) §9 verify steps on a sample app repo (optional smoke)
+- [ ] Run `python3 snippets/adoption-verify-links.py --profile A --canonical docs/workflows` on a sample app repo (Profile A), plus §9 agent smoke in [adoption-checklist.md](adoption-checklist.md)
+- [ ] Run `python3 -m unittest snippets.test_adoption_verify_links -v`
 
 ## Release checklist
 
@@ -54,6 +59,7 @@ When shipping a **MAJOR** bump, tell adopters to:
 
 When merging bundle updates into an adopted app repo:
 
-1. Diff each workflow file under `CANONICAL_DOCS_PATH`
-2. Record sync date and `BUNDLE_VERSION` (tag or SHA) in the app repo commit message or `PROJECT.md`
-3. Do not commit this file or absolute clone paths into the app repo
+1. Diff each workflow file under `CANONICAL_DOCS_PATH` (and root `which-workflow.md`, `templates/`, `examples/` if Profile A)
+2. Re-run link verification per [docs/adoption-layout.md](docs/adoption-layout.md) before merge
+3. Record sync date and `BUNDLE_VERSION` (tag or SHA) in the app repo commit message or `PROJECT.md`
+4. Do not commit this file or absolute clone paths into the app repo

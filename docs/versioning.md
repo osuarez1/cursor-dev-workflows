@@ -39,5 +39,6 @@ On copy or re-sync from this bundle:
 2. Re-copy [snippets/cursor-rules/](../snippets/cursor-rules/) when paths or `alwaysApply` rules changed.
 3. Update `BUNDLE_VERSION` in your `PROJECT.md`.
 4. Read the **Adopter action** bullets in the changelog for your target version.
+5. Re-run link verification per [adoption-layout.md](adoption-layout.md) before merge.
 
-See [adoption-checklist.md](../adoption-checklist.md).
+See [adoption-layout.md](adoption-layout.md) and [adoption-checklist.md](../adoption-checklist.md).

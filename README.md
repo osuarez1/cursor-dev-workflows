@@ -10,8 +10,9 @@ Portable **Cursor agent workflows** for any language or framework: ticket cards,
 
 1. Copy this entire folder into a new git repository (or use it as the repo root).
 2. Replace placeholders in the table below for your project.
-3. Follow [adoption-checklist.md](adoption-checklist.md).
-4. Copy [snippets/cursor-rules/](snippets/cursor-rules/) into your target repo’s `.cursor/rules/` and adjust paths to your canonical docs.
+3. Read [docs/adoption-layout.md](docs/adoption-layout.md) — choose Profile A (default) or B.
+4. Follow [adoption-checklist.md](adoption-checklist.md).
+5. Copy [snippets/cursor-rules/](snippets/cursor-rules/) into your target repo’s `.cursor/rules/` and adjust paths to your canonical docs.
 
 ## Placeholder registry
 
@@ -32,6 +33,7 @@ Set these once per target repository. Search/replace tokens in docs after copyin
 | `BRANCH_PATTERN` | `feature/<id>-slug` | Branch naming convention |
 | `PR_HOST` | `GitHub` / `GitLab` / `Bitbucket` | Where pull requests live |
 | `CANONICAL_DOCS_PATH` | `docs/workflows/` | Where adopted copies of these specs live in the target repo (use in rules and agent docs) |
+| `ADOPTION_PROFILE` | `A` | Layout profile: **A** mirror bundle (default) or **B** flatten — see [docs/adoption-layout.md](docs/adoption-layout.md) |
 | `BUNDLE_VERSION` | `v1.0.0` or commit SHA | Version of this bundle recorded in adopted `PROJECT.md` when copying or re-syncing |
 | `WORKFLOWS_BUNDLE_PATH` | `~/src/cursor-dev-workflows` | Optional: where you cloned this bundle locally; for maintainer notes only — do not commit machine-specific paths |
 
@@ -64,13 +66,19 @@ Not sure which doc to use? See [which-workflow.md](which-workflow.md).
 
 ## Adoption recipe (target repo)
 
-1. Copy workflow markdown from [`docs/workflows/`](docs/workflows/) into `CANONICAL_DOCS_PATH` (or keep a submodule/subtree of this repo).
-2. Install thin rules from [snippets/cursor-rules/](snippets/cursor-rules/) → `.cursor/rules/`.
-3. Add pointers in `AGENTS.md`, `CLAUDE.md`, or `.cursorrules`.
-4. Paste [snippets/user-rule-only-commit-when-asked.md](snippets/user-rule-only-commit-when-asked.md) into Cursor **Settings → Rules** (optional but recommended).
-5. Append [snippets/gitignore-local-artifacts.txt](snippets/gitignore-local-artifacts.txt) to `.gitignore`.
+**Default (Profile A — mirror bundle):**
 
-Full steps: [adoption-checklist.md](adoption-checklist.md).
+For submodule or subtree installs ([adoption-checklist.md §1](adoption-checklist.md)), copy specs into `CANONICAL_DOCS_PATH` in the **application** repo; still use Profile A for router, `templates/`, and `examples/` at the app repo root.
+
+1. Copy normative specs from [`docs/workflows/`](docs/workflows/) into `CANONICAL_DOCS_PATH`.
+2. Copy [`which-workflow.md`](which-workflow.md), [`templates/`](templates/), and [`examples/`](examples/) to the **app repo root** (do not nest under `CANONICAL_DOCS_PATH`).
+3. Install thin rules from [snippets/cursor-rules/](snippets/cursor-rules/) → `.cursor/rules/`.
+4. Add pointers in `AGENTS.md`, `CLAUDE.md`, or `.cursorrules`.
+5. Run link verification and agent smoke tests ([adoption-checklist.md §9](adoption-checklist.md)).
+6. Paste [snippets/user-rule-only-commit-when-asked.md](snippets/user-rule-only-commit-when-asked.md) into Cursor **Settings → Rules** (optional but recommended).
+7. Append [snippets/gitignore-local-artifacts.txt](snippets/gitignore-local-artifacts.txt) to `.gitignore`.
+
+Layout profiles, copy map, and link rules: [docs/adoption-layout.md](docs/adoption-layout.md). Full checklist: [adoption-checklist.md](adoption-checklist.md).
 
 ## Versioning
 
@@ -102,11 +110,19 @@ adoption-checklist.md
 MAINTAINER.md.example        # Copy → MAINTAINER.md (gitignored)
 AGENTS-LOCAL.md.example      # Copy → AGENTS-LOCAL.md (gitignored)
 docs/
+  adoption-layout.md         # Layout profiles, copy map, link verification
+  adoption-verify-architecture.md  # Verification gate design reference
   versioning.md              # Semver policy
   workflows/                 # CANONICAL_DOCS_PATH — normative specs
 templates/
 examples/
 snippets/
+  adoption-verify-links.py   # Post-adoption link verification (Profile A/B)
+  test_adoption_verify_links.py  # Regression tests (python3 -m unittest …)
+  fixtures/adoption-verify/  # Test fixture trees
+  cursor-rules/
+  user-rule-only-commit-when-asked.md
+  gitignore-local-artifacts.txt
 .cursor/
   rules/
     commit-pr-conventions.mdc   # alwaysApply: true (this repo)
