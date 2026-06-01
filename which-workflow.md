@@ -8,7 +8,7 @@ Use this routing guide when the user’s request could match more than one docum
 |----------------------|-----|------------------|
 | draft ticket card, `git ts`, task type/title/description | [ticket-card-info.md](docs/workflows/ticket-card-info.md) | Three copy-paste blocks |
 | create branch, wrong branch, on main | [branch-workflow.md](docs/workflows/branch-workflow.md) | Refuse or redirect to ticket branch |
-| draft PR title, PR description, PR copy | [pull-requests.md](docs/workflows/pull-requests.md) | Title + markdown body (Overview, Changes, Testing, Related) |
+| draft PR title, PR description, PR copy | [pull-requests.md](docs/workflows/pull-requests.md) | Title + markdown body (Overview, Changes, Potential risks, Testing, Related) |
 | ready for PR, production ready, ship checklist | [pr-production-readiness.md](docs/workflows/pr-production-readiness.md) | Checklist + `Ready` \| `Needs fixes` \| `Blocked` |
 | code review, review branch, review locally | [code-review.md](docs/workflows/code-review.md) | Summary, Critical, Suggestions, Tests; verdict `Ready` \| `Needs fixes` \| `Blocked` |
 | senior analysis, design alternatives, before/after, LC-1 | [senior-analysis.md](docs/workflows/senior-analysis.md) | Full report; verdict `Sound` \| `Acceptable with follow-ups` \| `Rethink` |

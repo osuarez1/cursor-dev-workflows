@@ -6,6 +6,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-06-01
+
+### Fixed
+
+- [which-workflow.md](which-workflow.md) PR row lists all required PR body sections, including Potential risks
+
 ## [1.0.0] - 2026-06-01
 
 First stable layout after normative specs moved under `docs/workflows/`.
