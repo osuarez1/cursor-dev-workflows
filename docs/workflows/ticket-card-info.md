@@ -1,6 +1,6 @@
 # Ticket card info
 
-Use when drafting **task cards** before branching. Output is for copy-paste into `TICKET_TOOL` (Jira, Linear, Trello, or manual entry). Customize `TITLE_PREFIX` and task types (see [README.md](README.md)).
+Use when drafting **task cards** before branching. Output is for copy-paste into `TICKET_TOOL` (Jira, Linear, Trello, or manual entry). Customize `TITLE_PREFIX` and task types (see [README.md](../../README.md)).
 
 **Do not** create remote tickets/cards or run tracker CLI commands (e.g. Trello `git ts`) unless the user explicitly asks.
 
@@ -78,11 +78,11 @@ Brief explanation of why this work is needed.
 
 ## Examples
 
-- [examples/ticket-good-vs-weak.md](examples/ticket-good-vs-weak.md)
-- Template: [templates/ticket-card-output.example.md](templates/ticket-card-output.example.md)
+- [examples/ticket-good-vs-weak.md](../../examples/ticket-good-vs-weak.md)
+- Template: [templates/ticket-card-output.example.md](../../templates/ticket-card-output.example.md)
 
 ## Related
 
 - [branch-workflow.md](branch-workflow.md)  
 - [integrations.md](integrations.md) — optional tracker tooling  
-- [which-workflow.md](which-workflow.md)  
+- [which-workflow.md](../../which-workflow.md)  

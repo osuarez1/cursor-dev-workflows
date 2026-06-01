@@ -115,7 +115,7 @@ Every `LC-n` must include:
 
 ## Output format
 
-Follow [templates/senior-analysis-report.template.md](templates/senior-analysis-report.template.md).
+Follow [templates/senior-analysis-report.template.md](../../templates/senior-analysis-report.template.md).
 
 Use code citations when referencing implementation.
 
@@ -129,7 +129,7 @@ Only when user asks to **save senior analysis locally**:
 .senior-analyses/YYYY-MM-DD-HHMM-<branch-slug>.md
 ```
 
-Gitignore via [snippets/gitignore-local-artifacts.txt](snippets/gitignore-local-artifacts.txt). Never commit `docs/analyses/`.
+Gitignore via [snippets/gitignore-local-artifacts.txt](../../snippets/gitignore-local-artifacts.txt). Never commit `docs/analyses/`.
 
 ## Remote posting
 
@@ -137,10 +137,10 @@ Do not post full reports to PR comments by default. Short executive summary only
 
 ## Examples
 
-- [examples/senior-analysis-good-vs-weak.md](examples/senior-analysis-good-vs-weak.md)
+- [examples/senior-analysis-good-vs-weak.md](../../examples/senior-analysis-good-vs-weak.md)
 
 ## Related
 
 - [code-review.md](code-review.md)  
-- [which-workflow.md](which-workflow.md)  
+- [which-workflow.md](../../which-workflow.md)  
 - [common-mistakes.md](common-mistakes.md)  

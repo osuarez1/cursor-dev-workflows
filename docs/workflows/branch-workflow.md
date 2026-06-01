@@ -1,6 +1,6 @@
 # Branch workflow
 
-Rules for **humans and coding agents** before and during feature work. Customize `PROTECTED_BRANCHES`, `TICKET_ID_PATTERN`, and `BRANCH_PATTERN` per project (see [README.md](README.md)).
+Rules for **humans and coding agents** before and during feature work. Customize `PROTECTED_BRANCHES`, `TICKET_ID_PATTERN`, and `BRANCH_PATTERN` per project (see [README.md](../../README.md)).
 
 ## Protected branches
 
@@ -27,7 +27,7 @@ When you must refuse:
 1. State that protected branches are off-limits for task work in **any** Cursor mode (Plan, Agent, Ask).
 2. Tell the user to create or check out a ticket-linked branch per team process.
 3. Point to [ticket-card-info.md](ticket-card-info.md) if they need card fields first.
-4. Point to [adoption-checklist.md](adoption-checklist.md) for tooling setup.
+4. Point to [adoption-checklist.md](../../adoption-checklist.md) for tooling setup.
 
 ## Ticket-linked branches
 
@@ -67,5 +67,5 @@ Optional: [git-trello-tool](https://github.com/osuarez1/git-trello-tool) (`git t
 
 ## Related
 
-- [which-workflow.md](which-workflow.md)  
+- [which-workflow.md](../../which-workflow.md)  
 - [common-mistakes.md](common-mistakes.md) — implementing on `main`  

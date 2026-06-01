@@ -1,6 +1,6 @@
 # Test requirements
 
-When automated tests are **required** on a change. Applies to humans and coding agents. Customize `SOURCE_ROOT`, `TEST_ROOT`, and `TEST_COMMAND` (see [README.md](README.md)).
+When automated tests are **required** on a change. Applies to humans and coding agents. Customize `SOURCE_ROOT`, `TEST_ROOT`, and `TEST_COMMAND` (see [README.md](../../README.md)).
 
 ## When tests are required
 

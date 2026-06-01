@@ -1,8 +1,8 @@
 # PR and production readiness
 
-Checklist for **“ready to open a PR?”** and **“ready to merge to production?”** Customize `BASE_BRANCH`, `TEST_COMMAND`, `PR_HOST` (see [README.md](README.md)).
+Checklist for **“ready to open a PR?”** and **“ready to merge to production?”** Customize `BASE_BRANCH`, `TEST_COMMAND`, `PR_HOST` (see [README.md](../../README.md)).
 
-For deep review, use [code-review.md](code-review.md). For routing, [which-workflow.md](which-workflow.md).
+For PR title and body **conventions**, use [pull-requests.md](pull-requests.md). For deep review, [code-review.md](code-review.md). For routing, [which-workflow.md](../../which-workflow.md).
 
 ## Triggers
 
@@ -67,9 +67,8 @@ Use markdown checkboxes; adapt to project.
 
 ### PR metadata
 
-- [ ] Title: Conventional Commits style (`type(scope): description`)
-- [ ] Body sections: Overview, Changes, Potential risks, Testing, Related
-- [ ] Template: [templates/pr-description.template.md](templates/pr-description.template.md)
+- [ ] Title and body follow [pull-requests.md](pull-requests.md)
+- [ ] Template: [templates/pr-description.template.md](../../templates/pr-description.template.md)
 
 ## Readiness verdict
 
@@ -108,6 +107,7 @@ Map to full PR template: *What changed* → Changes; *Why* → Overview; *Testin
 
 ## Related
 
+- [pull-requests.md](pull-requests.md)  
 - [code-review.md](code-review.md)  
 - [test-requirements.md](test-requirements.md)  
 - [commits-logical-order.md](commits-logical-order.md)  

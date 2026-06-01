@@ -1,6 +1,6 @@
 # Integrations (optional)
 
-Optional tooling around [cursor-dev-workflows](README.md). **None of this is required** for the core workflows to work.
+Optional tooling around [cursor-dev-workflows](../../README.md). **None of this is required** for the core workflows to work.
 
 ## Trello and git-trello-tool
 

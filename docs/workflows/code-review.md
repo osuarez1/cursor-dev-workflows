@@ -1,6 +1,6 @@
 # Code review and PR preparation
 
-Merge-gate review for any stack. Customize `BASE_BRANCH`, `SOURCE_ROOT`, `TEST_COMMAND` (see [README.md](README.md)).
+Merge-gate review for any stack. Customize `BASE_BRANCH`, `SOURCE_ROOT`, `TEST_COMMAND` (see [README.md](../../README.md)).
 
 **Not** [senior-analysis.md](senior-analysis.md) — use that for design depth and alternatives.
 
@@ -108,7 +108,7 @@ Use code citations (`startLine:endLine:path`) when referencing specific lines.
 2. <manual steps>
 ```
 
-Full PR body: [templates/pr-description.template.md](templates/pr-description.template.md) and [pr-production-readiness.md](pr-production-readiness.md).
+PR title and body conventions: [pull-requests.md](pull-requests.md). Template: [templates/pr-description.template.md](../../templates/pr-description.template.md). Readiness: [pr-production-readiness.md](pr-production-readiness.md).
 
 ## Pre-PR hygiene
 
@@ -154,17 +154,18 @@ Only when user asks to **save locally**:
 .reviews/YYYY-MM-DD-HHMM-<branch-slug>.md
 ```
 
-- Create `.reviews/` if missing; gitignore via [snippets/gitignore-local-artifacts.txt](snippets/gitignore-local-artifacts.txt)
+- Create `.reviews/` if missing; gitignore via [snippets/gitignore-local-artifacts.txt](../../snippets/gitignore-local-artifacts.txt)
 - Sanitize slug: lowercase, `/` → `-`, truncate if long
 - **Never** commit `.reviews/` or create `docs/reviews/` in the repo
 
 ## Examples
 
-- [examples/code-review-good-vs-weak.md](examples/code-review-good-vs-weak.md)
-- Template: [templates/code-review-output.template.md](templates/code-review-output.template.md)
+- [examples/code-review-good-vs-weak.md](../../examples/code-review-good-vs-weak.md)
+- Template: [templates/code-review-output.template.md](../../templates/code-review-output.template.md)
 
 ## Related
 
+- [pull-requests.md](pull-requests.md)  
 - [senior-analysis.md](senior-analysis.md)  
-- [which-workflow.md](which-workflow.md)  
+- [which-workflow.md](../../which-workflow.md)  
 - [common-mistakes.md](common-mistakes.md)  
