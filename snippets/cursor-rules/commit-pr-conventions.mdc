@@ -30,5 +30,6 @@ When drafting **PR merge info** or merge **extended description**: keep default 
 - Commits: **`CANONICAL_DOCS_PATH/commits-logical-order.md`**
 - PRs: **`CANONICAL_DOCS_PATH/pull-requests.md`**
 - Examples: bundle `examples/commit-messages-good-vs-weak.md`, `examples/pr-description-good-vs-weak.md`, `examples/pr-merge-commit-good-vs-weak.md`
+- Templates: bundle `templates/pr-description.template.md`, `templates/pr-merge-extended-description.template.md`
 
 Replace `CANONICAL_DOCS_PATH` with your repo path. The bundle default layout is `docs/workflows/`.
