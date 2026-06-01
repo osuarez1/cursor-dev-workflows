@@ -15,6 +15,6 @@ When the user asks to **save the review locally**, write to **`.reviews/YYYY-MM-
 
 When the user asks for **senior analysis** or **design alternatives**, use **`CANONICAL_DOCS_PATH/senior-analysis.md`** instead — not this rule.
 
-PR body: **`CANONICAL_DOCS_PATH/pr-production-readiness.md`** and PR template.
+PR conventions: **`CANONICAL_DOCS_PATH/pull-requests.md`** and PR template. PR readiness checklist: **`CANONICAL_DOCS_PATH/pr-production-readiness.md`**.
 
-Replace `CANONICAL_DOCS_PATH` with your repo path (e.g. `docs/workflows/`).
+Replace `CANONICAL_DOCS_PATH` with your repo path. The bundle default layout is `docs/workflows/`.

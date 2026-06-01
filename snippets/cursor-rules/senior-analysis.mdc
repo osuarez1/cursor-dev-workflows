@@ -17,4 +17,4 @@ Do not post full reports to PR/ticket systems unless the user explicitly wants a
 
 Recommend code review as follow-up when application source changed.
 
-Replace `CANONICAL_DOCS_PATH` with your repo path (e.g. `docs/workflows/`).
+Replace `CANONICAL_DOCS_PATH` with your repo path. The bundle default layout is `docs/workflows/`.

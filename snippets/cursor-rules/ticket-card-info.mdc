@@ -16,3 +16,5 @@ Do **not** run tracker CLI commands or create remote cards unless they explicitl
 Do not implement on protected branches. See **`CANONICAL_DOCS_PATH/branch-workflow.md`**.
 
 Examples: cursor-dev-workflows `examples/ticket-good-vs-weak.md`.
+
+Replace `CANONICAL_DOCS_PATH` with your repo path. The bundle default layout is `docs/workflows/`.
