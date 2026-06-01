@@ -1,6 +1,6 @@
 # cursor-dev-workflows
 
-Portable **Cursor agent workflows** for any language or framework: ticket cards, branch policy, PR/production readiness, code review, senior analysis, and logical commits.
+Portable **Cursor agent workflows** for any language or framework: ticket cards, branch policy, PR/production readiness, PR merge commit text, code review, senior analysis, and logical commits.
 
 **Repository:** Clone or copy this tree anywhere on your machine; treat **this directory** as the bundle’s **git repository root**. Teams often keep it as a sibling of the application repo, but the path is up to you. After adoption, agents and Cursor rules should read workflows from `CANONICAL_DOCS_PATH` in the **application** repo (see [adoption-checklist.md](adoption-checklist.md)), not from your local clone path.
 
@@ -45,7 +45,7 @@ Not sure which doc to use? See [which-workflow.md](which-workflow.md).
 |------|----------|
 | Draft ticket/card | [ticket-card-info.md](docs/workflows/ticket-card-info.md) |
 | Branch / ticket rules | [branch-workflow.md](docs/workflows/branch-workflow.md) |
-| PR title / description conventions | [pull-requests.md](docs/workflows/pull-requests.md) |
+| PR title / description / merge commit text | [pull-requests.md](docs/workflows/pull-requests.md) |
 | Ready for PR or production? | [pr-production-readiness.md](docs/workflows/pr-production-readiness.md) |
 | Merge-gate review | [code-review.md](docs/workflows/code-review.md) |
 | Design / alternatives | [senior-analysis.md](docs/workflows/senior-analysis.md) |

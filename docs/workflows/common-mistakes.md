@@ -51,6 +51,7 @@ Anti-patterns to avoid when using [cursor-dev-workflows](../../README.md) in a t
 | Mistake | Correct behavior |
 |---------|------------------|
 | PR title `Fixed stuff` or vague body (“looks good”) | [pull-requests.md](pull-requests.md) — Conventional Commits title; runnable Testing steps — [examples/pr-description-good-vs-weak.md](../../examples/pr-description-good-vs-weak.md) |
+| Merge extended description is only PR title or full PR markdown | [pull-requests.md](pull-requests.md) — Summary, `Changes:`, `Commits merged:`, `Post-merge:` — [examples/pr-merge-commit-good-vs-weak.md](../../examples/pr-merge-commit-good-vs-weak.md) |
 | Confusing PR conventions with readiness checklist | Conventions → `pull-requests.md`; verdict checklist → `pr-production-readiness.md` |
 
 ## Routing

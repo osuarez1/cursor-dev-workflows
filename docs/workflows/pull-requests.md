@@ -9,6 +9,7 @@ For **“ready to open a PR?”** checklists and verdicts, use [pr-production-re
 - draft PR title, PR description, PR copy
 - open a pull request on `PR_HOST`
 - what should the PR say
+- PR merge info, merge commit message, extended description, confirm merge on `PR_HOST`
 
 ## Platform
 
@@ -114,6 +115,50 @@ Copy-paste shape: [templates/pr-description.template.md](../../templates/pr-desc
 - [ ] Docs or config changes are intentional and scoped
 ```
 
+## PR merge commit (GitHub merge commit)
+
+When the user merges with a **merge commit** on `PR_HOST` (not squash), use GitHub’s two fields as follows.
+
+### Commit message (subject)
+
+Keep GitHub’s default unless the team has documented another merge strategy:
+
+```text
+Merge pull request #<N> from <owner>/<branch>
+```
+
+Do not put the Conventional Commits PR title here; that belongs in the PR title field when opening the PR, and in **Commits merged** below.
+
+### Extended description (body)
+
+Plain text (not markdown `##` headings). Required blocks in order:
+
+1. **Summary** — one or two sentences on why this merged (from PR Overview).
+2. **`Changes:`** — bullets: `path or area — what changed` (major files or release artifacts, not every diff hunk).
+3. **`Commits merged:`** — bullets: each feature commit on the branch, **oldest first** (how the branch was built). Omit merge commits that only sync `BASE_BRANCH` into the branch (e.g. `Merge branch 'main' into …`). Gather with `git log BASE_BRANCH..HEAD --oneline --reverse --no-merges`.
+4. **`Post-merge:`** — one line: tag, deploy, notify operators, or `none` if nothing is required.
+
+Template: [templates/pr-merge-extended-description.template.md](../../templates/pr-merge-extended-description.template.md).  
+Examples: [examples/pr-merge-commit-good-vs-weak.md](../../examples/pr-merge-commit-good-vs-weak.md).
+
+```text
+<Summary paragraph>
+
+Changes:
+- <path or area> — <outcome>
+- <path or area> — <outcome>
+
+Commits merged:
+- <type>(<scope>): <subject>
+- <type>(<scope>): <subject>
+
+Post-merge: <action or none>
+```
+
+### Squash merge
+
+If the repo uses **squash and merge**, the squash dialog uses a single subject + body: use the **PR title** (Conventional Commits) as the subject and a shortened summary from Overview — not the merge-commit extended description format above.
+
 ## Hygiene
 
 - Merge or rebase `BASE_BRANCH` into the branch before final review so the diff stays current.
@@ -123,6 +168,8 @@ Copy-paste shape: [templates/pr-description.template.md](../../templates/pr-desc
 
 ## Assistant output
 
+### PR title and description
+
 When drafting a PR for the user:
 
 1. **Title** — one line in a `text` fenced code block when copy-paste helps.
@@ -130,6 +177,14 @@ When drafting a PR for the user:
 3. Match commit **type** and **scope** from [commits-logical-order.md](commits-logical-order.md).
 4. Include concrete **Testing** steps using `TEST_COMMAND` and manual reviewer steps.
 5. Run [code-review.md](code-review.md) checklists before opening a PR when an agent or self-review was performed.
+
+### Merge commit (merge-commit strategy only)
+
+When the user asks for **PR merge info**, **merge commit text**, or help filling the merge dialog:
+
+1. **Commit message** — keep GitHub’s default `Merge pull request #…` line; state that explicitly; do not replace with the PR title.
+2. **Extended description** — output a `text` fenced code block with Summary, `Changes:`, `Commits merged:`, and `Post-merge:` blocks per the template above.
+3. **Commits merged** — populate from `git log BASE_BRANCH..HEAD --oneline --reverse --no-merges` when branch history is available (oldest first; omit sync merges from `BASE_BRANCH`).
 
 ## Overlap with other workflows
 
@@ -148,3 +203,5 @@ When drafting a PR for the user:
 - [branch-workflow.md](branch-workflow.md)  
 - [which-workflow.md](../../which-workflow.md)  
 - [examples/pr-description-good-vs-weak.md](../../examples/pr-description-good-vs-weak.md)  
+- [examples/pr-merge-commit-good-vs-weak.md](../../examples/pr-merge-commit-good-vs-weak.md)  
+- [templates/pr-merge-extended-description.template.md](../../templates/pr-merge-extended-description.template.md)  

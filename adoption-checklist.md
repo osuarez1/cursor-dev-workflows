@@ -103,6 +103,7 @@ From the **application repo root**, run checks in [docs/adoption-layout.md § Li
 - [ ] Ask agent to route “code review” → code-review doc ([which-workflow.md](which-workflow.md) or your Profile B router path)
 - [ ] Ask agent to draft a ticket card → three fenced blocks ([ticket-card-info.md](docs/workflows/ticket-card-info.md))
 - [ ] Ask agent to draft a PR description → body includes **Potential risks** ([pull-requests.md](docs/workflows/pull-requests.md))
+- [ ] Ask agent for PR merge info → extended description includes Summary, `Changes:`, `Commits merged:`, `Post-merge:` ([pull-requests.md](docs/workflows/pull-requests.md))
 - [ ] Confirm agent refuses task work on `PROTECTED_BRANCHES` ([branch-workflow.md](docs/workflows/branch-workflow.md))
 - [ ] Confirm agent outputs commit plan but does not commit until asked
 

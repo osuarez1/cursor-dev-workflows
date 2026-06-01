@@ -21,9 +21,17 @@ Always follow these rules when drafting commit messages, commit plans, PR titles
 - **Body sections (required):** Overview, Changes, Potential risks, Testing, Related
 - Imperative mood; runnable Testing steps when applicable
 
+## PR merge commit (GitHub merge commit)
+
+When drafting **PR merge info** or the merge dialog **extended description**:
+
+- **Commit message:** keep GitHub default `Merge pull request #N from owner/branch`
+- **Extended description:** summary paragraph, then `Changes:`, `Commits merged:`, `Post-merge:` (plain text, not PR markdown)
+- Full spec: `docs/workflows/pull-requests.md` — template: `templates/pr-merge-extended-description.template.md`
+
 ## Full specs and examples
 
 - Commits: `docs/workflows/commits-logical-order.md`
 - PRs: `docs/workflows/pull-requests.md`
-- Examples: `examples/commit-messages-good-vs-weak.md`, `examples/pr-description-good-vs-weak.md`
-- Template: `templates/pr-description.template.md`
+- Examples: `examples/commit-messages-good-vs-weak.md`, `examples/pr-description-good-vs-weak.md`, `examples/pr-merge-commit-good-vs-weak.md`
+- Templates: `templates/pr-description.template.md`, `templates/pr-merge-extended-description.template.md`
