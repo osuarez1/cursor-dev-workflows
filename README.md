@@ -111,12 +111,15 @@ MAINTAINER.md.example        # Copy → MAINTAINER.md (gitignored)
 AGENTS-LOCAL.md.example      # Copy → AGENTS-LOCAL.md (gitignored)
 docs/
   adoption-layout.md         # Layout profiles, copy map, link verification
+  adoption-verify-architecture.md  # Verification gate design reference
   versioning.md              # Semver policy
   workflows/                 # CANONICAL_DOCS_PATH — normative specs
 templates/
 examples/
 snippets/
   adoption-verify-links.py   # Post-adoption link verification (Profile A/B)
+  test_adoption_verify_links.py  # Regression tests (python3 -m unittest …)
+  fixtures/adoption-verify/  # Test fixture trees
   cursor-rules/
   user-rule-only-commit-when-asked.md
   gitignore-local-artifacts.txt

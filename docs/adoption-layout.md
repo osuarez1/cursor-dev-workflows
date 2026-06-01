@@ -120,7 +120,9 @@ Run from the **application repo root** after copy, path edits, or re-sync. Fix a
 
 ### Verification script (recommended)
 
-Copy [snippets/adoption-verify-links.py](../snippets/adoption-verify-links.py) into your app repo (or run from the bundle path). It checks link resolution, doubled-prefix patterns, and — for Profile **A** — root `templates/` and `examples/`.
+Design reference: [adoption-verify-architecture.md](adoption-verify-architecture.md).
+
+Copy [snippets/adoption-verify-links.py](../snippets/adoption-verify-links.py) into your app repo (or run from the bundle path). It checks link resolution, doubled-prefix patterns, and — for Profile **A** — root entry points (`which-workflow.md`, `AGENTS.md`, `README.md`) plus root `templates/` and `examples/`.
 
 ```bash
 python3 snippets/adoption-verify-links.py \
@@ -138,7 +140,18 @@ python3 snippets/adoption-verify-links.py \
   --repo-root .
 ```
 
-Use `--no-support-dirs` to skip `templates/` and `examples/` (Profile B default behavior).
+Profile **B** with `templates/` or `examples/` beside `CANONICAL_DOCS_PATH`:
+
+```bash
+python3 snippets/adoption-verify-links.py \
+  --profile B \
+  --canonical docs/workflows \
+  --extra-dirs docs/templates \
+  --extra-dirs docs/examples \
+  --repo-root .
+```
+
+Profile **A** only: use `--no-support-dirs` to skip root `templates/` and `examples/`. Profile **B** never scans root support dirs; the router is verified inside `CANONICAL_DOCS_PATH`.
 
 Exit code `0` means pass; non-zero prints broken links and pattern violations.
 
@@ -190,5 +203,6 @@ Maintainer sync mapping: [MAINTAINER.md.example](../MAINTAINER.md.example).
 ## Related
 
 - [adoption-checklist.md](../adoption-checklist.md) — full bootstrap checklist (including [merging existing docs](../adoption-checklist.md#merging-existing-docs-existing-app-repo))
+- [adoption-verify-architecture.md](adoption-verify-architecture.md) — verification gate design reference
 - [README.md](../README.md) — placeholder registry and bundle layout
 - [docs/versioning.md](versioning.md) — semver and adopter sync policy

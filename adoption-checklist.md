@@ -91,9 +91,11 @@ Use when the target repo already has `AGENTS.md`, `.cursor/rules/`, CONTRIBUTING
 
 ### Link verification (required before merge)
 
-From the **application repo root**, run checks in [docs/adoption-layout.md § Link verification](docs/adoption-layout.md#link-verification):
+From the **application repo root**, run checks in [docs/adoption-layout.md § Link verification](docs/adoption-layout.md#link-verification). Design reference: [docs/adoption-verify-architecture.md](docs/adoption-verify-architecture.md).
 
 - [ ] Run [snippets/adoption-verify-links.py](snippets/adoption-verify-links.py) (Profile A or B matching `ADOPTION_PROFILE`; `--canonical` = your `CANONICAL_DOCS_PATH`) — exit code 0
+- [ ] Profile **A:** script verifies root `which-workflow.md`, `AGENTS.md`, and `README.md` plus `CANONICAL_DOCS_PATH`, `templates/`, and `examples/`
+- [ ] Profile **B** with sibling support dirs: pass `--extra-dirs` for each path outside `CANONICAL_DOCS_PATH`
 - [ ] Optional: `rg` pattern spot-check if the script is unavailable
 
 ### Agent smoke tests
@@ -113,5 +115,6 @@ From the **application repo root**, run checks in [docs/adoption-layout.md § Li
 ## Related
 
 - [docs/adoption-layout.md](docs/adoption-layout.md) — layout profiles, copy map, link rules
+- [docs/adoption-verify-architecture.md](docs/adoption-verify-architecture.md) — verification gate design reference
 - [README.md](README.md)
 - [integrations.md](docs/workflows/integrations.md)

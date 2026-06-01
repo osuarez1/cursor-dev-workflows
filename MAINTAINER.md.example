@@ -35,6 +35,7 @@ Before bumping [VERSION](VERSION) or tagging:
 - [ ] Classify changes per [docs/versioning.md](docs/versioning.md) (MAJOR / MINOR / PATCH)
 - [ ] Update `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) with **Adopter action** bullets for MAJOR changes
 - [ ] Run `python3 snippets/adoption-verify-links.py --profile A --canonical docs/workflows` on a sample app repo (Profile A), plus §9 agent smoke in [adoption-checklist.md](adoption-checklist.md)
+- [ ] Run `python3 -m unittest snippets.test_adoption_verify_links -v`
 
 ## Release checklist
 

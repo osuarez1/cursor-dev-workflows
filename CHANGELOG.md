@@ -11,16 +11,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 
 - [docs/adoption-layout.md](docs/adoption-layout.md) — layout profiles (A mirror / B flatten), copy map, link conventions, merging existing docs, verification gate
+- [docs/adoption-verify-architecture.md](docs/adoption-verify-architecture.md) — verification gate design reference
 - [adoption-checklist.md](adoption-checklist.md) — profile choice, expanded copy steps, merging existing docs, required link verification in §9
 - [snippets/adoption-verify-links.py](snippets/adoption-verify-links.py) — runnable Profile A/B link and pattern verification
+- [snippets/test_adoption_verify_links.py](snippets/test_adoption_verify_links.py) and [snippets/fixtures/adoption-verify/](snippets/fixtures/adoption-verify/) — regression tests for link verification
 - [README.md](README.md) — Profile A adoption recipe, `ADOPTION_PROFILE` placeholder, submodule/subtree note
 - [AGENTS.md](AGENTS.md) — adoption layout as first step for application repos
 
 ### Changed
 
-- [MAINTAINER.md.example](MAINTAINER.md.example) — Profile A as default sync mapping; re-sync link verification step; pre-release script check
+- [snippets/adoption-verify-links.py](snippets/adoption-verify-links.py) — Profile A root entry points (`which-workflow.md`, `AGENTS.md`, `README.md`); `--extra-dirs`; out-of-repo link rejection
+- [MAINTAINER.md.example](MAINTAINER.md.example) — Profile A as default sync mapping; re-sync link verification step; pre-release script and unittest check
 - [docs/versioning.md](docs/versioning.md) — adopter sync references adoption layout and link verification
-- [docs/adoption-layout.md](docs/adoption-layout.md) — stable Profile B anchor; verification script as primary path
+- [docs/adoption-layout.md](docs/adoption-layout.md) — stable Profile B anchor; verification script as primary path; `--extra-dirs` and scan scope
 
 ### Adopter note (1.1.0)
 
