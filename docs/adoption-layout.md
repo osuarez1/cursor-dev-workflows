@@ -53,6 +53,8 @@ Replace `CANONICAL_DOCS_PATH` with your adopted path (bundle default: `docs/work
 | `templates/`, `examples/` at repo root | `../docs/workflows/foo.md` |
 | Spec → router | `../../which-workflow.md` (when specs are one level below root, e.g. `docs/workflows/`) |
 
+<a id="link-rewrites-profile-b"></a>
+
 ### Link rewrites (Profile B)
 
 After copying into `CANONICAL_DOCS_PATH`, apply:
