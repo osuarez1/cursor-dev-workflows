@@ -159,14 +159,6 @@ Post-merge: <action or none>
 
 If the repo uses **squash and merge**, the squash dialog uses a single subject + body: use the **PR title** (Conventional Commits) as the subject and a shortened summary from Overview — not the merge-commit extended description format above.
 
-### Assistant output
-
-When the user asks for **PR merge info**, **merge commit text**, or help filling the merge dialog:
-
-1. Leave **Commit message** as GitHub’s default `Merge pull request #…` line (state that explicitly).
-2. Output the **Extended description** in a `text` fenced code block using the template above.
-3. Populate **Commits merged** from `git log BASE_BRANCH..HEAD --oneline` when branch history is available.
-
 ## Hygiene
 
 - Merge or rebase `BASE_BRANCH` into the branch before final review so the diff stays current.
@@ -176,6 +168,8 @@ When the user asks for **PR merge info**, **merge commit text**, or help filling
 
 ## Assistant output
 
+### PR title and description
+
 When drafting a PR for the user:
 
 1. **Title** — one line in a `text` fenced code block when copy-paste helps.
@@ -184,10 +178,13 @@ When drafting a PR for the user:
 4. Include concrete **Testing** steps using `TEST_COMMAND` and manual reviewer steps.
 5. Run [code-review.md](code-review.md) checklists before opening a PR when an agent or self-review was performed.
 
-When drafting **merge commit** text (merge-commit strategy only):
+### Merge commit (merge-commit strategy only)
 
-1. **Commit message** — note: keep GitHub default; do not replace with PR title.
-2. **Extended description** — `text` fence with Summary, `Changes:`, `Commits merged:`, `Post-merge:` blocks.
+When the user asks for **PR merge info**, **merge commit text**, or help filling the merge dialog:
+
+1. **Commit message** — keep GitHub’s default `Merge pull request #…` line; state that explicitly; do not replace with the PR title.
+2. **Extended description** — output a `text` fenced code block with Summary, `Changes:`, `Commits merged:`, and `Post-merge:` blocks per the template above.
+3. **Commits merged** — populate from `git log BASE_BRANCH..HEAD --oneline --reverse --no-merges` when branch history is available (oldest first; omit sync merges from `BASE_BRANCH`).
 
 ## Overlap with other workflows
 
