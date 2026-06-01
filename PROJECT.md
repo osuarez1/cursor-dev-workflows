@@ -6,7 +6,7 @@ Resolved values for **this repository**. Application repos adopting the bundle s
 |-------|-------------------|
 | `REPO_NAME` | `cursor-dev-workflows` |
 | `CANONICAL_DOCS_PATH` | `docs/workflows/` |
-| `BUNDLE_VERSION` | `1.0.0` (matches [VERSION](VERSION); adopters use tag or SHA) |
+| `BUNDLE_VERSION` | `1.0.1` (matches [VERSION](VERSION); adopters use tag or SHA) |
 | `BASE_BRANCH` | `main` |
 | `PR_HOST` | `GitHub` |
 
