@@ -12,13 +12,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 - [docs/adoption-layout.md](docs/adoption-layout.md) — layout profiles (A mirror / B flatten), copy map, link conventions, merging existing docs, verification gate
 - [adoption-checklist.md](adoption-checklist.md) — profile choice, expanded copy steps, merging existing docs, required link verification in §9
-- [README.md](README.md) — Profile A adoption recipe; link to adoption layout
+- [snippets/adoption-verify-links.py](snippets/adoption-verify-links.py) — runnable Profile A/B link and pattern verification
+- [README.md](README.md) — Profile A adoption recipe, `ADOPTION_PROFILE` placeholder, submodule/subtree note
 - [AGENTS.md](AGENTS.md) — adoption layout as first step for application repos
 
 ### Changed
 
-- [MAINTAINER.md.example](MAINTAINER.md.example) — Profile A as default sync mapping; re-sync link verification step
+- [MAINTAINER.md.example](MAINTAINER.md.example) — Profile A as default sync mapping; re-sync link verification step; pre-release script check
 - [docs/versioning.md](docs/versioning.md) — adopter sync references adoption layout and link verification
+- [docs/adoption-layout.md](docs/adoption-layout.md) — stable Profile B anchor; verification script as primary path
+
+### Adopter note (1.1.0)
+
+- No adopter action required for repos already on Profile A mirror layout
+- New adopters: read [docs/adoption-layout.md](docs/adoption-layout.md) and run [snippets/adoption-verify-links.py](snippets/adoption-verify-links.py) before merge
 
 ## [1.0.1] - 2026-06-01
 
