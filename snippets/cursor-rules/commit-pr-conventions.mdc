@@ -21,10 +21,14 @@ Always follow these rules when drafting commit messages, commit plans, PR titles
 - **Body sections (required):** Overview, Changes, Potential risks, Testing, Related
 - Imperative mood; runnable Testing steps when applicable
 
+## PR merge commit (GitHub merge commit)
+
+When drafting **PR merge info** or merge **extended description**: keep default `Merge pull request #…` subject; body uses Summary, `Changes:`, `Commits merged:`, `Post-merge:` — see **`CANONICAL_DOCS_PATH/pull-requests.md`**.
+
 ## Full specs and examples
 
 - Commits: **`CANONICAL_DOCS_PATH/commits-logical-order.md`**
 - PRs: **`CANONICAL_DOCS_PATH/pull-requests.md`**
-- Examples: bundle `examples/commit-messages-good-vs-weak.md`, `examples/pr-description-good-vs-weak.md`
+- Examples: bundle `examples/commit-messages-good-vs-weak.md`, `examples/pr-description-good-vs-weak.md`, `examples/pr-merge-commit-good-vs-weak.md`
 
 Replace `CANONICAL_DOCS_PATH` with your repo path. The bundle default layout is `docs/workflows/`.
