@@ -20,7 +20,7 @@ All normative workflow specs live here. This repo dogfoods `CANONICAL_DOCS_PATH 
 |------|----------|
 | Draft ticket/card | [ticket-card-info.md](docs/workflows/ticket-card-info.md) |
 | Branch / ticket rules | [branch-workflow.md](docs/workflows/branch-workflow.md) |
-| PR title / description | [pull-requests.md](docs/workflows/pull-requests.md) |
+| PR title / description / merge commit text | [pull-requests.md](docs/workflows/pull-requests.md) |
 | Ready for PR or production? | [pr-production-readiness.md](docs/workflows/pr-production-readiness.md) |
 | Merge-gate review | [code-review.md](docs/workflows/code-review.md) |
 | Design / alternatives | [senior-analysis.md](docs/workflows/senior-analysis.md) |
@@ -37,10 +37,11 @@ Enforced by [.cursor/rules/commit-pr-conventions.mdc](.cursor/rules/commit-pr-co
 - **Only run `git commit` when the user explicitly asks**
 - **PR title:** Same format as commit subject
 - **PR body sections:** Overview, Changes, Potential risks, Testing, Related
+- **PR merge commit (merge-commit strategy):** default `Merge pull request #…` subject; extended description with Summary, `Changes:`, `Commits merged:`, `Post-merge:`
 
 Full specs: [docs/workflows/commits-logical-order.md](docs/workflows/commits-logical-order.md), [docs/workflows/pull-requests.md](docs/workflows/pull-requests.md)
 
-Examples: [examples/commit-messages-good-vs-weak.md](examples/commit-messages-good-vs-weak.md), [examples/pr-description-good-vs-weak.md](examples/pr-description-good-vs-weak.md)
+Examples: [examples/commit-messages-good-vs-weak.md](examples/commit-messages-good-vs-weak.md), [examples/pr-description-good-vs-weak.md](examples/pr-description-good-vs-weak.md), [examples/pr-merge-commit-good-vs-weak.md](examples/pr-merge-commit-good-vs-weak.md)
 
 ## Support artifacts
 
