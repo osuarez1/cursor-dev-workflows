@@ -1,2 +1,3 @@
-# Private maintainer notes (org-specific sync mapping, local paths)
+# Private maintainer / agent playbooks (copy from *.example)
 MAINTAINER.md
+AGENTS-LOCAL.md

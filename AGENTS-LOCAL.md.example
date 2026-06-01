@@ -1,0 +1,57 @@
+# Agent playbook — bundle release and sync (local only)
+
+Copy to **`AGENTS-LOCAL.md`** in the bundle root. This file is gitignored. Do not commit it.
+
+## When to use this playbook
+
+Engage when the user asks to:
+
+- Release or version the bundle (e.g. “bump version”, “prepare v1.0.0”, “update changelog”)
+- Cut a git tag for cursor-dev-workflows
+- Classify pending bundle changes for semver
+
+For normal workflow routing in this repo, use [AGENTS.md](AGENTS.md) and [which-workflow.md](which-workflow.md) instead.
+
+## Read order
+
+1. [docs/versioning.md](docs/versioning.md) — MAJOR / MINOR / PATCH rules
+2. [CHANGELOG.md](CHANGELOG.md) — `## [Unreleased]` section
+3. [VERSION](VERSION) — current released version
+4. Git diff / status — classify all pending bundle changes
+
+## Edit rules
+
+- Add user-facing notes under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md)
+- For **MAJOR** changes, include an **Adopter action** subsection (bulleted list)
+- Update [VERSION](VERSION) only when cutting a release (not for every doc edit)
+- Never stage or commit `MAINTAINER.md`, `AGENTS-LOCAL.md`, or machine-specific paths
+
+## Suggested commit plan (user must explicitly ask to commit)
+
+1. `docs(changelog): note <summary>` — changelog-only updates before release
+2. `chore(release): mark bundle vX.Y.Z` — final VERSION + dated changelog section
+
+One logical change per commit per [docs/workflows/commits-logical-order.md](docs/workflows/commits-logical-order.md).
+
+## Tagging (only when user asks)
+
+```bash
+git tag -a vX.Y.Z -m "cursor-dev-workflows vX.Y.Z"
+```
+
+Do not push unless the user explicitly asks. Do not amend, squash, or use `--no-verify` unless requested.
+
+## Release steps
+
+1. Ensure restructure / pending work is on `main` (or user’s release branch)
+2. Finalize `## [Unreleased]` → `## [X.Y.Z] - YYYY-MM-DD`
+3. Set [VERSION](VERSION) to `X.Y.Z`
+4. Commit when asked
+5. Annotated tag `vX.Y.Z` when asked
+6. Remind maintainer to notify adopters on **MAJOR** bumps (see [MAINTAINER.md.example](MAINTAINER.md.example))
+
+## Boundaries
+
+- **Docs-only repo** — no `TEST_COMMAND` runs required for bundle releases
+- Do not duplicate full release steps into tracked [AGENTS.md](AGENTS.md)
+- Read gitignored [MAINTAINER.md](MAINTAINER.md) if present for org-specific sync mapping
