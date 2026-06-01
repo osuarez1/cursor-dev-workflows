@@ -1,6 +1,6 @@
 # Ticket card: good vs weak
 
-See [ticket-card-info.md](../ticket-card-info.md).
+See [ticket-card-info.md](../docs/workflows/ticket-card-info.md).
 
 ## Weak
 

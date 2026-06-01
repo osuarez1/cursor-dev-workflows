@@ -1,6 +1,6 @@
 # Code review: good vs weak
 
-See [code-review.md](../code-review.md).
+See [code-review.md](../docs/workflows/code-review.md).
 
 ## Weak
 

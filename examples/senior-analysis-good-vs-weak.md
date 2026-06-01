@@ -1,6 +1,6 @@
 # Senior analysis: good vs weak
 
-See [senior-analysis.md](../senior-analysis.md).
+See [senior-analysis.md](../docs/workflows/senior-analysis.md).
 
 ## Weak
 

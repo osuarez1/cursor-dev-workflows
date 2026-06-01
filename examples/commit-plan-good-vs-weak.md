@@ -1,6 +1,6 @@
 # Commit plan: good vs weak
 
-See [commits-logical-order.md](../commits-logical-order.md).
+See [commits-logical-order.md](../docs/workflows/commits-logical-order.md).
 
 ## Weak
 
