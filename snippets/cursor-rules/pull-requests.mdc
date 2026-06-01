@@ -1,0 +1,16 @@
+---
+description: Pull request title and description conventions
+alwaysApply: false
+---
+
+# Pull requests
+
+When the user asks to **draft a PR title**, **PR description**, **PR copy**, or **open a pull request**, follow **`CANONICAL_DOCS_PATH/pull-requests.md`**.
+
+Output: Conventional-Commit-style **title** (often in a `text` fence) and markdown **body** with Overview, Changes, Potential risks, Testing, and Related.
+
+When the user asks **ready for PR** or **production ready**, use **`CANONICAL_DOCS_PATH/pr-production-readiness.md`** for the checklist and verdict.
+
+When the user asks for **code review** before merge, use **`CANONICAL_DOCS_PATH/code-review.md`**.
+
+Replace `CANONICAL_DOCS_PATH` with your repo path. The bundle default layout is `docs/workflows/`.

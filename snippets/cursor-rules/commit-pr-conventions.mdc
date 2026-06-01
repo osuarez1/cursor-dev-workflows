@@ -1,0 +1,30 @@
+---
+description: Conventional Commits and PR conventions — always on
+alwaysApply: true
+---
+
+# Commit and PR conventions
+
+Always follow these rules when drafting commit messages, commit plans, PR titles, or PR descriptions.
+
+## Commits
+
+- **Conventional Commits:** `type(scope): imperative subject` — ≤ ~72 chars, no trailing period
+- **One logical change per commit** — do not mix unrelated feature, refactor, and fix
+- **Commit plan first** when multiple logical changes exist on a branch (ordered list with type, subject, files)
+- **Only run `git commit` when the user explicitly asks**
+- Do not amend, squash, or use `--no-verify` unless the user explicitly requests
+
+## Pull requests
+
+- **Title:** Same format as commit subject (Conventional Commits)
+- **Body sections (required):** Overview, Changes, Potential risks, Testing, Related
+- Imperative mood; runnable Testing steps when applicable
+
+## Full specs and examples
+
+- Commits: **`CANONICAL_DOCS_PATH/commits-logical-order.md`**
+- PRs: **`CANONICAL_DOCS_PATH/pull-requests.md`**
+- Examples: bundle `examples/commit-messages-good-vs-weak.md`, `examples/pr-description-good-vs-weak.md`
+
+Replace `CANONICAL_DOCS_PATH` with your repo path. The bundle default layout is `docs/workflows/`.
