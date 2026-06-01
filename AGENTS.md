@@ -67,6 +67,7 @@ Examples: [examples/commit-messages-good-vs-weak.md](examples/commit-messages-go
 
 ## Adoption into application repos
 
-To copy this bundle into a target project, follow [adoption-checklist.md](adoption-checklist.md).
+1. Read [docs/adoption-layout.md](docs/adoption-layout.md) — choose Profile A (default) or B; copy map and link rules.
+2. Follow [adoption-checklist.md](adoption-checklist.md).
 
 Human-oriented overview and placeholder registry: [README.md](README.md).
