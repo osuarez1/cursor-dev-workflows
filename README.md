@@ -116,6 +116,10 @@ docs/
 templates/
 examples/
 snippets/
+  adoption-verify-links.py   # Post-adoption link verification (Profile A/B)
+  cursor-rules/
+  user-rule-only-commit-when-asked.md
+  gitignore-local-artifacts.txt
 .cursor/
   rules/
     commit-pr-conventions.mdc   # alwaysApply: true (this repo)

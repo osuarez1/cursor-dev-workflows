@@ -34,7 +34,7 @@ Before bumping [VERSION](VERSION) or tagging:
 - [ ] Diff `docs/workflows/`, `snippets/cursor-rules/`, `templates/`, `examples/` against last release
 - [ ] Classify changes per [docs/versioning.md](docs/versioning.md) (MAJOR / MINOR / PATCH)
 - [ ] Update `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) with **Adopter action** bullets for MAJOR changes
-- [ ] Run [adoption-checklist.md](adoption-checklist.md) §9 link verification + agent smoke on a sample app repo (Profile A)
+- [ ] Run `python3 snippets/adoption-verify-links.py --profile A --canonical docs/workflows` on a sample app repo (Profile A), plus §9 agent smoke in [adoption-checklist.md](adoption-checklist.md)
 
 ## Release checklist
 

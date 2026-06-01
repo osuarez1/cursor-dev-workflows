@@ -118,7 +118,33 @@ Pointers in `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, and `.cursor/rules/*.mdc` 
 
 Run from the **application repo root** after copy, path edits, or re-sync. Fix all failures before merge.
 
-### Pattern checks
+### Verification script (recommended)
+
+Copy [snippets/adoption-verify-links.py](../snippets/adoption-verify-links.py) into your app repo (or run from the bundle path). It checks link resolution, doubled-prefix patterns, and — for Profile **A** — root `templates/` and `examples/`.
+
+```bash
+python3 snippets/adoption-verify-links.py \
+  --profile A \
+  --canonical docs/workflows \
+  --repo-root .
+```
+
+Profile **B**:
+
+```bash
+python3 snippets/adoption-verify-links.py \
+  --profile B \
+  --canonical docs/workflows \
+  --repo-root .
+```
+
+Use `--no-support-dirs` to skip `templates/` and `examples/` (Profile B default behavior).
+
+Exit code `0` means pass; non-zero prints broken links and pattern violations.
+
+### Optional pattern checks (`rg`)
+
+The script covers doubled-prefix detection. For a quick manual spot-check:
 
 Profile **A** — expect **no matches** inside `CANONICAL_DOCS_PATH`:
 
@@ -138,37 +164,6 @@ rg '\]\(\.\./docs/workflows/' docs/workflows/
 ```
 
 Adjust paths if your `CANONICAL_DOCS_PATH` differs.
-
-### Resolver script
-
-Every relative markdown link under `CANONICAL_DOCS_PATH` must resolve on disk:
-
-```python
-import re
-import sys
-from pathlib import Path
-
-canonical = Path("docs/workflows")  # set to your CANONICAL_DOCS_PATH
-root = Path(".").resolve()
-broken = []
-
-if not canonical.is_dir():
-    sys.exit(f"Missing: {canonical}")
-
-for md in sorted(canonical.rglob("*.md")):
-    for link in re.findall(r"\]\(([^)#]+)", md.read_text()):
-        if link.startswith(("http", "mailto:")):
-            continue
-        target = (md.parent / link.split("#")[0]).resolve()
-        if not target.exists():
-            broken.append(f"{md.relative_to(root)}: ({link})")
-
-if broken:
-    raise SystemExit("BROKEN:\n" + "\n".join(broken))
-print("OK: all relative links under", canonical, "resolve")
-```
-
-Optionally extend the script to check `templates/` and `examples/` at repo root (Profile A).
 
 ## Agent smoke tests
 

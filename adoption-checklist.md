@@ -93,8 +93,8 @@ Use when the target repo already has `AGENTS.md`, `.cursor/rules/`, CONTRIBUTING
 
 From the **application repo root**, run checks in [docs/adoption-layout.md § Link verification](docs/adoption-layout.md#link-verification):
 
-- [ ] Pattern checks pass (no doubled `docs/workflows/` prefixes inside `CANONICAL_DOCS_PATH`)
-- [ ] Resolver script reports all relative links under `CANONICAL_DOCS_PATH` resolve
+- [ ] Run [snippets/adoption-verify-links.py](snippets/adoption-verify-links.py) (Profile A or B matching `ADOPTION_PROFILE`; `--canonical` = your `CANONICAL_DOCS_PATH`) — exit code 0
+- [ ] Optional: `rg` pattern spot-check if the script is unavailable
 
 ### Agent smoke tests
 
