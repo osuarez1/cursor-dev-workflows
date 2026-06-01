@@ -6,6 +6,8 @@ Portable **Cursor agent workflows** for any language or framework: ticket cards,
 
 ## Quick start
 
+**Agents:** start at [AGENTS.md](AGENTS.md).
+
 1. Copy this entire folder into a new git repository (or use it as the repo root).
 2. Replace placeholders in the table below for your project.
 3. Follow [adoption-checklist.md](adoption-checklist.md).
@@ -30,6 +32,7 @@ Set these once per target repository. Search/replace tokens in docs after copyin
 | `BRANCH_PATTERN` | `feature/<id>-slug` | Branch naming convention |
 | `PR_HOST` | `GitHub` / `GitLab` / `Bitbucket` | Where pull requests live |
 | `CANONICAL_DOCS_PATH` | `docs/workflows/` | Where adopted copies of these specs live in the target repo (use in rules and agent docs) |
+| `BUNDLE_VERSION` | `v1.0.0` or commit SHA | Version of this bundle recorded in adopted `PROJECT.md` when copying or re-syncing |
 | `WORKFLOWS_BUNDLE_PATH` | `~/src/cursor-dev-workflows` | Optional: where you cloned this bundle locally; for maintainer notes only — do not commit machine-specific paths |
 
 ## Workflow routing
@@ -38,15 +41,16 @@ Not sure which doc to use? See [which-workflow.md](which-workflow.md).
 
 | Need | Document |
 |------|----------|
-| Draft ticket/card | [ticket-card-info.md](ticket-card-info.md) |
-| Branch / ticket rules | [branch-workflow.md](branch-workflow.md) |
-| Ready for PR or production? | [pr-production-readiness.md](pr-production-readiness.md) |
-| Merge-gate review | [code-review.md](code-review.md) |
-| Design / alternatives | [senior-analysis.md](senior-analysis.md) |
-| Commit plan / messages | [commits-logical-order.md](commits-logical-order.md) |
-| When tests are required | [test-requirements.md](test-requirements.md) |
-| Optional tooling | [integrations.md](integrations.md) |
-| Agent mistakes | [common-mistakes.md](common-mistakes.md) |
+| Draft ticket/card | [ticket-card-info.md](docs/workflows/ticket-card-info.md) |
+| Branch / ticket rules | [branch-workflow.md](docs/workflows/branch-workflow.md) |
+| PR title / description conventions | [pull-requests.md](docs/workflows/pull-requests.md) |
+| Ready for PR or production? | [pr-production-readiness.md](docs/workflows/pr-production-readiness.md) |
+| Merge-gate review | [code-review.md](docs/workflows/code-review.md) |
+| Design / alternatives | [senior-analysis.md](docs/workflows/senior-analysis.md) |
+| Commit plan / messages | [commits-logical-order.md](docs/workflows/commits-logical-order.md) |
+| When tests are required | [test-requirements.md](docs/workflows/test-requirements.md) |
+| Optional tooling | [integrations.md](docs/workflows/integrations.md) |
+| Agent mistakes | [common-mistakes.md](docs/workflows/common-mistakes.md) |
 
 ## Cursor modes
 
@@ -56,11 +60,11 @@ Not sure which doc to use? See [which-workflow.md](which-workflow.md).
 | **Agent** | Implementation on a ticket-linked feature branch |
 | **Ask** | Questions and reviews without edits |
 
-**Branch policy applies in every mode:** do not implement task work on `PROTECTED_BRANCHES`. See [branch-workflow.md](branch-workflow.md).
+**Branch policy applies in every mode:** do not implement task work on `PROTECTED_BRANCHES`. See [branch-workflow.md](docs/workflows/branch-workflow.md).
 
 ## Adoption recipe (target repo)
 
-1. Copy workflow markdown into `CANONICAL_DOCS_PATH` (or keep a submodule/subtree of this repo).
+1. Copy workflow markdown from [`docs/workflows/`](docs/workflows/) into `CANONICAL_DOCS_PATH` (or keep a submodule/subtree of this repo).
 2. Install thin rules from [snippets/cursor-rules/](snippets/cursor-rules/) → `.cursor/rules/`.
 3. Add pointers in `AGENTS.md`, `CLAUDE.md`, or `.cursorrules`.
 4. Paste [snippets/user-rule-only-commit-when-asked.md](snippets/user-rule-only-commit-when-asked.md) into Cursor **Settings → Rules** (optional but recommended).
@@ -68,31 +72,45 @@ Not sure which doc to use? See [which-workflow.md](which-workflow.md).
 
 Full steps: [adoption-checklist.md](adoption-checklist.md).
 
+## Versioning
+
+| Artifact | Purpose |
+|----------|---------|
+| [VERSION](VERSION) | Current released bundle version |
+| [CHANGELOG.md](CHANGELOG.md) | History and **Adopter action** notes for breaking releases |
+| [docs/versioning.md](docs/versioning.md) | Semver policy for this bundle |
+
+Record `BUNDLE_VERSION` in your adopted `PROJECT.md` when you copy or re-sync.
+
 ## Maintainer notes
 
-If you sync this bundle from an internal source repo, keep the **file mapping** (bundle path → canonical path in the app repo) in maintainer-only notes — gitignored `MAINTAINER.md`, a private wiki, or similar. Do not commit org names, internal repo slugs, or machine-specific clone paths.
+Copy [MAINTAINER.md.example](MAINTAINER.md.example) → gitignored `MAINTAINER.md` and fill in local paths, sync mapping, and release checklists. For bundle release tasks, copy [AGENTS-LOCAL.md.example](AGENTS-LOCAL.md.example) → gitignored `AGENTS-LOCAL.md`.
 
-When merging updates from a source repo, diff each workflow file against its adopted copy under `CANONICAL_DOCS_PATH` and record the sync date in your commit message or local notes.
+Do not commit org names, internal repo slugs, or machine-specific clone paths.
 
 ## Repository layout
 
 ```text
+AGENTS.md                    # Agent entry point
+CLAUDE.md                    # Points to AGENTS.md
+PROJECT.md                   # Resolved placeholders (this repo)
 README.md
-LICENSE
-which-workflow.md
-branch-workflow.md
-test-requirements.md
-common-mistakes.md
+VERSION                      # Released bundle version
+CHANGELOG.md
+which-workflow.md            # Workflow router
 adoption-checklist.md
-integrations.md
-ticket-card-info.md
-pr-production-readiness.md
-code-review.md
-senior-analysis.md
-commits-logical-order.md
+MAINTAINER.md.example        # Copy → MAINTAINER.md (gitignored)
+AGENTS-LOCAL.md.example      # Copy → AGENTS-LOCAL.md (gitignored)
+docs/
+  versioning.md              # Semver policy
+  workflows/                 # CANONICAL_DOCS_PATH — normative specs
 templates/
-snippets/
 examples/
+snippets/
+.cursor/
+  rules/
+    commit-pr-conventions.mdc   # alwaysApply: true (this repo)
+LICENSE
 ```
 
 ## License
