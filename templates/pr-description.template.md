@@ -1,6 +1,6 @@
 # Pull request description template
 
-Use with [pr-production-readiness.md](../pr-production-readiness.md). Replace placeholders for your project.
+Normative rules: [pull-requests.md](../docs/workflows/pull-requests.md). Readiness checklist: [pr-production-readiness.md](../docs/workflows/pr-production-readiness.md). Replace placeholders for your project.
 
 **Title (separate line):** `feat(scope): imperative description`
 

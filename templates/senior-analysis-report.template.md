@@ -87,4 +87,4 @@ flowchart LR
 ## Relationship to code review
 
 - Merge readiness (`Ready` / `Blocked`) is **not** this document’s verdict.
-- Run [code-review.md](../code-review.md) before merge for security, performance, and tests.
+- Run [code-review.md](../docs/workflows/code-review.md) before merge for security, performance, and tests.

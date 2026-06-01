@@ -1,6 +1,6 @@
 # Code review output template
 
-Use with [code-review.md](../code-review.md).
+Use with [code-review.md](../docs/workflows/code-review.md).
 
 ```markdown
 ## Summary

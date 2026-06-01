@@ -1,6 +1,6 @@
 # Ticket card output example
 
-Paste-ready blocks for [ticket-card-info.md](../ticket-card-info.md).
+Paste-ready blocks for [ticket-card-info.md](../docs/workflows/ticket-card-info.md).
 
 ### 1. Task type
 
@@ -29,5 +29,5 @@ Accept partner webhooks only when HMAC signature matches shared secret.
 **Technical Notes**
 - Touch `src/api/webhook.ts`, `src/api/webhook.test.ts`.
 - Branch: `feature/<ticket-id>-webhook-hmac`.
-- Commits: [commits-logical-order.md](../commits-logical-order.md).
+- Commits: [commits-logical-order.md](../docs/workflows/commits-logical-order.md).
 ```

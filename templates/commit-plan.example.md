@@ -1,6 +1,6 @@
 # Commit plan example
 
-Use with [commits-logical-order.md](../commits-logical-order.md). **Do not run `git commit` until the user asks.**
+Use with [commits-logical-order.md](../docs/workflows/commits-logical-order.md). **Do not run `git commit` until the user asks.**
 
 ## Proposed commit plan (3 commits)
 
