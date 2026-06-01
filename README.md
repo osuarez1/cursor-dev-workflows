@@ -33,6 +33,7 @@ Set these once per target repository. Search/replace tokens in docs after copyin
 | `BRANCH_PATTERN` | `feature/<id>-slug` | Branch naming convention |
 | `PR_HOST` | `GitHub` / `GitLab` / `Bitbucket` | Where pull requests live |
 | `CANONICAL_DOCS_PATH` | `docs/workflows/` | Where adopted copies of these specs live in the target repo (use in rules and agent docs) |
+| `ADOPTION_PROFILE` | `A` | Layout profile: **A** mirror bundle (default) or **B** flatten — see [docs/adoption-layout.md](docs/adoption-layout.md) |
 | `BUNDLE_VERSION` | `v1.0.0` or commit SHA | Version of this bundle recorded in adopted `PROJECT.md` when copying or re-syncing |
 | `WORKFLOWS_BUNDLE_PATH` | `~/src/cursor-dev-workflows` | Optional: where you cloned this bundle locally; for maintainer notes only — do not commit machine-specific paths |
 
@@ -66,6 +67,8 @@ Not sure which doc to use? See [which-workflow.md](which-workflow.md).
 ## Adoption recipe (target repo)
 
 **Default (Profile A — mirror bundle):**
+
+For submodule or subtree installs ([adoption-checklist.md §1](adoption-checklist.md)), copy specs into `CANONICAL_DOCS_PATH` in the **application** repo; still use Profile A for router, `templates/`, and `examples/` at the app repo root.
 
 1. Copy normative specs from [`docs/workflows/`](docs/workflows/) into `CANONICAL_DOCS_PATH`.
 2. Copy [`which-workflow.md`](which-workflow.md), [`templates/`](templates/), and [`examples/`](examples/) to the **app repo root** (do not nest under `CANONICAL_DOCS_PATH`).
