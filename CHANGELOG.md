@@ -6,6 +6,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-01
+
+### Added
+
+- [docs/adoption-layout.md](docs/adoption-layout.md) — layout profiles (A mirror / B flatten), copy map, link conventions, merging existing docs, verification gate
+- [adoption-checklist.md](adoption-checklist.md) — profile choice, expanded copy steps, merging existing docs, required link verification in §9
+- [README.md](README.md) — Profile A adoption recipe; link to adoption layout
+- [AGENTS.md](AGENTS.md) — adoption layout as first step for application repos
+
+### Changed
+
+- [MAINTAINER.md.example](MAINTAINER.md.example) — Profile A as default sync mapping; re-sync link verification step
+- [docs/versioning.md](docs/versioning.md) — adopter sync references adoption layout and link verification
+
 ## [1.0.1] - 2026-06-01
 
 ### Fixed
