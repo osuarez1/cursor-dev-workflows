@@ -6,6 +6,28 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-01
+
+### Added
+
+- [docs/workflows/pull-requests.md](docs/workflows/pull-requests.md) — **PR merge commit** section (GitHub default subject, extended description blocks, squash vs merge)
+- [templates/pr-merge-extended-description.template.md](templates/pr-merge-extended-description.template.md) — copy-paste merge extended description
+- [examples/pr-merge-commit-good-vs-weak.md](examples/pr-merge-commit-good-vs-weak.md) — good vs weak merge-commit illustrations
+
+### Changed
+
+- [which-workflow.md](which-workflow.md) — route PR merge info to `pull-requests.md`; merge step in large-feature order
+- [AGENTS.md](AGENTS.md) — merge commit guidance in entry point and examples list
+- [docs/workflows/common-mistakes.md](docs/workflows/common-mistakes.md) — anti-pattern for weak merge extended descriptions
+- [.cursor/rules/commit-pr-conventions.mdc](.cursor/rules/commit-pr-conventions.mdc) and [snippets/cursor-rules/commit-pr-conventions.mdc](snippets/cursor-rules/commit-pr-conventions.mdc) — PR merge commit rules
+- [snippets/cursor-rules/pull-requests.mdc](snippets/cursor-rules/pull-requests.mdc) — merge info routing
+
+### Adopter note (1.2.0)
+
+- Re-sync [docs/workflows/pull-requests.md](docs/workflows/pull-requests.md)
+- Re-copy [snippets/cursor-rules/commit-pr-conventions.mdc](snippets/cursor-rules/commit-pr-conventions.mdc) and [snippets/cursor-rules/pull-requests.mdc](snippets/cursor-rules/pull-requests.mdc) into `.cursor/rules/`
+- Copy [templates/pr-merge-extended-description.template.md](templates/pr-merge-extended-description.template.md) and [examples/pr-merge-commit-good-vs-weak.md](examples/pr-merge-commit-good-vs-weak.md) to repo root (Profile A)
+
 ## [1.1.0] - 2026-06-01
 
 ### Added
