@@ -4,8 +4,11 @@
 
 ## 2. Routing and rules
 
-- [ ] 2.1 Add `/lsi:help` row to `overlays/lsi/docs/workflows/which-workflow.md` and `overlays/lsi/which-workflow-lsi.md`
-- [ ] 2.2 List `/lsi:help` in `overlays/lsi/agent-stack/openspec-git-integration.mdc` and `overlays/lsi/docs/workflows/openspec-git-integration.md` quick reference
+- [ ] 2.1 Add `/lsi:help` decision-table row to `overlays/lsi/docs/workflows/which-workflow.md` and `overlays/lsi/which-workflow-lsi.md`
+- [ ] 2.2 Add overlap rule **#7** (`/lsi:help` vs implementation commands) to **LSI overlay** `overlays/lsi/docs/workflows/which-workflow.md` only — one paragraph per `design.md` §8; link to `lsi-help.md`; do not paste full guardrail list
+- [ ] 2.3 Optional: extend bundle-root `which-workflow.md` LSI row with “discovery → `/lsi:help` (overlay)” — **no** full overlap rule at root
+- [ ] 2.4 Optional: overlay flowchart early branch for workflow help / which command → `/lsi:help`
+- [ ] 2.5 List `/lsi:help` in `overlays/lsi/agent-stack/openspec-git-integration.mdc` and `overlays/lsi/docs/workflows/openspec-git-integration.md` quick reference
 
 ## 3. Parity tooling
 

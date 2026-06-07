@@ -76,6 +76,29 @@ Topics: `lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links
 
 **Alternative rejected:** Refuse when AskQuestion missing — blocks help in environments that still support text navigation.
 
+### 8. Overlap rule in LSI overlay router only
+
+**Choice:** Add overlap rule **#7** to `overlays/lsi/docs/workflows/which-workflow.md` only — not a full rule in bundle-root `which-workflow.md`. At most extend the root LSI decision-table row with “discovery → `/lsi:help` (overlay)” so maintainers know where to look.
+
+**Suggested overlay text (one paragraph; link to `lsi-help.md` for detail):**
+
+> **`/lsi:help` vs implementation commands** — `/lsi:help` is read-only consultation until **Exit**; it explains routing and may suggest the next command but does **not** run `/lsi:*`, `/opsx:*`, `git ts`/`git tb`, Trello API, `adopt.py`, or commits. When the user wants to **do** work (card, apply, PR, close), use the implementation command — do not substitute an ongoing help session. After **Exit**, a fresh explicit slash invocation applies.
+
+**Rationale:** Matches existing overlay overlap rules framed as consultation vs side effects (commit plan vs execution, card vs implementation). Agents read `which-workflow.md` before picking a workflow; without this rule, routing docs and command guardrails can diverge. `/opsx:explore` stays table-only (single-turn, less sticky); `/lsi:help` justifies a dedicated rule.
+
+**Layer ownership (avoid duplication):**
+
+| Layer | Owns |
+|-------|------|
+| LSI overlay `which-workflow.md` overlap #7 | Routing disambiguation: help session ≠ implementation |
+| `lsi-help.md` | Session loop, menu, section templates, no auto-run |
+| Delta spec | Testable scenarios (read-only, Exit, first-turn overview) |
+| Help `overlap` section | Summarize existing overlap rules + this one |
+
+**Optional (overlay flowchart):** Early branch for “workflow help / which command / LSI onboarding” → `/lsi:help`, before the card/branch fork.
+
+**Alternative rejected:** Full overlap rule in bundle-root `which-workflow.md` — root overlap rules are workflow-spec disambiguation (PR vs readiness vs review), not slash-command session behavior.
+
 ## Help session flow
 
 ```mermaid
@@ -216,7 +239,7 @@ Link to [which-workflow.md](https://github.com/osuarez1/cursor-dev-workflows/blo
 | `status` | Branch, active OpenSpec, phase, suggested next command |
 | `commands` | Phase table with GitHub-linked Spec column |
 | `policies` | Key policies with GitHub spec links |
-| `overlap` | readiness vs review vs PR; card path table |
+| `overlap` | readiness vs review vs PR; card paths; **`/lsi:help` vs implementation** (cite overlay overlap #7) |
 | `links` | Bullet list of all specs from bundle-path map |
 | `next` | One `/lsi:*` or `/opsx:*` + rationale |
 
