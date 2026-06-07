@@ -6,6 +6,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+
+- `snippets/bootstrap-maintainer-local.sh` and `snippets/verify-maintainer-local.sh` — one-time gitignored maintainer kit install and health check
+- `snippets/install-maintainer-local-commands.py` — path-rewritten `/opsx:*` and `/lsi:*` slash commands for bundle layout
+- `snippets/maintainer-local/` — templates for `MAINTAINER.md`, `AGENTS-LOCAL.md`, local rules, bundled command sources, and OpenSpec scaffold
+- `openspec/config.yaml` and [docs/ai/openspec.md](docs/ai/openspec.md) — tracked OpenSpec layout for bundle maintainers
+- [docs/adopter-boundaries.md](docs/adopter-boundaries.md) — adopt vs maintainer-only path zones
+
+### Changed
+
+- [AGENTS.md](AGENTS.md) and [README.md](README.md) — maintainer bootstrap quick start and `openspec/` layout
+- [MAINTAINER.md.example](MAINTAINER.md.example) and [AGENTS-LOCAL.md.example](AGENTS-LOCAL.md.example) — slim pointers to maintainer-local templates
+- `.gitignore` — gitignore `MAINTAINER.md`, `AGENTS-LOCAL.md`, `.cursor/rules/local-*.mdc`, `.cursor/commands/`
+
 ## [1.2.0] - 2026-06-01
 
 ### Added
