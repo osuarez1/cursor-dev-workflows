@@ -10,6 +10,8 @@ from pathlib import Path
 
 LINK_RE = re.compile(r"\]\(([^)#]+)")
 DOCS_WORKFLOWS_IN_CANONICAL = re.compile(r"\]\(docs/workflows/")
+OVERLAYS_LSI_IN_CANONICAL = re.compile(r"\]\(overlays/lsi/")
+AGENT_STACK_IN_CANONICAL = re.compile(r"\]\(agent-stack/")
 
 LSI_ENTRYPOINTS = ("AGENTS.md", "README.md")
 
@@ -55,6 +57,16 @@ def check_patterns(repo_root: Path, md: Path, text: str, canonical: Path) -> lis
     if inside_canonical and DOCS_WORKFLOWS_IN_CANONICAL.search(text):
         violations.append(
             f"{rel}: doubled prefix ](docs/workflows/ inside CANONICAL_DOCS_PATH"
+        )
+
+    if inside_canonical and OVERLAYS_LSI_IN_CANONICAL.search(text):
+        violations.append(
+            f"{rel}: maintainer path ](overlays/lsi/ inside CANONICAL_DOCS_PATH"
+        )
+
+    if inside_canonical and AGENT_STACK_IN_CANONICAL.search(text):
+        violations.append(
+            f"{rel}: maintainer path ](agent-stack/ inside CANONICAL_DOCS_PATH"
         )
 
     return violations

@@ -133,6 +133,10 @@ LINK_REWRITES = [
     (re.compile(r"\]\(\.\./\.\./sdlc/"), "](sdlc/"),
     (re.compile(r"\]\(\.\./ai/"), "](../docs/ai/"),
     (re.compile(r"\]\(\.\./deployment/"), "](../../docs/deployment/"),
+    (re.compile(r"\]\(\.\./\.\./overlays/lsi/docs/workflows/"), "](",),
+    (re.compile(r"\]\(\.\./\.\./overlays/lsi/docs/sdlc/"), "](sdlc/",),
+    (re.compile(r"\]\(\.\./\.\./agent-stack/commands/"), "](../../.cursor/commands/",),
+    (re.compile(r"\]\(\.\./\.\./\.\./docs/adopt-and-update\.md\)"), "](adopt-and-update.md)"),
 ]
 
 
