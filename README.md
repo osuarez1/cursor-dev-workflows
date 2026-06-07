@@ -89,6 +89,8 @@ Layout spec: [docs/adoption-layout.md](docs/adoption-layout.md). New repo: [docs
 
 Record `BUNDLE_VERSION` in your adopted `PROJECT.md` when you copy or re-sync.
 
+**Bundle maintainers — pre-`VERSION` gate:** `python3 snippets/test_adoption_verify_links.py`, `python3 snippets/test_adopt_links.py`, and `python3 snippets/check-workflow-link-sources.py` must pass before bumping [VERSION](VERSION) or tagging a release.
+
 ## Maintainer notes
 
 Copy [MAINTAINER.md.example](MAINTAINER.md.example) → gitignored `MAINTAINER.md` and fill in local paths, sync mapping, and release checklists. For bundle release tasks, copy [AGENTS-LOCAL.md.example](AGENTS-LOCAL.md.example) → gitignored `AGENTS-LOCAL.md`.
@@ -121,7 +123,9 @@ snippets/
   adopt.py                   # LSI adopt entry point
   adoption-verify-links.py   # Post-adoption link verification (.lsi/workflows/)
   verify-adopters.py         # Parity checklist + audit gate
-  test_adoption_verify_links.py  # Regression tests (python3 snippets/test_adoption_verify_links.py)
+  test_adoption_verify_links.py  # Fixture regression (python3 snippets/test_adoption_verify_links.py)
+  test_adopt_links.py            # Temp adopt + verify gate (python3 snippets/test_adopt_links.py)
+  check-workflow-link-sources.py # Manual pre-PR grep for tier 2 paths in workflow sources
   test_adopt_tokens.py           # Adopt token + YAML tests (python3 snippets/test_adopt_tokens.py)
   fixtures/adoption-verify/  # Test fixture trees
   cursor-rules/              # Canonical Cursor rules (adopters + local install)

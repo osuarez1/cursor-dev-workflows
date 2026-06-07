@@ -11,9 +11,24 @@ After **`snippets/adopt.py`** installs workflow docs under **`.lsi/workflows/`**
 | Operator guide | [adoption-layout.md](adoption-layout.md) — LSI layout, CLI examples |
 | Checklist gate | [adoption-checklist.md](../adoption-checklist.md) — required verify step |
 | Implementation | [snippets/adoption-verify-links.py](../snippets/adoption-verify-links.py) |
-| Regression tests | [snippets/test_adoption_verify_links.py](../snippets/test_adoption_verify_links.py) |
+| Adopt link regression | [snippets/test_adopt_links.py](../snippets/test_adopt_links.py) — temp adopt + verify (bundle gate) |
+| Fixture regression | [snippets/test_adoption_verify_links.py](../snippets/test_adoption_verify_links.py) |
+| Source grep (manual pre-PR) | [snippets/check-workflow-link-sources.py](../snippets/check-workflow-link-sources.py) |
+| Adopter-shaped sources | [overlays/lsi/adopter-docs/](../overlays/lsi/adopter-docs/) — when maintainer layout diverges |
 
 Legacy Profile A/B scan modes were **retired in v1.3.0** — the script targets the LSI layout only.
+
+## Three-tier link policy (adopt output)
+
+| Tier | When | Link style |
+|------|------|------------|
+| **1 — Installed** | Target exists in adopter repo after adopt | Relative path from containing file |
+| **2 — Maintainer-only** | Never copied to adopter (`patches/`, bundle `overlays/lsi/…`) | GitHub blob URL with `v{{BUNDLE_VERSION}}` or prose |
+| **3 — Copy extras** | Small artifact copied during adopt (e.g. CI snippets) | Copy in `adopt.py`, then tier 1 relative link |
+
+Authoring: [overlays/lsi/adopter-docs/README.md](../overlays/lsi/adopter-docs/README.md). Fix links at source — `LINK_REWRITES` in `adopt.py` are a transition aid only.
+
+Tier 3: both `docs/ci/check_version-*.yml` copy to `.lsi/workflows/ci/` on every adopt.
 
 ## Components
 
@@ -60,6 +75,8 @@ If `which-workflow.md` is missing under `CANONICAL_DOCS_PATH`, the script prints
 | Pattern | When flagged |
 |---------|----------------|
 | `](docs/workflows/` inside `CANONICAL_DOCS_PATH` | Always (doubled prefix) |
+| `](overlays/lsi/` inside `CANONICAL_DOCS_PATH` | Always (tier 2 smuggled as relative) |
+| `](agent-stack/` inside `CANONICAL_DOCS_PATH` | Always (tier 2 smuggled as relative) |
 
 ### Not checked
 
@@ -109,13 +126,18 @@ Fixtures live under [snippets/fixtures/adoption-verify/](../snippets/fixtures/ad
 | `lsi-broken-agents/` | Broken link in root `AGENTS.md` |
 | `lsi-doubled-prefix/` | Doubled `docs/workflows/` prefix inside canonical |
 | `lsi-extra-dirs-pass/` | Sibling dir via `--extra-dirs` |
+| `lsi-maintainer-path/` | Tier 2 maintainer paths inside canonical tree |
 | `out-of-repo-link/` | Href escapes repo root |
 
-Run:
+Run (required before any bundle `VERSION` bump):
 
 ```bash
 python3 snippets/test_adoption_verify_links.py
+python3 snippets/test_adopt_links.py
+python3 snippets/check-workflow-link-sources.py   # manual pre-PR until CI
 ```
+
+**When bundle CI lands:** run all three in the same job on every PR; block merge on failure.
 
 Maintainers: include in pre-release checklist ([MAINTAINER.md.example](../MAINTAINER.md.example)).
 

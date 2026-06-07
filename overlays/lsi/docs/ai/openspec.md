@@ -40,7 +40,7 @@ Documentation sprint seeds `openspec/` manually; `openspec init` is optional if 
 
 Manual equivalent: create `openspec/changes/<id>/proposal.md`, spec deltas, `design.md`, `tasks.md`.
 
-Full lifecycle: [openspec-git-integration.md](../workflows/openspec-git-integration.md).
+Full lifecycle: [openspec-git-integration.md](../../.lsi/workflows/openspec-git-integration.md).
 
 ## Profile
 
@@ -63,7 +63,7 @@ Planned (folders not created yet): `v2-workflows-dashboard`, `v3-cloud-scale`.
 ## Slash commands and overlay
 
 - **OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive`
-- **Git / delivery:** `/lsi:*` commands — see [openspec-git-integration.md](../workflows/openspec-git-integration.md)
+- **Git / delivery:** `/lsi:*` commands — see [openspec-git-integration.md](../../.lsi/workflows/openspec-git-integration.md)
 - **Archive timing:** keep change folders active through staging QA; sync/archive only on **`main`** via `/lsi:close`
 - **`tasks.md` scope:** never add `/opsx:sync`, `/opsx:archive`, or `/lsi:close` as tasks — production close is separate from `/opsx:apply`
 - **Human sync policy:** [openspec-sync.md](openspec-sync.md)
