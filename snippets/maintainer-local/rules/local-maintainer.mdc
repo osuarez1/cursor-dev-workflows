@@ -1,0 +1,45 @@
+---
+description: Bundle maintainer — tracked OpenSpec, adopt loop, source layout (gitignored)
+alwaysApply: true
+---
+
+# Bundle maintainer (local)
+
+Read gitignored **`MAINTAINER.md`** and **`AGENTS-LOCAL.md`** when present (copy from `*.example`).
+
+## Canonical paths (this repo)
+
+| Artifact | Path |
+|----------|------|
+| Core workflows | [docs/workflows/](docs/workflows/) |
+| LSI overlay (authoring) | [overlays/lsi/](overlays/lsi/) |
+| Router | [which-workflow.md](which-workflow.md) |
+| OpenSpec | `openspec/changes/<slug>/` (tracked) |
+| Slash commands (source) | [overlays/lsi/agent-stack/commands/](../../overlays/lsi/agent-stack/commands/) |
+| Slash commands (local) | `.cursor/commands/` — see gitignored **`MAINTAINER.md`** |
+
+**Do not** edit or create `.lsi/workflows/` in this repo. **Do not** run `adopt.py --target .`.
+
+## OpenSpec lifecycle
+
+Follow [overlays/lsi/docs/workflows/openspec-git-integration.md](../../overlays/lsi/docs/workflows/openspec-git-integration.md).
+
+- Changes: **`openspec/changes/<slug>/`**
+- Config: [openspec/config.yaml](../../openspec/config.yaml)
+- Production close on **`main`** when using `/lsi:close` (bundle has no `staging` branch)
+
+Branch policy: [local-branch-workflow.mdc](local-branch-workflow.mdc) if installed.
+
+## Workflow routing
+
+1. [which-workflow.md](which-workflow.md)
+2. Matching spec under `docs/workflows/` or `overlays/lsi/docs/workflows/`
+3. [examples/](examples/) for good vs weak output
+
+## Commits and PRs
+
+[snippets/cursor-rules/commit-pr-conventions.mdc](../../snippets/cursor-rules/commit-pr-conventions.mdc) applies (local install: `.cursor/rules/`). Only `git commit` when the user explicitly asks.
+
+## Adopter sync
+
+When user asks to re-sync adopters, read `MAINTAINER.md` adopt loop and run `verify-all-adopters.sh` after adopt.
