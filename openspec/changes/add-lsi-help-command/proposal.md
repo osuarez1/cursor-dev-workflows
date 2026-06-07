@@ -4,21 +4,14 @@ LSI adopters have many slash commands and workflow specs under `.lsi/workflows/`
 
 ## What Changes
 
-**This change adds OpenSpec artifacts only.** Bundle implementation is deferred to a follow-on `/opsx:apply` on the same change slug.
-
-**Future implementation (documented in `tasks.md`, not in this PR scope):**
-
-- Add **`/lsi:help`** (`lsi-help.md`) to `overlays/lsi/agent-stack/commands/`
-- Update routing docs and `openspec-git-integration.mdc` to list the command
-- Extend `verify-adopters.py` and `audit-agent-docs.py` parity lists
-- Bootstrap maintainer `.cursor/commands/`; bump bundle to **v1.4.1** with CHANGELOG entry
-
-**Behavior (specified in `design.md` and delta spec):**
-
-- Read-only interactive session: overview once, then AskQuestion menu (9 sections + Exit)
-- User stays in help until Exit; every section response re-displays the menu
-- Separate **SDLC diagram** menu section (mermaid, staging-first happy path)
-- All spec links in help output point to **GitHub blob URLs** on [osuarez1/cursor-dev-workflows](https://github.com/osuarez1/cursor-dev-workflows), pinned to `v{BUNDLE_VERSION}` from adopter `PROJECT.md`
+- Add **`/lsi:help`** (`overlays/lsi/agent-stack/commands/lsi-help.md`) — read-only interactive session: overview once, then AskQuestion menu (9 sections + Exit); user stays in help until Exit; every section response re-displays the menu; separate **SDLC diagram** section (mermaid, staging-first happy path); **`status`** / **`next`** branch → phase → command heuristics; all spec links use **GitHub blob URLs** on [osuarez1/cursor-dev-workflows](https://github.com/osuarez1/cursor-dev-workflows), pinned to `v{BUNDLE_VERSION}` from adopter `PROJECT.md`
+- Add `/lsi:help` decision-table row to overlay routing docs (`overlays/lsi/docs/workflows/which-workflow.md`, `overlays/lsi/which-workflow-lsi.md`) after `/opsx:propose`
+- Add overlap rule **#7** (`/lsi:help` vs implementation commands) to overlay `which-workflow.md` only
+- Extend bundle-root `which-workflow.md` LSI row with “Discovery: `/lsi:help` (overlay)” — no full overlap rule at root
+- List `/lsi:help` in `overlays/lsi/agent-stack/openspec-git-integration.mdc` and `overlays/lsi/docs/workflows/openspec-git-integration.md` quick reference
+- Append `lsi-help` to `LSI_COMMANDS` in `snippets/verify-adopters.py` and `snippets/audit-agent-docs.py`
+- Bootstrap maintainer `.cursor/commands/lsi-help.md` via `snippets/bootstrap-maintainer-local.sh` (or `install-maintainer-local.py`)
+- Bump bundle to **v1.4.1** — `VERSION`, `PROJECT.md` `BUNDLE_VERSION`, and `[Unreleased]` `CHANGELOG.md` entry for `/lsi:help`
 
 ## Capabilities
 
@@ -32,6 +25,11 @@ LSI adopters have many slash commands and workflow specs under `.lsi/workflows/`
 
 ## Impact
 
-- **This change:** `openspec/changes/add-lsi-help-command/` artifacts only
-- **Follow-on apply:** bundle overlay command, router rows, parity scripts, VERSION 1.4.1
-- **Adopters:** receive `/lsi:help` after bundle release and `adopt.py` / `/lsi:update` re-sync
+- `overlays/lsi/agent-stack/commands/lsi-help.md` — new slash command; bootstrap → gitignored `.cursor/commands/lsi-help.md` in bundle repo
+- `overlays/lsi/docs/workflows/which-workflow.md`, `overlays/lsi/which-workflow-lsi.md` — decision-table row; overlap rule **#7** in overlay `which-workflow.md` only
+- `which-workflow.md` (bundle root) — LSI discovery pointer to `/lsi:help`
+- `overlays/lsi/agent-stack/openspec-git-integration.mdc`, `overlays/lsi/docs/workflows/openspec-git-integration.md` — quick-reference listing
+- `snippets/verify-adopters.py`, `snippets/audit-agent-docs.py` — `lsi-help` in `LSI_COMMANDS`
+- `VERSION`, `PROJECT.md`, `CHANGELOG.md` — release **v1.4.1** and `/lsi:help` changelog entry
+- Overlay flowchart early branch for workflow help → `/lsi:help` — polish follow-up, not this PR (task 2.4 deferred unless dogfood shows routing misses)
+- Adopters: receive `/lsi:help` after bundle release and `adopt.py` / `/lsi:update` re-sync
