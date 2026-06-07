@@ -99,6 +99,14 @@ Topics: `lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links
 
 **Alternative rejected:** Full overlap rule in bundle-root `which-workflow.md` — root overlap rules are workflow-spec disambiguation (PR vs readiness vs review), not slash-command session behavior.
 
+### 9. Status section — conditional `TITLE_PREFIX` note only
+
+**Choice:** The **`status`** section shows branch, active OpenSpec, phase, and suggested next command. Do **not** emit a standing line about whether this repo defines `TITLE_PREFIX`. When the inferred phase or suggested next step involves **card setup** (`/lsi:card`, `/lsi:card-link`, `/lsi:trello-list` → branch), add one conditional note framed as a **token rule**: read `TITLE_PREFIX` from `PROJECT.md` for card titles; when the token is absent, use `REPO_NAME |` per [ticket-card-info.md](docs/workflows/ticket-card-info.md).
+
+**Rationale:** `TITLE_PREFIX` is adopter-specific; help should not bake in bundle-maintainer exceptions. Card setup is the only common status turn where the token matters.
+
+**Alternative rejected:** Always mention `TITLE_PREFIX` in status — noise on most phases; reads as bundle-specific lore instead of portable workflow guidance.
+
 ## Help session flow
 
 ```mermaid
@@ -236,7 +244,7 @@ Link to [which-workflow.md](https://github.com/osuarez1/cursor-dev-workflows/blo
 | id | Content |
 |----|---------|
 | `lifecycle` | Numbered 1–13 from which-workflow § Recommended order; GitHub links inline |
-| `status` | Branch, active OpenSpec, phase, suggested next command |
+| `status` | Branch, active OpenSpec, phase, suggested next command; **conditional** `TITLE_PREFIX` token note only when card setup is the suggested next step (see §9) — never a standing repo-specific line |
 | `commands` | Phase table with GitHub-linked Spec column |
 | `policies` | Key policies with GitHub spec links |
 | `overlap` | readiness vs review vs PR; card paths; **`/lsi:help` vs implementation** (cite overlay overlap #7) |

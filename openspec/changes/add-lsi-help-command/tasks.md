@@ -1,6 +1,6 @@
 ## 1. Slash command
 
-- [ ] 1.1 Add `overlays/lsi/agent-stack/commands/lsi-help.md` — overview template, AskQuestion menu ids, per-section templates, SDLC mermaid, bundle-path map, session loop guardrails, GitHub URL builder
+- [ ] 1.1 Add `overlays/lsi/agent-stack/commands/lsi-help.md` — overview template, AskQuestion menu ids, per-section templates, SDLC mermaid, bundle-path map, session loop guardrails, GitHub URL builder; **`status`**: no standing `TITLE_PREFIX` line — conditional token note only when card setup is suggested (`design.md` §9)
 
 ## 2. Routing and rules
 
