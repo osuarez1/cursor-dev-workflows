@@ -6,6 +6,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+
+- `snippets/verify-adopters.py` — parity checklist + link/audit gate for LSI adopters
+- `docs/ci/check_version-web.yml`, `docs/ci/check_version-ai-agent.yml` — Bitbucket pipeline snippets
+
+### Changed
+
+- `MAINTAINER.md.example` — LSI adopt loop and verify commands (replaces Profile A/B)
+
 ## [1.3.0] - 2026-06-06
 
 ### Added
