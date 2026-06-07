@@ -16,7 +16,7 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 | link Trello card to existing branch, `/lsi:card-link` | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card-link` | Requires open OpenSpec; card body redacted from artifacts |
 | list Trello To Do cards, `/lsi:trello-list` | [git-trello.md](../sdlc/git-trello.md) | `/lsi:trello-list` | Picker → confirm; requires OpenSpec to branch |
 | branch from existing Trello card, `/lsi:trello-branch` | [git-trello.md](../sdlc/git-trello.md) | `/lsi:trello-branch` | Requires open OpenSpec; sync card then `git tb` |
-| draft ticket card, task type/title/description (no CLI) | [ticket-card-info.md](ticket-card-info.md) | — | Three copy-paste blocks; use `/lsi:card` for card + branch |
+| draft ticket card, task type/title/description (no CLI) | [ticket-card-info.md](ticket-card-info.md) | — | Three labeled copy-paste blocks (type, title, description); use `/lsi:card` for card + branch |
 | create branch, wrong branch, on main | [branch-workflow.md](branch-workflow.md) | `/lsi:branch` | Refuse or redirect to ticket branch |
 | draft PR title, PR description, PR copy | [pull-requests.md](pull-requests.md) | `/lsi:pr` | Title + markdown body |
 | production promotion PR (staging → main) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:promote` | Promotion PR to `main` |

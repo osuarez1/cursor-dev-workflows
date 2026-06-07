@@ -6,7 +6,7 @@ Use this routing guide when the user’s request could match more than one docum
 
 | User says (examples) | Use | Output / verdict |
 |----------------------|-----|------------------|
-| draft ticket card, `git ts`, task type/title/description | [ticket-card-info.md](docs/workflows/ticket-card-info.md) | Three copy-paste blocks |
+| draft ticket card, `git ts`, task type/title/description | [ticket-card-info.md](docs/workflows/ticket-card-info.md) | Three labeled copy-paste blocks (type, title, description) |
 | create branch, wrong branch, on main | [branch-workflow.md](docs/workflows/branch-workflow.md) | Refuse or redirect to ticket branch |
 | draft PR title, PR description, PR copy | [pull-requests.md](docs/workflows/pull-requests.md) | Title + markdown body (Overview, Changes, Potential risks, Testing, Related) |
 | PR merge info, merge commit, extended description | [pull-requests.md](docs/workflows/pull-requests.md) | Default `Merge pull request #…` subject + extended description (Summary, Changes, Commits merged, Post-merge) |

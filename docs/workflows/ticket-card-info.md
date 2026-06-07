@@ -14,9 +14,11 @@ When running Trello Start, use **`git ts`** (space-separated Git subcommand via 
 
 ## Output format (required)
 
-Use exactly these three headings. Wrap **only the paste-ready value** for each item in its **own** fenced code block (Copy to Clipboard).
+**Mandatory clipboard output (always):** emit **exactly three** fenced blocks in order — **Task type (copy below)**, **Task title (copy below)**, **Task description (copy below)**. Put **all** paste-ready values **only** inside those blocks; do not repeat type, title, or description as prose, bullets, or un-fenced markdown elsewhere in the response.
 
-### 1. Task type
+Use these labels and fence types:
+
+### Task type (copy below)
 
 - Single lowercase keyword for branch prefix when your team uses ticket-linked branch names.
 - **Default allowed values:** `feature`, `bugfix`, `hotfix`, `chore`, `release`
@@ -27,22 +29,30 @@ Use exactly these three headings. Wrap **only the paste-ready value** for each i
   - maintenance, config, docs-only, tests-only → `chore`
   - versioned rollout → `release`
 
+````markdown
+**Task type (copy below):**
+
 ```text
 feature
 ```
+````
 
-### 2. Task title
+### Task title (copy below)
 
 - **Required prefix:** `TITLE_PREFIX` (e.g. `MyApp | ` — repo name, pipe, space)
 - Imperative mood, present tense after the prefix
 - Full title under **60 characters** (prefix counts). No quotes. No trailing period.
 - Align with [commits-logical-order.md](commits-logical-order.md) subject style after the prefix
 
+````markdown
+**Task title (copy below):**
+
 ```text
 MyApp | Add webhook signature verification
 ```
+````
 
-### 3. Task description
+### Task description (copy below)
 
 Markdown body. Required sections:
 
@@ -58,6 +68,9 @@ Markdown body. Required sections:
 - Branch pattern `BRANCH_PATTERN`, commit/PR conventions
 - Push command if hooks require explicit branch name
 
+````markdown
+**Task description (copy below):**
+
 ```markdown
 **Context/Goal**
 Brief explanation of why this work is needed.
@@ -70,6 +83,7 @@ Brief explanation of why this work is needed.
 **Technical Notes**
 - Relevant paths, APIs, or commands for this repo.
 ```
+````
 
 ## Agent boundaries
 
