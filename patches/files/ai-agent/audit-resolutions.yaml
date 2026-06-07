@@ -1,0 +1,7 @@
+- id: claude_symlink
+  choice: symlink_to_agents
+  note: "CLAUDE.md thin pointer; AGENTS.md canonical with domain block"
+- id: openspec_archive_timing
+  choice: lsi_close_on_main
+- id: pr_target
+  choice: staging_first

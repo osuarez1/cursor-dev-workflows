@@ -1,17 +1,19 @@
 # Adoption link verification architecture
 
-Design reference for the adoption link verification gate. Operator steps: [adoption-layout.md](adoption-layout.md) and [adoption-checklist.md §9](../adoption-checklist.md).
+Design reference for the adoption link verification gate. Operator steps: [adoption-layout.md](adoption-layout.md) and [adoption-checklist.md](../adoption-checklist.md).
 
 ## Purpose
 
-After copying **cursor-dev-workflows** into an application repository, markdown links must resolve and layout-specific anti-patterns must not appear. The verification gate runs **before merge** on adoption and re-sync PRs.
+After **`snippets/adopt.py`** installs workflow docs under **`.lsi/workflows/`**, markdown links must resolve and layout anti-patterns must not appear. The verification gate runs **before merge** on adoption and re-sync PRs.
 
 | Role | Artifact |
 |------|----------|
-| Operator guide | [adoption-layout.md](adoption-layout.md) — profiles, copy map, CLI examples |
-| Checklist gate | [adoption-checklist.md §9](../adoption-checklist.md) — required step |
+| Operator guide | [adoption-layout.md](adoption-layout.md) — LSI layout, CLI examples |
+| Checklist gate | [adoption-checklist.md](../adoption-checklist.md) — required verify step |
 | Implementation | [snippets/adoption-verify-links.py](../snippets/adoption-verify-links.py) |
 | Regression tests | [snippets/test_adoption_verify_links.py](../snippets/test_adoption_verify_links.py) |
+
+Legacy Profile A/B scan modes were **retired in v1.3.0** — the script targets the LSI layout only.
 
 ## Components
 
@@ -27,33 +29,22 @@ flowchart TD
   result -->|no| exit0[exit 0]
 ```
 
-1. **Build scan set** — Collect markdown files from `CANONICAL_DOCS_PATH`, profile-specific roots, optional `--extra-dirs`, and Profile A entry points.
+1. **Build scan set** — Collect markdown under `CANONICAL_DOCS_PATH` (default `.lsi/workflows/`), root entry points, and optional `--extra-dirs`.
 2. **Process file** — Single read per file; extract `](href)` links and run checks.
 3. **Exit** — Non-zero if any broken link or pattern violation; warnings alone do not fail.
 
-## Scan model
-
-### Profile A (mirror bundle)
+## Scan model (LSI layout)
 
 | Source | Included when |
 |--------|----------------|
-| `CANONICAL_DOCS_PATH/**/*.md` | Always |
-| Root `which-workflow.md` | File exists |
+| `CANONICAL_DOCS_PATH/**/*.md` | Always (default: `.lsi/workflows/`) |
 | Root `AGENTS.md` | File exists |
 | Root `README.md` | File exists |
-| Root `templates/**/*.md` | Default; skipped with `--no-support-dirs` |
-| Root `examples/**/*.md` | Default; skipped with `--no-support-dirs` |
 | `--extra-dirs` paths | When directory exists |
 
-If Profile A is selected and root `which-workflow.md` is missing, the script prints a **warning** (non-fatal) to stderr.
+If `which-workflow.md` is missing under `CANONICAL_DOCS_PATH`, the script prints a **warning** (non-fatal) to stderr.
 
-### Profile B (flatten)
-
-| Source | Included when |
-|--------|----------------|
-| `CANONICAL_DOCS_PATH/**/*.md` | Always (router lives here) |
-| Root `templates/` / `examples/` | **Never** scanned by default |
-| `--extra-dirs` paths | When directory exists (sibling templates/examples) |
+`templates/` and `examples/` live **inside** `.lsi/workflows/` after adopt — scanned via the canonical tree, not as separate root dirs.
 
 ## Check types
 
@@ -69,7 +60,6 @@ If Profile A is selected and root `which-workflow.md` is missing, the script pri
 | Pattern | When flagged |
 |---------|----------------|
 | `](docs/workflows/` inside `CANONICAL_DOCS_PATH` | Always (doubled prefix) |
-| `](../docs/workflows/` inside `CANONICAL_DOCS_PATH` | Profile **B** only |
 
 ### Not checked
 
@@ -85,31 +75,15 @@ Run from the **application repo root** (or pass `--repo-root`).
 | Flag | Default | Purpose |
 |------|---------|---------|
 | `--repo-root` | `.` | Application repository root |
-| `--canonical` | `docs/workflows` | `CANONICAL_DOCS_PATH` relative to repo root |
-| `--profile` | `A` | Layout profile: `A` or `B` |
-| `--no-support-dirs` | off | Profile **A** only: skip root `templates/` and `examples/` |
+| `--canonical` | `.lsi/workflows` | `CANONICAL_DOCS_PATH` relative to repo root |
 | `--extra-dirs PATH` | none (repeatable) | Scan additional directory trees |
 
-**Examples:**
-
-Profile A (default):
+**Example:**
 
 ```bash
 python3 snippets/adoption-verify-links.py \
-  --profile A \
-  --canonical docs/workflows \
-  --repo-root .
-```
-
-Profile B with sibling support dirs:
-
-```bash
-python3 snippets/adoption-verify-links.py \
-  --profile B \
-  --canonical docs/workflows \
-  --extra-dirs docs/templates \
-  --extra-dirs docs/examples \
-  --repo-root .
+  --repo-root . \
+  --canonical .lsi/workflows
 ```
 
 Exit code `0` = pass; non-zero prints `PATTERN VIOLATIONS` and/or `BROKEN LINKS` to stderr.
@@ -122,9 +96,7 @@ Add a compiled regex and a branch in `check_patterns()` in [adoption-verify-link
 
 ### When to use `--extra-dirs`
 
-Use when Profile B places `templates/` or `examples/` **beside** `CANONICAL_DOCS_PATH` rather than inside it. Prefer co-locating under `CANONICAL_DOCS_PATH` when possible to avoid extra flags.
-
-Changing the default Profile A entry-point list (`which-workflow.md`, `AGENTS.md`, `README.md`) requires a script change and an architecture doc update — do not rely on `--extra-dirs` for root entry points.
+Use when additional markdown trees outside `.lsi/workflows/` must participate in link checks (rare — prefer keeping adopt-managed docs under the canonical path).
 
 ## Tests
 
@@ -132,23 +104,23 @@ Fixtures live under [snippets/fixtures/adoption-verify/](../snippets/fixtures/ad
 
 | Fixture | Asserts |
 |---------|---------|
-| `profile-a-pass/` | Clean Profile A layout |
-| `profile-a-broken-router/` | Broken link in root router |
-| `profile-a-broken-agents/` | Broken link in root `AGENTS.md` |
-| `profile-b-doubled-prefix/` | Doubled `docs/workflows/` prefix |
+| `lsi-pass/` | Clean LSI layout |
+| `lsi-broken-router/` | Broken link in `.lsi/workflows/which-workflow.md` |
+| `lsi-broken-agents/` | Broken link in root `AGENTS.md` |
+| `lsi-doubled-prefix/` | Doubled `docs/workflows/` prefix inside canonical |
+| `lsi-extra-dirs-pass/` | Sibling dir via `--extra-dirs` |
 | `out-of-repo-link/` | Href escapes repo root |
-| `profile-b-extra-dirs-pass/` | Sibling dir via `--extra-dirs` |
 
 Run:
 
 ```bash
-python3 -m unittest snippets.test_adoption_verify_links -v
+python3 snippets/test_adoption_verify_links.py
 ```
 
 Maintainers: include in pre-release checklist ([MAINTAINER.md.example](../MAINTAINER.md.example)).
 
 ## Related
 
-- [adoption-layout.md](adoption-layout.md) — layout profiles and adopter how-to
+- [adoption-layout.md](adoption-layout.md) — LSI layout and adopter how-to
 - [adoption-checklist.md](../adoption-checklist.md) — bootstrap checklist
 - [docs/versioning.md](versioning.md) — re-sync policy

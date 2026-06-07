@@ -1,0 +1,5 @@
+<!-- lsi:workflows:start -->
+## LSI workflows (adopt-managed)
+
+Router: `.lsi/workflows/which-workflow.md` — branch policy: `.cursor/rules/branch-workflow.mdc` (always on).
+<!-- lsi:workflows:end -->

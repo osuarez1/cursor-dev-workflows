@@ -68,7 +68,6 @@ Examples: [examples/commit-messages-good-vs-weak.md](examples/commit-messages-go
 
 ## Adoption into application repos
 
-1. Read [docs/adoption-layout.md](docs/adoption-layout.md) — choose Profile A (default) or B; copy map and link rules.
-2. Follow [adoption-checklist.md](adoption-checklist.md).
+**LSI adopters:** use **`snippets/adopt.py`** — [docs/adopt-and-update.md](docs/adopt-and-update.md), [adoption-checklist.md](adoption-checklist.md), layout [docs/adoption-layout.md](docs/adoption-layout.md) (`.lsi/workflows/` only).
 
 Human-oriented overview and placeholder registry: [README.md](README.md).

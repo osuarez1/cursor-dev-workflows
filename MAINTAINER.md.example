@@ -7,59 +7,65 @@ Copy this file to **`MAINTAINER.md`** in the bundle root. `MAINTAINER.md` is git
 | Field | Your value |
 |-------|------------|
 | `WORKFLOWS_BUNDLE_PATH` | e.g. `~/Repos/lsi/current/cursor-dev-workflows` |
-| Internal source repo (if any) | `ORG/internal-cursor-dev-workflows` |
-| Default adoption target(s) | App repo name(s), `CANONICAL_DOCS_PATH`, `ADOPTION_PROFILE` (A or B) |
-| Default profile | **A — mirror bundle** (see [docs/adoption-layout.md](docs/adoption-layout.md)) |
+| Adopter repos | `video-encoder`, `web`, `agents/ai-agent` |
+| Layout | **LSI only** — `.lsi/workflows/` (see [docs/adoption-layout.md](docs/adoption-layout.md)) |
 
-## Sync mapping
+## Adopt / re-sync loop
 
-Bundle path → adopted path in application repo(s). Default is **Profile A** ([docs/adoption-layout.md](docs/adoption-layout.md)):
+After every bundle release (`VERSION` + tag):
 
-| Bundle | Adopted in `<APP_REPO>` (Profile A) |
-|--------|-------------------------------------|
-| `docs/workflows/*.md` | `docs/workflows/*.md` (or your `CANONICAL_DOCS_PATH`) |
-| `which-workflow.md` | **app repo root** |
-| `templates/`, `examples/` | **app repo root** |
-| `snippets/cursor-rules/*.mdc` | `.cursor/rules/*.mdc` |
-| `AGENTS.md` | `AGENTS.md` (merge or replace per team) |
+```bash
+cd "$WORKFLOWS_BUNDLE_PATH"
 
-Profile **B** (flatten): router, templates, and examples under `CANONICAL_DOCS_PATH` with mandatory link rewrites — document in this table if a target uses B.
+for target config; do
+  # video-encoder
+  python3 snippets/adopt.py --target ../video-encoder --config patches/video-encoder.yaml --accept-policy-defaults
+  # web
+  python3 snippets/adopt.py --target ../web --config patches/web.yaml --accept-policy-defaults
+  # ai-agent monorepo
+  python3 snippets/adopt.py --target ../agents/ai-agent --config patches/ai-agent.yaml --accept-policy-defaults
+done
+```
 
-Add rows for any team-specific overrides.
+First adopt on a repo with drift: run `--audit-only` first, commit `patches/files/<repo>/audit-resolutions.yaml`, then adopt.
 
-## Pre-release checklist
+## Verify all adopters
 
-Before bumping [VERSION](VERSION) or tagging:
+```bash
+./snippets/verify-all-adopters.sh
+```
 
-- [ ] Diff `docs/workflows/`, `snippets/cursor-rules/`, `templates/`, `examples/` against last release
-- [ ] Classify changes per [docs/versioning.md](docs/versioning.md) (MAJOR / MINOR / PATCH)
-- [ ] Update `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) with **Adopter action** bullets for MAJOR changes
-- [ ] Run `python3 snippets/adoption-verify-links.py --profile A --canonical docs/workflows` on a sample app repo (Profile A), plus §9 agent smoke in [adoption-checklist.md](adoption-checklist.md)
-- [ ] Run `python3 -m unittest snippets.test_adoption_verify_links -v`
+Or per repo: `python3 snippets/verify-adopters.py --repo-root ../web`
 
-## Release checklist
+## Register a new adopter
 
-- [ ] Move `[Unreleased]` entries to `## [X.Y.Z] - YYYY-MM-DD` in [CHANGELOG.md](CHANGELOG.md)
-- [ ] Set [VERSION](VERSION) to `X.Y.Z`
-- [ ] Commit on `main` (e.g. `chore(release): mark bundle vX.Y.Z`)
-- [ ] Tag: `git tag -a vX.Y.Z -m "cursor-dev-workflows vX.Y.Z"`
-- [ ] Push tag when ready: `git push origin vX.Y.Z`
-- [ ] Optional: GitHub Release — paste the `X.Y.Z` section from the changelog
+Follow [docs/adopt-new-repo.md](docs/adopt-new-repo.md) — add `patches/<repo>.yaml`, update [patches/README.md](patches/README.md), then add the adopt line to the loop above.
 
-## Adopter comms (MAJOR releases)
+Individual checks:
 
-When shipping a **MAJOR** bump, tell adopters to:
+```bash
+python3 snippets/adoption-verify-links.py --repo-root ../web --canonical .lsi/workflows
+python3 snippets/audit-agent-docs.py --repo-root ../web --fail-on error
+```
 
-1. Re-sync `CANONICAL_DOCS_PATH` from `docs/workflows/`
-2. Re-copy and path-fix `snippets/cursor-rules/*.mdc`
-3. Update `BUNDLE_VERSION` in their `PROJECT.md`
-4. Read **Adopter action** in [CHANGELOG.md](CHANGELOG.md) for that version
+## CI: `check_version.py`
 
-## Sync from upstream (ongoing)
+Adopt copies `scripts/check_version.py` — **pipelines are not auto-edited**. Snippets:
 
-When merging bundle updates into an adopted app repo:
+| Repo | File | Version file |
+|------|------|----------------|
+| video-encoder | `bitbucket-pipelines.yml` (existing) | `version.txt` |
+| web | [docs/ci/check_version-web.yml](docs/ci/check_version-web.yml) | `version.txt` |
+| ai-agent | [docs/ci/check_version-ai-agent.yml](docs/ci/check_version-ai-agent.yml) | `VERSION` (`VERSION_FILE=VERSION`) |
 
-1. Diff each workflow file under `CANONICAL_DOCS_PATH` (and root `which-workflow.md`, `templates/`, `examples/` if Profile A)
-2. Re-run link verification per [docs/adoption-layout.md](docs/adoption-layout.md) before merge
-3. Record sync date and `BUNDLE_VERSION` (tag or SHA) in the app repo commit message or `PROJECT.md`
-4. Do not commit this file or absolute clone paths into the app repo
+## Pre-release checklist (bundle)
+
+- [ ] Update `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md)
+- [ ] Run `python3 snippets/verify-adopters.py` on each adopter after adopt dry-run
+- [ ] Classify bump per [docs/versioning.md](docs/versioning.md)
+
+## Release checklist (bundle)
+
+- [ ] `## [X.Y.Z] - YYYY-MM-DD` in CHANGELOG; set [VERSION](VERSION)
+- [ ] Tag `vX.Y.Z` on `main`
+- [ ] Re-sync all adopters; open app-repo PRs with `BUNDLE_VERSION` bump in `PROJECT.md`
