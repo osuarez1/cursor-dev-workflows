@@ -18,7 +18,7 @@ git branch --show-current
 
 If the current branch is protected, **stop** — do not write code, run task migrations, or continue as if that branch were acceptable.
 
-**Exception:** **`/lsi:card`** on **`main`** or **`staging`** — creates Trello card + branch via `git ts`; no source edits. **Refuse on other protected branches.** See [openspec-git-integration.md](openspec-git-integration.md).
+**Exception:** Card-setup commands **`/lsi:card`**, **`/lsi:trello-list`**, and **`/lsi:trello-branch`** on **`main`** or **`staging`** — create or link Trello card + ticket branch (`git ts` / `git tb`); no source edits. **Refuse on other protected branches.** See [openspec-git-integration.md](openspec-git-integration.md).
 
 ### Agent refusal template
 

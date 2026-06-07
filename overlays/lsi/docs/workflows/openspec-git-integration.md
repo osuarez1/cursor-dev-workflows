@@ -20,7 +20,7 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 | Scope ticket | OpenSpec change slug |
 | Delivery ticket | Trello card (24-char id in branch) |
 | Branch | `feature\|bugfix\|hotfix\|chore/{id}-<change-slug>` via **`/lsi:card`**, **`/lsi:card-link`**, or **`/lsi:trello-list`** / **`/lsi:trello-branch`** |
-| Protected branches | **`main`**, **`staging`** — no task work (except `/lsi:card` on `main` or `staging`) |
+| Protected branches | **`main`**, **`staging`** — no task work (except card-setup: `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch` on `main` or `staging`) |
 | Implement | `/opsx:apply` on ticket branch |
 | Close ticket | After **`main`** promotion: **`/lsi:close`** (or `/opsx:sync` → `/opsx:archive` on `main`) |
 | Normative specs | [`openspec/specs/`](../../openspec/specs/) after production close on `main` |
@@ -90,7 +90,7 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 
 ## Branch checklist
 
-- [ ] Not on `main` or `staging` (except `/lsi:card` setup from `main` or `staging`)
+- [ ] Not on `main` or `staging` (except card-setup from `main` or `staging`: `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch`)
 - [ ] Branch matches `feature|bugfix|hotfix|chore/{24-char-id}-<change-slug>`
 - [ ] Suffix matches active OpenSpec change (`openspec list --json`)
 - [ ] Trello card exists (via `git ts` or `git tb`)
@@ -286,6 +286,6 @@ Cursor stores slash commands as files under `.cursor/commands/` with **hyphen** 
 ## What we do not do
 
 - Manual branches without Trello id.
-- Task work on `main` or `staging` (except `/lsi:card` on `main` or `staging`).
+- Task work on `main` or `staging` (except card-setup: `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch` on `main` or `staging`).
 - `gh pr create` or GitHub releases.
 - Auto-commit or auto-open PRs without explicit request.
