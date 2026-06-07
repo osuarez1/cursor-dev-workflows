@@ -1,0 +1,22 @@
+schema: spec-driven
+
+context: |
+  cursor-dev-workflows — portable Cursor workflow bundle (docs-only, no application code).
+  Canonical authoring paths: docs/workflows/ (core), overlays/lsi/ (LSI extension).
+  OpenSpec: openspec/changes/<slug>/ (tracked). Do not self-adopt .lsi/workflows/.
+  Branch: feat/<slug> or chore/bundle-<slug> off main; protected branch: main only.
+  PR host: GitHub (bundle repo). No TEST_COMMAND required for bundle doc edits.
+  Full lifecycle: overlays/lsi/docs/workflows/openspec-git-integration.md
+  Maintainer kit: ./snippets/bootstrap-maintainer-local.sh (gitignored playbooks + .cursor/commands/).
+
+rules:
+  proposal:
+    - Link to active openspec/changes/<slug>/ when extending bundle or overlay
+    - Note adopter impact (patches/, adopt.py, verify scripts) when behavior changes
+    - Call out MAJOR semver + Adopter action in CHANGELOG when adopters must re-sync
+  design:
+    - Document chosen approach for bundle source layout (not .lsi/workflows/ self-adopt)
+    - Reference overlays/lsi/ vs docs/workflows/ split explicitly
+  tasks:
+    - Implementation checklist only — code, docs, snippets, unittest for verify scripts
+    - Do not list PR open, code review, or /lsi:close as tasks.md deliverables
