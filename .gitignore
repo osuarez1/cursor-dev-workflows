@@ -6,3 +6,7 @@ maintainer-adopters.local.yaml
 
 # Local Cursor install (see gitignored MAINTAINER.md)
 .cursor/
+
+# Test / smoke artifacts
+.coverage
+.tmp-adopt-smoke-*/
