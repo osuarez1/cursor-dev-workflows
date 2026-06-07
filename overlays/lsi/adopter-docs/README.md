@@ -27,6 +27,8 @@ When a doc copied into adopters cannot be authored correctly in the maintainer t
 
 When a **second** dual doc enters this directory, add heading lint (compare adopter-relevant `##` headings between maintainer superset and adopter copy) — deferred until then.
 
+**Current scope:** one dual doc (`adopt-and-update.md`). Checklist (1.5) + `test_adopt_links.py` suffice until a second doc triggers task 7.2.
+
 ## `which-workflow.md` canonicality
 
 | Role | Path |
