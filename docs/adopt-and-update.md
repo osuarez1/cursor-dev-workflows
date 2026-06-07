@@ -46,6 +46,25 @@ python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --ac
 
 `snippets/audit-agent-docs.py` runs before and after adopt. Blocking on error-severity contradictions unless resolutions are accepted.
 
+## Verify after adopt
+
+```bash
+python3 snippets/verify-adopters.py --repo-root ../my-repo
+```
+
+Checks: `.lsi/workflows/`, 3 always-on rules, 14× `lsi-*` commands, `CLAUDE.md` symlink, `PROJECT.md`, `scripts/check_version.py`, link verify, audit.
+
+## CI: version gate
+
+Adopt installs `scripts/check_version.py` but **does not edit** `bitbucket-pipelines.yml`. Copy from:
+
+- [docs/ci/check_version-web.yml](ci/check_version-web.yml) — `version.txt`
+- [docs/ci/check_version-ai-agent.yml](ci/check_version-ai-agent.yml) — `VERSION_FILE=VERSION`
+
+## Ongoing sync (maintainer)
+
+See [MAINTAINER.md.example](../MAINTAINER.md.example) — re-run `adopt.py` on every bundle tag for each adopter repo.
+
 ## New repo
 
 Copy `patches/_template.yaml` → `patches/<repo>.yaml`, add overlay files under `patches/files/<repo>/`, run adopt.
