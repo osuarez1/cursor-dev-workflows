@@ -17,6 +17,13 @@ The LSI agent stack SHALL provide `/lsi:help` as a read-only consultation comman
 - **AND** the agent does not emit the full lifecycle list, command reference table, or SDLC diagram in the same turn
 - **AND** the agent presents an AskQuestion menu with section options and Exit
 
+#### Scenario: Numbered menu when AskQuestion unavailable
+
+- **WHEN** AskQuestion is unavailable and the user invokes `/lsi:help`
+- **THEN** the agent presents the same section menu as a numbered list with menu ids (`sdlc`, `lifecycle`, `status`, `commands`, `policies`, `overlap`, `links`, `next`, `exit`)
+- **AND** the agent prompts the user to reply with a menu id
+- **AND** the agent does not refuse help or emit all sections in one response
+
 #### Scenario: Direct topic enters session with menu
 
 - **WHEN** a user invokes `/lsi:help` with a recognized topic argument (`lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links`, `next`)

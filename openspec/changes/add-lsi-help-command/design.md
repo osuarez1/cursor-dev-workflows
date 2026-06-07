@@ -68,6 +68,14 @@ where `{ref}` = `v{BUNDLE_VERSION}` from repo `PROJECT.md`, fallback `main`.
 
 Topics: `lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links`, `next`.
 
+### 7. AskQuestion fallback (no refuse)
+
+**Choice:** Prefer **AskQuestion** for the section menu. When AskQuestion is unavailable, present the same nine sections + Exit as a **numbered list** with menu ids (`sdlc`, `lifecycle`, …, `exit`) and prompt the user to **reply with the id**. Do **not** refuse or dump all sections.
+
+**Rationale:** Keeps the session loop and read-only guardrails without hard-depending on a single Cursor tool.
+
+**Alternative rejected:** Refuse when AskQuestion missing — blocks help in environments that still support text navigation.
+
 ## Help session flow
 
 ```mermaid
@@ -119,8 +127,8 @@ description: Interactive LSI workflow help — stay in menu until Exit
 1. Read `PROJECT.md` → `{ref}` from `BUNDLE_VERSION`.
 2. Optional read-only: `git branch --show-current`, `openspec list --json`.
 3. Session start: emit overview only.
-4. AskQuestion — section menu.
-5. Loop until Exit: section → AskQuestion; Exit → `Exited /lsi:help.` and stop.
+4. Section menu — **AskQuestion** when available; otherwise numbered list + “reply with id” (same ids; do not refuse).
+5. Loop until Exit: section → menu again; Exit → `Exited /lsi:help.` and stop.
 
 ### Overview template
 
@@ -241,6 +249,6 @@ Example link:
 
 ## Risks / Trade-offs
 
-- **AskQuestion required** — agents without AskQuestion must approximate with explicit numbered options; command guardrails should still forbid full dumps.
+- **AskQuestion preferred** — when unavailable, use numbered menu + “reply with id”; never refuse and never dump all sections at once.
 - **GitHub-only links** — adopters on private forks must use their fork URL manually until a `DOCS_WEB_BASE` token exists (out of scope).
 - **Session state** — agent must track “in help session” across turns; new `/lsi:help` starts fresh session.
