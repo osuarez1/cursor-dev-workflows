@@ -39,6 +39,9 @@ OPSX_ARCHIVE_AFTER_MERGE = re.compile(
 PROTECTED_TOKEN = re.compile(r"PROTECTED_BRANCHES\s*[=:]\s*([^\n]+)", re.IGNORECASE)
 LSI_COMMANDS = [
     "lsi-card",
+    "lsi-card-link",
+    "lsi-trello-list",
+    "lsi-trello-branch",
     "lsi-branch",
     "lsi-senior",
     "lsi-commit",

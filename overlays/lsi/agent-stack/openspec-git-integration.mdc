@@ -15,13 +15,17 @@ OpenSpec changes under `openspec/changes/<change-slug>/` define **what to build*
 
 **OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive`
 
-**LSI (git):** `/lsi:card`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`
+**LSI (git):** `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`
 
 | Step | Command |
 |------|---------|
 | Explore | `/opsx:explore` |
 | Propose | `/opsx:propose` |
-| Card + branch | `/lsi:card` (from `main`) |
+| Card + branch | `/lsi:card` (from `main` or `staging`) |
+| Link card to existing branch | `/lsi:card-link` (on feature branch without Trello id) |
+| List / branch from To Do card | `/lsi:trello-list`, `/lsi:trello-branch` (from `main`/`staging`) |
+| List To Do cards | `/lsi:trello-list` | Interactive picker; confirm → `git tb` |
+| Branch from existing card | `/lsi:trello-branch` (from `main` or `staging`) |
 | Senior analysis | `/lsi:senior` (large changes) |
 | Implement | `/opsx:apply` |
 | Commit | `/lsi:commit` (when asked) |

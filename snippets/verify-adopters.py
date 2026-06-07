@@ -14,6 +14,9 @@ VERIFY = BUNDLE_ROOT / "snippets" / "adoption-verify-links.py"
 
 LSI_COMMANDS = [
     "lsi-card",
+    "lsi-card-link",
+    "lsi-trello-list",
+    "lsi-trello-branch",
     "lsi-branch",
     "lsi-senior",
     "lsi-commit",
