@@ -23,9 +23,7 @@ OpenSpec changes under `openspec/changes/<change-slug>/` define **what to build*
 | Propose | `/opsx:propose` |
 | Card + branch | `/lsi:card` (from `main` or `staging`) |
 | Link card to existing branch | `/lsi:card-link` (on feature branch without Trello id) |
-| List / branch from To Do card | `/lsi:trello-list`, `/lsi:trello-branch` (from `main`/`staging`) |
-| List To Do cards | `/lsi:trello-list` | Interactive picker; confirm → `git tb` |
-| Branch from existing card | `/lsi:trello-branch` (from `main` or `staging`) |
+| List / branch from To Do card | `/lsi:trello-list` (picker; confirm → `git tb`), `/lsi:trello-branch` (from `main`/`staging`) |
 | Senior analysis | `/lsi:senior` (large changes) |
 | Implement | `/opsx:apply` |
 | Commit | `/lsi:commit` (when asked) |

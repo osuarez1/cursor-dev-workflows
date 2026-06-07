@@ -73,6 +73,6 @@ Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists a
 **Guardrails**
 
 - **Never** implement features on `main` or `staging`.
-- **Never** create branches without Trello id — use **`/lsi:card`** + `git ts` only.
+- **Never** create branches without Trello id — use **`/lsi:card`**, **`/lsi:card-link`**, **`/lsi:trello-list`**, or **`/lsi:trello-branch`** per [git-trello.md](../../docs/sdlc/git-trello.md); do not use raw `git checkout -b`.
 - Branch suffix must match active change slug exactly.
 - Do not auto-run full lifecycle — branch verification only unless user confirms broader scope.
