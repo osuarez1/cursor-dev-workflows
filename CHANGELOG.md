@@ -6,6 +6,28 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-06-06
+
+### Added
+
+- **LSI overlay** — `overlays/lsi/` with OpenSpec + Git integration, release scripts, agent stack (3 always-on rules, 13× `/lsi:*`, 5× `/opsx:*` commands)
+- **`snippets/adopt.py`** — single adopt entry point for `.lsi/workflows/` layout
+- **`snippets/audit-agent-docs.py`** — pre/post adopt contradiction scan (v1 token/path checks)
+- **`patches/`** — per-repo YAML registry (`video-encoder`, `web`, `ai-agent`, `_template`)
+- **Docs** — [docs/adopt-and-update.md](docs/adopt-and-update.md), [docs/token-registry.md](docs/token-registry.md), [docs/adopter-boundaries.md](docs/adopter-boundaries.md), [overlays/lsi/docs/workflows/branch-reviewability.md](overlays/lsi/docs/workflows/branch-reviewability.md)
+
+### Changed
+
+- **Adoption layout** — LSI only (`.lsi/workflows/`); Profile A/B retired
+- **`snippets/adoption-verify-links.py`** — LSI layout only; removed `--profile` flag
+- **`check_version.py`** — supports `VERSION_FILE` env var (e.g. `VERSION` for ai-agent)
+
+### Adopter note (1.3.0)
+
+- Add `patches/<repo>.yaml` if missing; run `python3 snippets/adopt.py --target ../<repo> --config patches/<repo>.yaml`
+- Review audit report before first adopt; use `--accept-policy-defaults` on video-encoder re-sync after sign-off
+- `/lsi:ask` deferred to v1.3.1
+
 ## [1.2.0] - 2026-06-01
 
 ### Added
