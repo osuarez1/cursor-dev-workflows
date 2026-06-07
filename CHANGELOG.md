@@ -4,7 +4,10 @@ All notable changes to **cursor-dev-workflows** are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning policy: [docs/versioning.md](docs/versioning.md).
 
+
 ## [Unreleased]
+
+## [1.4.0] - 2026-06-07
 
 ### Added
 
