@@ -53,6 +53,12 @@ The bundle repository SHALL include automated tests that exercise adopt link out
 - **AND** `python3 snippets/test_adopt_links.py` or `python3 snippets/test_adoption_verify_links.py` fails
 - **THEN** the release MUST NOT proceed until both tests pass (local gate and CI when present)
 
+#### Scenario: Bundle CI runs both adopt-link test modules
+
+- **WHEN** the bundle repository has a CI pipeline
+- **THEN** every PR runs `python3 snippets/test_adoption_verify_links.py` and `python3 snippets/test_adopt_links.py`
+- **AND** merge is blocked when either module fails
+
 #### Scenario: Release note tells adopters to re-sync
 
 - **WHEN** a bundle release changes adopt output or link policy

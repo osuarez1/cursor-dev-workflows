@@ -117,7 +117,16 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 
 **Choice:** New unittest that exercises **full adopt → verify** end-to-end. This is the **highest-value deliverable** for long-term maintenance — it catches link drift in bundle sources and transforms before adopter re-sync or release.
 
-**Release gate:** `python3 snippets/test_adopt_links.py` and `python3 snippets/test_adoption_verify_links.py` **MUST pass** before any `VERSION` / `CHANGELOG.md` bump on the bundle repo. Document in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md), [README.md](../../README.md), and maintainer pre-release checklist; wire into bundle CI when a pipeline exists.
+**Release gate:** `python3 snippets/test_adopt_links.py` and `python3 snippets/test_adoption_verify_links.py` **MUST pass** before any `VERSION` / `CHANGELOG.md` bump on the bundle repo. Document in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md), [README.md](../../README.md), and maintainer pre-release checklist.
+
+**CI (when bundle pipeline lands — task 4.6):** Add a pipeline step that runs **both** modules on every PR (block merge on failure):
+
+```bash
+python3 snippets/test_adoption_verify_links.py
+python3 snippets/test_adopt_links.py
+```
+
+No `VERSION` bump or release tag until this job is green locally and in CI. Source grep (decision 6) and `test_adopt_tokens.py` may join the same job when wired.
 
 1. Creates temp dir with minimal adopter skeleton (`PROJECT.md`, patch config from `_template.yaml`)
 2. Runs `adopt.py --target <tmp> --config patches/_template.yaml --accept-policy-defaults` (or invokes `copy_core_bundle` + `copy_overlay` helpers if full adopt is heavy)
@@ -205,9 +214,18 @@ Both phases scan the same directories; phase 2 enables the second pattern in the
 
 **Choice:** Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` on every adopt. Cheap, avoids per-patch conditionals, matches adopter doc linking both snippets.
 
-### Release gate (task 4.5, 5.3)
+### Release gate (tasks 4.5, 4.6, 5.3)
 
-**Choice:** `test_adopt_links.py` + `test_adoption_verify_links.py` are **required** before any bundle `VERSION` bump — local maintainer gate and CI step when a pipeline exists. Do not tag or bump `VERSION` on failing adopt-link regression.
+**Choice:** `test_adopt_links.py` + `test_adoption_verify_links.py` are **required** before any bundle `VERSION` bump — local maintainer gate always; **CI step for both modules when bundle pipeline lands** (task 4.6). Do not tag or bump `VERSION` on failing adopt-link regression.
+
+**CI step (task 4.6):** When the bundle repo gets a pipeline (`bitbucket-pipelines.yml`, GitHub Actions, etc.), add one job/step:
+
+```bash
+python3 snippets/test_adoption_verify_links.py
+python3 snippets/test_adopt_links.py
+```
+
+Run on PRs to protected branches; block merge on non-zero exit. Documents-only repo today — implement at pipeline introduction, not deferred to adopters.
 
 **CHANGELOG requirement:** Every release that changes adopt output or link policy must include a prominent **Adopters** section (or equivalent callout) stating registered LSI adopters need **`/lsi:update`** after pulling the bundle release — not buried in a bullet; adopters must see the action without reading maintainer notes.
 

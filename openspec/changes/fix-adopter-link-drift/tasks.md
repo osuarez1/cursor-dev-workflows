@@ -33,11 +33,17 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 4.2 Assert **`BUNDLE_VERSION` token parity** after temp adopt — adopter `PROJECT.md` has `BUNDLE_VERSION` matching bundle `VERSION`; adopted tier 2 URLs show `v{VERSION}` with no literal `{{BUNDLE_VERSION}}` (existing `substitute_tokens` + `update_project_md`; one assertion in `test_adopt_links.py`)
 - [ ] 4.3 Assert adopted `.lsi/workflows/**/*.md` contains no `overlays/lsi/` or `../../agent-stack/` substrings (tier 2 paths in tier 1 tree)
 - [ ] 4.4 Run `python3 snippets/test_adoption_verify_links.py` and `python3 snippets/test_adopt_links.py` locally — both must pass before §5 release tasks
-- [ ] 4.5 Document **required release gate**: adopt-link regression tests (`test_adopt_links.py`, `test_adoption_verify_links.py`) must pass before `VERSION` bump — update `docs/adoption-verify-architecture.md`, bundle `README.md`, and maintainer pre-release checklist; add CI step when bundle pipeline exists; document source grep (task 3.4) as fast PR/pre-commit check
+- [ ] 4.5 Document **required release gate**: adopt-link regression tests must pass before `VERSION` bump — update `docs/adoption-verify-architecture.md`, bundle `README.md`, and maintainer pre-release checklist; document source grep (task 3.4) as fast PR/pre-commit check
+- [ ] 4.6 **When bundle pipeline lands:** add CI step running **both** test modules on every PR / pre-release:
+  ```bash
+  python3 snippets/test_adoption_verify_links.py
+  python3 snippets/test_adopt_links.py
+  ```
+  Block merge on failure; same gate as local maintainer pre-`VERSION` checklist (task 4.4). Optionally add source grep (task 3.4) and `test_adopt_tokens.py` in the same job.
 
 ## 5. Docs and release
 
-- [ ] 5.1 Update `docs/adoption-verify-architecture.md` — three-tier link policy, pattern rules, bundle source grep (task 3.4), `overlays/lsi/adopter-docs/` source path, tier 3 CI copy, **pre-`VERSION` regression gate**
+- [ ] 5.1 Update `docs/adoption-verify-architecture.md` — three-tier link policy, pattern rules, bundle source grep (task 3.4), `overlays/lsi/adopter-docs/` source path, tier 3 CI copy, **pre-`VERSION` regression gate**, **CI step for both test modules when pipeline lands** (task 4.6)
 - [ ] 5.2 Fix `overlays/lsi/docs/ai/openspec.md` at source (tier 1 cross-tree): `../workflows/openspec-git-integration.md` → `../../.lsi/workflows/openspec-git-integration.md` (both occurrences); do **not** add `--extra-dirs docs/ai` to `verify-adopters.py`
 - [ ] 5.3 Bump `VERSION` and `CHANGELOG.md` — **only after §4 tests pass**; release note **must** include a prominent **Adopters** callout that registered LSI adopters need **`/lsi:update`** after pulling this bundle release (not optional); also summarize three-tier link policy
 - [ ] 5.4 Manual smoke: `adopt.py` against temp repo + `verify-adopters.py --repo-root <tmp>` passes
