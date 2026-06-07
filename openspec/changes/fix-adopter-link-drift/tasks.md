@@ -37,6 +37,8 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 5.3 Bump `VERSION` and `CHANGELOG.md` — **only after §4 tests pass**; release note **must** include a prominent **Adopters** callout that registered LSI adopters need **`/lsi:update`** after pulling this bundle release (not optional); also summarize three-tier link policy
 - [ ] 5.4 Manual smoke: `adopt.py` against temp repo + `verify-adopters.py --repo-root <tmp>` passes
 
-## 6. Post-merge (maintainer — not apply deliverables)
+## 6. Post-merge (maintainer — not apply deliverables; **real acceptance test**)
 
-- [ ] 6.1 Re-sync registered adopters via maintainer adopt loop; confirm `verify-adopters.py` passes on each
+Adopter parity on registered repos is the **real acceptance test** — temp-dir regression (§4) is necessary but not sufficient. **Do not announce** the release (team chat, adopter ping, `/lsi:update` broadcast) until 6.1 completes.
+
+- [ ] 6.1 Re-sync registered adopters via maintainer adopt loop; confirm `verify-adopters.py` passes on each — **required before announcing this release**

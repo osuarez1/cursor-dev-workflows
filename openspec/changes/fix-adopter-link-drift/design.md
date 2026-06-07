@@ -161,9 +161,10 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 1. Implement bundle fixes on feature branch (`chore/bundle-fix-adopter-link-drift` or similar — **not on `main`**).
 2. **Run adopt-link regression gate** — `python3 snippets/test_adopt_links.py` and `python3 snippets/test_adoption_verify_links.py` must pass; source grep (decision 6) should pass on workflow doc changes.
-3. Bump `VERSION` / `CHANGELOG.md` (only after step 2). **Release note must clearly state:** registered LSI adopters need **`/lsi:update`** after pulling this bundle release.
-4. Maintainer adopt loop: re-sync each registered adopter; `verify-adopters.py --repo-root <adopter>` must pass.
-5. Rollback: revert bundle release; adopters keep previous `.lsi/workflows/` until re-sync.
+3. Bump `VERSION` / `CHANGELOG.md` and tag release (only after step 2). **Release note must clearly state:** registered LSI adopters need **`/lsi:update`** after pulling this bundle release.
+4. **Maintainer adopt loop (task 6.1)** — re-sync each registered adopter; `verify-adopters.py --repo-root <adopter>` must pass on every repo. **Adopter parity is the real acceptance test** — do not treat bundle temp-adopt tests alone as ship-ready.
+5. **Announce only after step 4** — team/adopter notification that the release is live and `/lsi:update` is required waits until adopt loop passes on all registered adopters.
+6. Rollback: revert bundle release; adopters keep previous `.lsi/workflows/` until re-sync.
 
 ## Resolved decisions
 
@@ -182,3 +183,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 **Choice:** `test_adopt_links.py` + `test_adoption_verify_links.py` are **required** before any bundle `VERSION` bump — local maintainer gate and CI step when a pipeline exists. Do not tag or bump `VERSION` on failing adopt-link regression.
 
 **CHANGELOG requirement:** Every release that changes adopt output or link policy must include a prominent **Adopters** section (or equivalent callout) stating registered LSI adopters need **`/lsi:update`** after pulling the bundle release — not buried in a bullet; adopters must see the action without reading maintainer notes.
+
+### Adopter parity before announce (task 6.1)
+
+**Choice:** After the first (and every) bundle release that changes adopt output, run the **maintainer adopt loop** on all registered adopters and confirm `verify-adopters.py` passes **before announcing** the release. Temp-dir regression (`test_adopt_links.py`) gates the VERSION bump; **adopter parity on real repos is the real acceptance test** for ship confidence.

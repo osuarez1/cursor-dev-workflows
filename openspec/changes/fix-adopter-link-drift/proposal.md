@@ -29,4 +29,4 @@ Recent LSI overlay updates (card-link, Trello list/branch flows, `/lsi:update`, 
 - **Adopt authoring:** `overlays/lsi/adopter-docs/` (three-tier link policy README + adopter-facing docs)
 - **Verification:** `snippets/adoption-verify-links.py`, `snippets/verify-adopters.py`, new `snippets/test_adopt_links.py` — **required local/CI gate before `VERSION` bump**; optional source grep script for workflow doc trees (pre-commit or CI)
 - **Fixtures:** `snippets/fixtures/adoption-verify/` — add post-adopt drift cases
-- **Adopters:** **`/lsi:update` required** after bundle release — release note (`CHANGELOG.md`) must state this clearly; no application code changes in adopter repos
+- **Adopters:** **`/lsi:update` required** after bundle release — release note (`CHANGELOG.md`) must state this clearly; maintainer adopt loop (6.1) must pass on registered repos **before announcing**; no application code changes in adopter repos
