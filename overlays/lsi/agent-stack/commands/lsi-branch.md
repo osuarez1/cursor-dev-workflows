@@ -5,7 +5,7 @@ category: Workflow
 description: Branch checklist and verify ticket-linked branch for active change
 ---
 
-Run the video-encoder branch checklist and verify the ticket-linked branch for the active OpenSpec change.
+Run the branch checklist and verify the ticket-linked branch for the active OpenSpec change.
 
 **Canonical source:** [`docs/workflows/openspec-git-integration.md` § Branch checklist](../../docs/workflows/openspec-git-integration.md#branch-checklist) · [branch-workflow.md](../../docs/workflows/branch-workflow.md) · [git-trello.md](../../docs/sdlc/git-trello.md)
 
