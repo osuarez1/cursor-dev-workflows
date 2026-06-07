@@ -18,7 +18,7 @@ Hard and soft limits for PR size. Values come from [PROJECT.md](../../PROJECT.md
 
 1. **Stop** — do not open the PR as-is.
 2. Propose a **split plan** — each slice gets its own Trello card and ticket branch.
-3. Run `/lsi:card` per slice from `main`.
+3. Run `/lsi:card`, `/lsi:card-link`, or `/lsi:trello-list` per slice from `main` or `staging` (OpenSpec required for card-link and trello flows).
 4. One OpenSpec change folder = one PR when possible.
 
 ## OpenSpec at propose

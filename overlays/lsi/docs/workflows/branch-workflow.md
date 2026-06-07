@@ -18,7 +18,7 @@ git branch --show-current
 
 If the current branch is protected, **stop** — do not write code, run task migrations, or continue as if that branch were acceptable.
 
-**Exception:** **`/lsi:card`** on **`main` only** — creates Trello card + branch via `git ts`; no source edits. **Refuse on other protected branches.** See [openspec-git-integration.md](openspec-git-integration.md).
+**Exception:** **`/lsi:card`** on **`main`** or **`staging`** — creates Trello card + branch via `git ts`; no source edits. **Refuse on other protected branches.** See [openspec-git-integration.md](openspec-git-integration.md).
 
 ### Agent refusal template
 
@@ -26,7 +26,11 @@ When you must refuse:
 
 1. State that protected branches are off-limits for task work in **any** Cursor mode (Plan, Agent, Ask).
 2. Show [stop-sign image](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Stop_sign_MUTCD.svg/240px-Stop_sign_MUTCD.svg.png) and **🛑**.
-3. Tell the user to create or check out a ticket-linked branch: `git ts`, `git tl`, `git tb`.
+3. Tell the user to create or check out a ticket-linked branch:
+   - **`/lsi:card`** — from `main`/`staging` via `git ts` (new card + branch)
+   - **`/lsi:card-link`** — existing feature branch without Trello id (requires OpenSpec)
+   - **`/lsi:trello-list`** / **`/lsi:trello-branch`** — existing To Do card (requires OpenSpec to branch)
+   - **`git ts`**, **`git tl`**, **`git tb`** — low-level CLI; see [sdlc/git-trello.md](../sdlc/git-trello.md)
 4. Point to [ticket-card-info.md](ticket-card-info.md) if they need card fields first.
 5. Point to [sdlc/git-trello.md](sdlc/git-trello.md) for branch/Trello tooling setup.
 
@@ -49,7 +53,10 @@ Agents should:
 ## Before you branch
 
 1. Draft or locate the ticket — [ticket-card-info.md](ticket-card-info.md) (or Jira/Linear equivalent).
-2. Create the branch from **`BASE_BRANCH`** (`main`) using team naming — typically via **`/lsi:card`** → `git ts`.
+2. Create the branch from **`BASE_BRANCH`** or **`staging`** using team naming:
+   - **`/lsi:card`** → `git ts` (new card + branch)
+   - **`/lsi:card-link`** → card + rename current branch (after `/opsx:propose`)
+   - **`/lsi:trello-list`** → **`/lsi:trello-branch`** → existing To Do card + `git tb`
 3. Push with explicit branch name if hooks require it (some tools reject `git push origin HEAD`).
 
 Feature PRs target **`PR_TARGET_BRANCH`** (`staging`), not `BASE_BRANCH`. See [openspec-git-integration.md](openspec-git-integration.md).
@@ -59,7 +66,7 @@ Feature PRs target **`PR_TARGET_BRANCH`** (`staging`), not `BASE_BRANCH`. See [o
 | Workflow | Role |
 |----------|------|
 | [ticket-card-info.md](ticket-card-info.md) | Card fields before `git ts` / branch creation |
-| [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card`, `/lsi:branch`, full lifecycle |
+| [openspec-git-integration.md](openspec-git-integration.md) | Card/branch slash commands, full lifecycle |
 | [commits-logical-order.md](commits-logical-order.md) | Commits only on feature branch; only when user asks |
 | [pr-production-readiness.md](pr-production-readiness.md) | Merge/rebase `PR_TARGET_BRANCH` before feature PR |
 | [branch-reviewability.md](branch-reviewability.md) | PR size limits and split guidance |

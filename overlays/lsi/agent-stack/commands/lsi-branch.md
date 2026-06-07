@@ -41,8 +41,9 @@ Run the video-encoder branch checklist and verify the ticket-linked branch for t
    If on `main` or `staging`, or branch lacks a 24-char Trello id, or suffix ≠ change slug:
 
    - **Stop** — do not run `git checkout -b feature/<slug>` or any branch without Trello id.
-   - Suggest **`/lsi:card`** from **`main`** (never from `staging`) to create card + branch via `git ts`.
-   - If card already exists, suggest `git tb <card_id>` per [git-trello.md](../../docs/sdlc/git-trello.md).
+   - Suggest **`/lsi:card`** from **`main`** or **`staging`** to create card + branch via `git ts`.
+   - If on a feature branch **without** a 24-char Trello id but with an active OpenSpec change, suggest **`/lsi:card-link`** (card + rename in place).
+   - If card already exists and you need a **new** branch for that card, suggest **`/lsi:trello-list`** then **`/lsi:trello-branch <card-id>`** (or `git tb <card_id>`) per [git-trello.md](../../docs/sdlc/git-trello.md).
 
 4. **Switch or sync existing ticket branch (when user confirms)**
 
