@@ -9,10 +9,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 
 - `snippets/verify-adopters.py` — parity checklist + link/audit gate for LSI adopters
+- `snippets/verify-all-adopters.sh` — verify video-encoder, web, ai-agent in one command
 - `docs/ci/check_version-web.yml`, `docs/ci/check_version-ai-agent.yml` — Bitbucket pipeline snippets
+- `docs/adopt-new-repo.md` — step-by-step guide for registering new LSI repos
+- `patches/files/_template/` — overlay examples + `audit-resolutions.yaml.example`
 
 ### Changed
 
+- `patches/_template.yaml` — full patch schema with comments
+- `patches/README.md` — registered repos table and patch key reference
+- `adoption-checklist.md` — LSI adopt.py path at top; legacy manual steps deprecated
 - `MAINTAINER.md.example` — LSI adopt loop and verify commands (replaces Profile A/B)
 
 ## [1.3.0] - 2026-06-06
