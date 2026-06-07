@@ -55,6 +55,7 @@ LSI_COMMANDS = [
     "lsi-changelog",
     "lsi-release",
     "lsi-bootstrap-release",
+    "lsi-update",
 ]
 OPSX_COMMANDS = [
     "opsx-explore",

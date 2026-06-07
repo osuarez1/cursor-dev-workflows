@@ -30,6 +30,7 @@ LSI_COMMANDS = [
     "lsi-changelog",
     "lsi-release",
     "lsi-bootstrap-release",
+    "lsi-update",
 ]
 ALWAYS_ON_RULES = (
     "branch-workflow.mdc",
