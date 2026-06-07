@@ -28,3 +28,4 @@
 - [ ] 5.3 Manual: `sdlc` section shows mermaid only
 - [ ] 5.4 Manual: all spec links are `github.com/osuarez1/cursor-dev-workflows/blob/v.../...`
 - [ ] 5.5 Run `python3 snippets/verify-adopters.py` after bootstrap (bundle repo smoke)
+- [ ] 5.6 Manual: mid-session user says “create a card” → agent stays read-only until Exit (may suggest `/lsi:card` or relevant help section; does not run Trello API, `git ts`/`git tb`, or other implementation commands)
