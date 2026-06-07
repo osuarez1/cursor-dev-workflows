@@ -1,26 +1,58 @@
 # Adopter patches
 
-Each application repo has a `patches/<repo>.yaml` file consumed by `snippets/adopt.py`.
+Each LSI application repo has a `patches/<repo>.yaml` consumed by `snippets/adopt.py`.
+
+**New repo?** Follow [docs/adopt-new-repo.md](../docs/adopt-new-repo.md).
+
+## Registered repos
+
+| Patch | Application repo | Version file | Protected branches |
+|-------|------------------|--------------|-------------------|
+| [video-encoder.yaml](video-encoder.yaml) | video-encoder | `version.txt` | `main`, `staging` |
+| [web.yaml](web.yaml) | web | `version.txt` | `main`, `staging`, `master` |
+| [ai-agent.yaml](ai-agent.yaml) | ai-agent (monorepo) | `VERSION` | `main`, `staging`, `test` |
+| [_template.yaml](_template.yaml) | — copy for new repos | configurable | configurable |
+
+Per-repo markdown overlays: `patches/files/<repo>/` (template: `patches/files/_template/`).
 
 ## Run adopt
 
 ```bash
 cd cursor-dev-workflows
+
+# 1. Audit (first time or after drift)
 python3 snippets/adopt.py --target ../video-encoder --config patches/video-encoder.yaml --audit-only
+
+# 2. Adopt / re-sync
 python3 snippets/adopt.py --target ../video-encoder --config patches/video-encoder.yaml --accept-policy-defaults
+
+# 3. Verify
+python3 snippets/verify-adopters.py --repo-root ../video-encoder
 ```
 
-## Files
+Paths for this workspace:
 
-| Patch | Repo |
-|-------|------|
-| `video-encoder.yaml` | video-encoder |
-| `web.yaml` | web |
-| `ai-agent.yaml` | ai-agent monorepo |
-| `_template.yaml` | Copy for new repos |
+| Repo | `--target` |
+|------|------------|
+| video-encoder | `../video-encoder` |
+| web | `../web` |
+| ai-agent | `../agents/ai-agent` |
 
-Per-repo markdown overlays live in `patches/files/<repo>/`.
+## Patch YAML keys
+
+| Key | Purpose |
+|-----|---------|
+| `project` | Tokens written to `PROJECT.md` |
+| `preserve` | Globs/paths adopt never deletes |
+| `overlay_files` | Replace specific `.lsi/workflows/*.md` from `patches/files/<repo>/` |
+| `remove_after_adopt` | Delete legacy paths after adopt |
+| `agents_claude` | `AGENTS.md` canonical + `CLAUDE.md` symlink |
+| `bootstrap` | Create `version.txt` / `VERSION` if missing |
+| `sync_opsx` | Overwrite root `opsx-*.md` commands (default `false`) |
+| `ci_hook.add_check_version` | Document only — see `docs/ci/` |
+
+Full token list: [docs/token-registry.md](../docs/token-registry.md).
 
 ## Audit resolutions
 
-Record human decisions in `patches/files/<repo>/audit-resolutions.yaml` when first adopt surfaces contradictions.
+When `--audit-only` reports errors, record decisions in `patches/files/<repo>/audit-resolutions.yaml`. Example: [files/_template/audit-resolutions.yaml.example](files/_template/audit-resolutions.yaml.example).
