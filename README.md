@@ -92,15 +92,22 @@ Record `BUNDLE_VERSION` in your adopted `PROJECT.md` when you copy or re-sync.
 
 ## Maintainer notes
 
-Copy [MAINTAINER.md.example](MAINTAINER.md.example) → gitignored `MAINTAINER.md` and fill in local paths, sync mapping, and release checklists. For bundle release tasks, copy [AGENTS-LOCAL.md.example](AGENTS-LOCAL.md.example) → gitignored `AGENTS-LOCAL.md`.
+**Local kit (private):**
 
-Do not commit org names, internal repo slugs, or machine-specific clone paths.
+```bash
+./snippets/bootstrap-maintainer-local.sh
+./snippets/verify-maintainer-local.sh
+```
+
+Installs gitignored `MAINTAINER.md`, `AGENTS-LOCAL.md`, `.cursor/rules/local-*.mdc`, and `.cursor/commands/`. Templates: [snippets/maintainer-local/README.md](snippets/maintainer-local/README.md).
+
+**OpenSpec:** tracked `openspec/` — [docs/ai/openspec.md](docs/ai/openspec.md). Do not commit org names, internal repo slugs, or machine-specific clone paths.
 
 ## Repository layout
 
 ```text
 AGENTS.md                    # Agent entry point
-CLAUDE.md                    # Points to AGENTS.md
+CLAUDE.md                    # Symlink → AGENTS.md
 PROJECT.md                   # Resolved placeholders (this repo)
 README.md
 VERSION                      # Released bundle version
@@ -117,15 +124,21 @@ docs/
 templates/
 examples/
 snippets/
-  adoption-verify-links.py   # Post-adoption link verification (Profile A/B)
-  test_adoption_verify_links.py  # Regression tests (python3 -m unittest …)
-  fixtures/adoption-verify/  # Test fixture trees
+  maintainer-local/          # Kit templates (MAINTAINER, openspec scaffold, rules)
+  bootstrap-maintainer-local.sh
+  verify-maintainer-local.sh
+  adoption-verify-links.py
+  test_adoption_verify_links.py
+  fixtures/adoption-verify/
   cursor-rules/
-  user-rule-only-commit-when-asked.md
   gitignore-local-artifacts.txt
+openspec/                         # tracked OpenSpec (config, changes, specs)
+docs/ai/openspec.md               # bundle OpenSpec pointer
 .cursor/
   rules/
-    commit-pr-conventions.mdc   # alwaysApply: true (this repo)
+    commit-pr-conventions.mdc   # tracked always-on rule
+    local-*.mdc                   # gitignored (bootstrap)
+  commands/                       # gitignored (bootstrap)
 LICENSE
 ```
 
