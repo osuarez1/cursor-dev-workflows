@@ -4,6 +4,8 @@ Use when drafting **task cards** before branching. Output is for copy-paste into
 
 **Do not** create remote tickets/cards or run tracker CLI commands (e.g. Trello `git ts`) unless the user explicitly asks.
 
+When running Trello Start, use **`git ts`** (space-separated Git subcommand via local alias) — not `git-ts` or `which git-ts`. See [integrations.md](integrations.md).
+
 ## Triggers
 
 - create / draft ticket card, Jira issue, Linear issue, Trello card
@@ -75,6 +77,17 @@ Brief explanation of why this work is needed.
 - One card = one deliverable when possible.
 - If context is insufficient, ask **one** focused question; use `(confirm: …)` only in Technical Notes.
 - Do not implement on `PROTECTED_BRANCHES` — [branch-workflow.md](branch-workflow.md).
+
+### LSI repos (OpenSpec + Trello)
+
+When using **`/lsi:card`**, **`/lsi:card-link`**, **`/lsi:trello-branch`**, or **`/lsi:trello-list`** (confirm path):
+
+1. **Require** an open in-progress OpenSpec change (`openspec/changes/<slug>/` with `proposal.md`) before creating or updating Trello cards — except trello-list **Exit** (list-only).
+2. **Draft** Context/Goal from `proposal.md` **Why**; Acceptance Criteria from `tasks.md`; Technical Notes from `design.md` when present.
+3. **Redact** before Trello API: secrets, `.env`, credentials, absolute home paths, org-only slugs; link `openspec/changes/<slug>/`.
+4. Branch suffix after card setup = OpenSpec change slug (kebab-case).
+
+See [integrations.md](integrations.md) and adopted [openspec-git-integration.md](../../overlays/lsi/docs/workflows/openspec-git-integration.md).
 
 ## Examples
 

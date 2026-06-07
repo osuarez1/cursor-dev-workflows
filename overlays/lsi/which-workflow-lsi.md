@@ -7,7 +7,10 @@ Merge these rows into the decision table when adopting with `--overlay lsi`.
 | explore idea, think through change | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:explore` | Discussion; docs-only on protected branches |
 | propose OpenSpec change | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:propose` | proposal, design, tasks |
 | sync delta specs | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:sync` | Main specs updated |
-| create Trello card and branch, `/lsi:card` | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card` | Card + branch via `git ts` |
+| create Trello card and branch, `/lsi:card` | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card` | Card + branch via `git ts` from `main`/`staging` |
+| link Trello card to existing branch | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card-link` | OpenSpec required; redacted card + rename branch |
+| list Trello To Do cards | [git-trello.md](docs/sdlc/git-trello.md) | `/lsi:trello-list` | Interactive picker; OpenSpec required to branch |
+| branch from existing Trello card | [git-trello.md](docs/sdlc/git-trello.md) | `/lsi:trello-branch` | OpenSpec required; sync card + `git tb` |
 | production promotion PR (staging → main) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:promote` | Promotion PR to `main` |
 | production close (sync + archive on main) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:close` | Close change after main merge |
 | merge extended description (Bitbucket) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:merge-desc` | Extended merge body |

@@ -12,6 +12,15 @@ curl -s https://raw.githubusercontent.com/osuarez1/git-trello-tool/main/install.
 
 This creates `.git-trello/` (gitignored), local Git aliases, and hooks.
 
+### How commands work (agents)
+
+Commands such as **`git ts`**, **`git tb`**, and **`git tl`** are **local Git aliases** to `.git-trello/bin/git-trello` — not standalone binaries on `PATH`.
+
+| Do | Don't |
+|----|-------|
+| Run `git ts` | Run `git-ts`, `which git-ts`, or probe for a hyphenated executable |
+| Verify install: `git config --local --get alias.ts` | Assume a `git-*` binary like `git-lfs` exists for Trello Start |
+
 **Prerequisites:** `git`, `curl`, `jq`. Trello API key and token from [trello.com/app-key](https://trello.com/app-key).
 
 ### Local credentials (`~/.trello_secrets`)
@@ -44,8 +53,10 @@ When drafting a card description for a milestone or OpenSpec phase, follow [docs
 
 | Command | Use |
 |---------|-----|
-| `git ts` | New Trello card + branch |
-| `git tb <card_id>` | Branch for existing card |
+| `git ts` | New Trello card + branch (from `main`/`staging`) |
+| `/lsi:card-link` | New card + rename **current** branch (see agent command) |
+| `git tl` | List To Do cards — agent: **`/lsi:trello-list`** (interactive picker → confirm → `git tb`) |
+| `git tb <card_id>` | Branch from existing card — agent: **`/lsi:trello-branch`** |
 | `git tc "message"` | Comment on card (includes Bitbucket branch link) |
 | `git td` / `git tt` | Move card to Doing / To Do |
 | `git tl` | List cards in To Do |
@@ -58,6 +69,20 @@ When drafting a card description for a milestone or OpenSpec phase, follow [docs
 - Pre-push hook blocks pushes without a valid 24-character Trello ID on feature branches (tag pushes are exempt).
 
 Example: `feature/5f1b2c3d4e5f6789012345ab-add-hls-pipeline`
+
+### Link card to an existing branch
+
+When `/opsx:propose` or early work started on `{type}/<change-slug>` **without** a Trello id:
+
+1. Stay on the feature branch (not `main`/`staging`).
+2. Run **`/lsi:card-link`** — creates the Trello card via API, then `git branch -m` to `{type}/{id}-<change-slug>`.
+3. Do **not** run `git ts` — it checks out a new branch and leaves the old one behind.
+
+OpenSpec change slug must match the branch suffix after rename.
+
+### Card description from OpenSpec (required)
+
+**`/lsi:card-link`**, **`/lsi:trello-branch`**, and **`/lsi:trello-list`** (confirm path) require an **open in-progress OpenSpec change**. Card title and body are drafted from `proposal.md` / `tasks.md` / `design.md`, **redacted** (no secrets, credentials, or org-only paths), then written to Trello via API before branch creation or `git tb`.
 
 ## Bitbucket Pipelines (Trello sync)
 

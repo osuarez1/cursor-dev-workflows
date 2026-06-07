@@ -1,6 +1,6 @@
 # OpenSpec + Git workflow (video-encoder)
 
-**LSI overlay** for [cursor-dev-workflows](https://github.com/osuarez1/cursor-dev-workflows) v1.0.0. Generic commit/PR/branch/review rules live in [docs/workflows/which-workflow.md](which-workflow.md); this doc maps them to **OpenSpec + Trello + Bitbucket**.
+**LSI overlay** for [cursor-dev-workflows](https://github.com/osuarez1/cursor-dev-workflows) v{{BUNDLE_VERSION}}. Generic commit/PR/branch/review rules live in [docs/workflows/which-workflow.md](which-workflow.md); this doc maps them to **OpenSpec + Trello + Bitbucket**.
 
 ## Dual ticketing
 
@@ -9,7 +9,7 @@
 | **OpenSpec** | Scope, specs, `tasks.md`, design — PR **Related** path `openspec/changes/<slug>/` |
 | **Trello** | 24-char id in branch, pipeline list moves — via [git-trello-tool](https://github.com/osuarez1/git-trello-tool) |
 
-Both align on the same **`<change-slug>`** (OpenSpec folder name).
+Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands **`/lsi:card`**, **`/lsi:card-link`**, **`/lsi:trello-branch`**, and **`/lsi:trello-list`** (confirm path) draft Trello descriptions from OpenSpec artifacts only, redacted before API calls.
 
 ---
 
@@ -19,8 +19,8 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name).
 |---------|---------------|
 | Scope ticket | OpenSpec change slug |
 | Delivery ticket | Trello card (24-char id in branch) |
-| Branch | `feature\|bugfix\|hotfix\|chore/{id}-<change-slug>` via **`/lsi:card`** → `git ts` |
-| Protected branches | **`main`**, **`staging`** — no task work (except `/lsi:card` on `main` only) |
+| Branch | `feature\|bugfix\|hotfix\|chore/{id}-<change-slug>` via **`/lsi:card`**, **`/lsi:card-link`**, or **`/lsi:trello-list`** / **`/lsi:trello-branch`** |
+| Protected branches | **`main`**, **`staging`** — no task work (except `/lsi:card` on `main` or `staging`) |
 | Implement | `/opsx:apply` on ticket branch |
 | Close ticket | After **`main`** promotion: **`/lsi:close`** (or `/opsx:sync` → `/opsx:archive` on `main`) |
 | Normative specs | [`openspec/specs/`](../../openspec/specs/) after production close on `main` |
@@ -28,6 +28,9 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name).
 | Upstream workflow | Link | Command |
 |-------------------|------|---------|
 | Trello card + branch | [ticket-card-info.md](ticket-card-info.md) | `/lsi:card` |
+| Link card to existing branch | [ticket-card-info.md](ticket-card-info.md) | `/lsi:card-link` |
+| List To Do cards | [git-trello.md](../sdlc/git-trello.md) | `/lsi:trello-list` |
+| Branch from existing card | [git-trello.md](../sdlc/git-trello.md) | `/lsi:trello-branch` |
 | Branch verify | [branch-workflow.md](branch-workflow.md) | `/lsi:branch` |
 | Commits | [commits-logical-order.md](commits-logical-order.md) | `/lsi:commit` |
 | Pull requests | [pull-requests.md](pull-requests.md) | `/lsi:pr` |
@@ -44,7 +47,7 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name).
 
 **OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive`
 
-**LSI (git):** `/lsi:card`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`
+**LSI (git):** `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`
 
 **Release scripts:** `uv run python scripts/release/infer_version.py`, `generate_changelog.py`, `scripts/check_version.py`
 
@@ -55,7 +58,11 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name).
 1. **Explore** (optional) — `/opsx:explore`; docs-only on protected branches.
 2. **Propose** — `/opsx:propose <slug>`.
 3. **Senior analysis** (large changes) — `/lsi:senior` after `design.md`.
-4. **Card + branch** — `/lsi:card` from **`main`** → `git ts`.
+4. **Card + branch** — choose one (OpenSpec change must exist for all except list-only exit):
+   - **`/lsi:card`** from **`main`** or **`staging`** → `git ts` (new card + branch)
+   - **`/lsi:card-link`** on existing branch without Trello id → API + `git branch -m`
+   - **`/lsi:trello-list`** → confirm → **`/lsi:trello-branch`** flow for existing To Do card → `git tb`
+   - Card title/body from OpenSpec artifacts, redacted before Trello API
 5. **Apply** — `/opsx:apply`; complete `tasks.md`.
 6. **Commit** (when asked) — `/lsi:commit`.
 7. **Readiness + review** (when asked) — `/lsi:readiness` → `/lsi:review`.
@@ -76,14 +83,14 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name).
 | Branch | Task implementation | `/lsi:card` | `/opsx:propose` |
 |--------|---------------------|-------------|-----------------|
 | `main` | Forbidden | **Allowed** (card only) | Allowed (docs) |
-| `staging` | Forbidden | Refuse — use `main` | Allowed (docs) |
+| `staging` | Forbidden | **Allowed** (card only) | Allowed (docs) |
 | ticket branch | Allowed | N/A | Allowed |
 
 ---
 
 ## Branch checklist
 
-- [ ] Not on `main` or `staging` (except `/lsi:card` setup from `main`)
+- [ ] Not on `main` or `staging` (except `/lsi:card` setup from `main` or `staging`)
 - [ ] Branch matches `feature|bugfix|hotfix|chore/{24-char-id}-<change-slug>`
 - [ ] Suffix matches active OpenSpec change (`openspec list --json`)
 - [ ] Trello card exists (via `git ts` or `git tb`)
@@ -279,6 +286,6 @@ Cursor stores slash commands as files under `.cursor/commands/` with **hyphen** 
 ## What we do not do
 
 - Manual branches without Trello id.
-- Task work on `main` or `staging` (except `/lsi:card` on `main`).
+- Task work on `main` or `staging` (except `/lsi:card` on `main` or `staging`).
 - `gh pr create` or GitHub releases.
 - Auto-commit or auto-open PRs without explicit request.

@@ -27,7 +27,10 @@ Documentation sprint seeds `openspec/` manually; `openspec init` is optional if 
 |------|---------|-------|
 | Explore | `/opsx:explore` | Docs-only on `main`/`staging` |
 | Propose | `/opsx:propose <slug>` | Creates proposal, design, tasks |
-| Card + branch | `/lsi:card` | From `main` only |
+| Card + branch | `/lsi:card` | From `main` or `staging`; OpenSpec → card fields |
+| Link card to branch | `/lsi:card-link` | Feature branch without Trello id; **OpenSpec required** |
+| List To Do cards | `/lsi:trello-list` | Interactive picker; **OpenSpec required** to confirm/branch |
+| Branch from card | `/lsi:trello-branch` | From `main`/`staging`; **OpenSpec required**; sync card + `git tb` |
 | Implement | `/opsx:apply` | Ticket branch only |
 | PR to staging | `/lsi:pr` | Default target `staging` |
 | Promote to main | `/lsi:promote` | After staging QA |

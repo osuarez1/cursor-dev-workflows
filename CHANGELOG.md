@@ -6,6 +6,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+
+- **LSI slash commands** — `/lsi:card-link` (Trello card + rename existing branch), `/lsi:trello-list` (interactive To Do picker), `/lsi:trello-branch` (`git tb` from existing card)
+- **OpenSpec-gated card copy** — card-link, trello-branch, and trello-list (confirm path) require an in-progress OpenSpec change; Trello title/body drafted from `proposal.md` / `tasks.md` / `design.md` and redacted before API calls
+
+### Changed
+
+- **`/lsi:card`** — allowed from **`staging`** as well as **`main`**; contrast docs for card-link vs trello flows
+- **`/lsi:trello-list`** — interactive AskQuestion picker with confirm/exit before `git tb`
+- **`snippets/adopt.py`** — inject `BUNDLE_VERSION` from bundle `VERSION` into overlay token substitution; simplify stdlib YAML fallback parser
+- **Overlay** — `openspec-git-integration.md` uses `v{{BUNDLE_VERSION}}` placeholder; workflow docs updated for Trello card routing ([integrations.md](docs/workflows/integrations.md), [git-trello.md](overlays/lsi/docs/sdlc/git-trello.md), [which-workflow-lsi.md](overlays/lsi/which-workflow-lsi.md))
+- **`snippets/verify-adopters.py`** / **`snippets/audit-agent-docs.py`** — parity lists include new slash commands (16× `/lsi:*` in agent stack)
+
+### Fixed
+
+- **`PROJECT.md`** dogfood — `BUNDLE_VERSION` synced with `VERSION`
+
 ## [1.3.0] - 2026-06-06
 
 ### Added
