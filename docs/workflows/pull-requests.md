@@ -172,8 +172,8 @@ If the repo uses **squash and merge**, the squash dialog uses a single subject +
 
 When drafting a PR for the user:
 
-1. **Title** — one line in a `text` fenced code block when copy-paste helps.
-2. **Description** — full markdown body in a `markdown` fenced code block using the section template above.
+1. **Title** — **always** one line in a `text` fenced code block labeled **Title (copy below)**.
+2. **Description** — **always** full markdown body in a `markdown` fenced code block labeled **Body (copy below)** using the section template above. Do not put title or body content outside those blocks.
 3. Match commit **type** and **scope** from [commits-logical-order.md](commits-logical-order.md).
 4. Include concrete **Testing** steps using `TEST_COMMAND` and manual reviewer steps.
 5. Run [code-review.md](code-review.md) checklists before opening a PR when an agent or self-review was performed.
@@ -183,7 +183,7 @@ When drafting a PR for the user:
 When the user asks for **PR merge info**, **merge commit text**, or help filling the merge dialog:
 
 1. **Commit message** — keep GitHub’s default `Merge pull request #…` line; state that explicitly; do not replace with the PR title.
-2. **Extended description** — output a `text` fenced code block with Summary, `Changes:`, `Commits merged:`, and `Post-merge:` blocks per the template above.
+2. **Extended description** — **always** output a `text` fenced code block labeled **Extended description (copy below)** with Summary, `Changes:`, `Commits merged:`, and `Post-merge:` blocks per the template above. Do not put merge body content outside that block.
 3. **Commits merged** — populate from `git log BASE_BRANCH..HEAD --oneline --reverse --no-merges` when branch history is available (oldest first; omit sync merges from `BASE_BRANCH`).
 
 ## Overlap with other workflows
