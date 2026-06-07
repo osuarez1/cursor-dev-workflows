@@ -2,3 +2,6 @@
 MAINTAINER.md
 AGENTS-LOCAL.md
 .git-trello/
+
+# Local Cursor install (bootstrap-maintainer-local.sh / adopt.py)
+.cursor/
