@@ -67,6 +67,7 @@ def _load_simple_yaml(text: str) -> dict:
                 stack.append((indent, parent))
                 continue
             if isinstance(parent, dict):
+                # Patch YAML uses one list key per indented block; append to the most recent list value.
                 for v in reversed(list(parent.values())):
                     if isinstance(v, list):
                         v.append(value)
