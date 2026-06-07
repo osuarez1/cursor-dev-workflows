@@ -100,4 +100,3 @@ Bundle **v1.3.0** promotion review (`/lsi:review`) flagged three fixable nits: s
 ## Open Questions
 
 - None blocking merge.
-- **Deferred:** add a second patch-YAML fixture test for another list-key shape in `_load_simple_yaml` stdlib fallback (e.g. nested list under dict in `patches/ai-agent.yaml`); current coverage uses `web.yaml` / `scope_exclude_globs` only.

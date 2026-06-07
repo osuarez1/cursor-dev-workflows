@@ -54,6 +54,22 @@ class AdoptTokenTests(unittest.TestCase):
         self.assertIsInstance(globs, list)
         self.assertGreater(len(globs), 0)
 
+    def test_load_config_ai_agent_yaml_preserve_list(self) -> None:
+        config = adopt.load_config(adopt.BUNDLE_ROOT / "patches" / "ai-agent.yaml")
+        self.assertEqual(config["repo"], "ai-agent")
+        preserve = config.get("preserve")
+        self.assertIsInstance(preserve, list)
+        self.assertIn("bitbucket-pipelines.yml", preserve)
+
+    def test_load_simple_yaml_ai_agent_preserve_list(self) -> None:
+        """Stdlib fallback must parse top-level preserve list keys."""
+        text = (adopt.BUNDLE_ROOT / "patches" / "ai-agent.yaml").read_text(encoding="utf-8")
+        config = adopt._load_simple_yaml(text)
+        self.assertEqual(config["repo"], "ai-agent")
+        preserve = config.get("preserve")
+        self.assertIsInstance(preserve, list)
+        self.assertIn("bitbucket-pipelines.yml", preserve)
+
 
 if __name__ == "__main__":
     unittest.main()
