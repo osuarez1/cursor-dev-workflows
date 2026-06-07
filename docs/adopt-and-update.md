@@ -28,6 +28,8 @@ python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --ac
 2. Re-run adopt against each adopter repo — agent: **`/lsi:update`** or `python3 snippets/update-workflows.py` (with `WORKFLOWS_BUNDLE_PATH` or `--bundle /path/to/cursor-dev-workflows`)
 3. Commit adopted files in each app repo
 
+**After merge:** when a bundle release adds slash commands, overlay token placeholders (e.g. `v{{BUNDLE_VERSION}}`), or workflow doc changes, adopters do **not** pick them up until re-sync. Run **`/lsi:update`** (or the maintainer adopt loop in gitignored **`MAINTAINER.md`**) before opening adopter PRs.
+
 ## Always-on rules (installed by adopt)
 
 | Rule | Role |
