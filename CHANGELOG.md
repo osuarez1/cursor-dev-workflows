@@ -19,7 +19,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - **Overlay** — `openspec-git-integration.md` uses `v{{BUNDLE_VERSION}}` placeholder; workflow docs updated for Trello card routing ([integrations.md](docs/workflows/integrations.md), [git-trello.md](overlays/lsi/docs/sdlc/git-trello.md), [which-workflow-lsi.md](overlays/lsi/which-workflow-lsi.md))
 - **`snippets/verify-adopters.py`** / **`snippets/audit-agent-docs.py`** — parity lists include new slash commands (18× `/lsi:*` in agent stack)
 - **`.gitignore`** — gitignore local `.cursor/` maintainer install (canonical rules in `snippets/cursor-rules/`; install playbook in gitignored `MAINTAINER.md`)
-- **`snippets/bootstrap-maintainer-local.sh`**, **`snippets/update-workflows.py`**, **`/lsi:update`** — maintainer/adopter re-sync helpers (maintainer install steps in gitignored `MAINTAINER.md` only)
+- **`snippets/bootstrap-maintainer-local.sh`**, **`snippets/update-workflows.py`**, **`/lsi:update`** — maintainer/adopter re-sync helpers; org-specific adopter paths in gitignored `maintainer-adopters.local.yaml` (see gitignored `MAINTAINER.md`)
 
 ### Fixed
 

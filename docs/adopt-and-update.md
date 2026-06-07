@@ -74,4 +74,4 @@ Summary:
 1. Copy `patches/_template.yaml` → `patches/<repo>.yaml` and `patches/files/_template/` → `patches/files/<repo>/`
 2. Register in [patches/README.md](../patches/README.md)
 3. `--audit-only` → `audit-resolutions.yaml` if needed → adopt → `verify-adopters.py`
-4. Add to local `MAINTAINER.md` adopt loop
+4. Add to gitignored **`MAINTAINER.md`** (`maintainer-adopters.local.yaml` + adopt loop)

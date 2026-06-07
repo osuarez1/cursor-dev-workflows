@@ -14,6 +14,7 @@ Copy this file to **`MAINTAINER.md`** in the bundle root. **`MAINTAINER.md` is g
 
 ## Sections to add in gitignored MAINTAINER.md
 
+- **`maintainer-adopters.local.yaml`** — org-specific adopter clone paths for `update-workflows.py` / `/lsi:update` / `verify-all-adopters.sh` (never commit; not documented in tracked slash commands)
 - Local Cursor install (`bootstrap-maintainer-local.sh`, `/lsi:update --local-only`)
 - Adopt / re-sync loop (`adopt.py`, `update-workflows.py`, `/lsi:update`)
 - Verify all adopters
