@@ -2,66 +2,52 @@
 
 ## Purpose
 
-Define the interactive `/lsi:help` slash command for LSI workflow discovery — overview-first help session, section menu until Exit, SDLC diagram section, GitHub bundle spec links, and adopter parity expectations.
+Define the `/lsi:help` slash command for LSI workflow discovery — one response per invocation, topic list or section content, SDLC diagram section, GitHub bundle spec links, and adopter parity expectations.
 
 ## ADDED Requirements
 
-### Requirement: Interactive help session overview and menu
+### Requirement: One-shot help overview and topic list
 
-The LSI agent stack SHALL provide `/lsi:help` as a read-only consultation command that starts with a short overview and an AskQuestion section menu.
+The LSI agent stack SHALL provide `/lsi:help` as a read-only reference command with exactly one response per invocation.
 
-#### Scenario: First turn shows overview only
+#### Scenario: No topic shows overview and topic list only
 
 - **WHEN** a user invokes `/lsi:help` with no topic argument
 - **THEN** the agent emits a short LSI workflow overview (dual ticketing, staging-first, typical path, bundle version reference)
-- **AND** the agent does not emit the full lifecycle list, command reference table, or SDLC diagram in the same turn
-- **AND** the agent presents an AskQuestion menu with section options and Exit
+- **AND** the agent presents a numbered list of eight topic ids with labels and `/lsi:help <topic>` invoke hints
+- **AND** the agent does not emit section bodies (lifecycle list, command table, SDLC diagram) in the same response
 
-#### Scenario: Numbered menu when AskQuestion unavailable
-
-- **WHEN** AskQuestion is unavailable and the user invokes `/lsi:help`
-- **THEN** the agent presents the same section menu as a numbered list with menu ids (`sdlc`, `lifecycle`, `status`, `commands`, `policies`, `overlap`, `links`, `next`, `exit`)
-- **AND** the agent prompts the user to reply with a menu id
-- **AND** the agent does not refuse help or emit all sections in one response
-
-#### Scenario: Direct topic enters session with menu
+#### Scenario: Topic arg renders section in one response
 
 - **WHEN** a user invokes `/lsi:help` with a recognized topic argument (`lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links`, `next`)
-- **THEN** the agent emits a short overview and the requested section only
-- **AND** the agent presents the AskQuestion menu again (session continues)
+- **THEN** the agent reads the matching `## Section:` block from the command source, substitutes `{ref}` from `PROJECT.md`, and emits the full section in chat
+- **AND** the agent does not re-show the topic list or start a multi-turn help session
 
-### Requirement: Help session loop until Exit
+#### Scenario: Invalid topic
 
-The help session SHALL continue across turns until the user selects Exit.
+- **WHEN** a user invokes `/lsi:help` with an unrecognized topic argument
+- **THEN** the agent emits a one-line error and the numbered topic list
+- **AND** the response remains a single turn
 
-#### Scenario: Section pick re-displays menu
+### Requirement: Read-only consultation
 
-- **WHEN** the user selects any section option other than Exit from the AskQuestion menu
-- **THEN** the agent shows that section's content only
-- **AND** the agent presents the AskQuestion menu again in the same or next turn
-- **AND** the agent does not end the session with only a suggested slash command and no menu
+`/lsi:help` SHALL not perform implementation side effects.
 
-#### Scenario: Exit ends session
+#### Scenario: No implementation from help
 
-- **WHEN** the user selects Exit from the AskQuestion menu
-- **THEN** the agent acknowledges exit briefly (e.g. `Exited /lsi:help.`)
-- **AND** the agent does not present the AskQuestion menu again
-- **AND** the agent does not perform implementation work (commits, Trello API, adopt)
-
-#### Scenario: Read-only consultation
-
-- **WHEN** `/lsi:help` is active (session not exited)
-- **THEN** the agent does not run `git ts`, `git tb`, `git commit`, Trello API calls, `adopt.py`, or other slash commands unless the user explicitly invokes them outside help
+- **WHEN** `/lsi:help` runs (with or without topic)
+- **THEN** the agent does not run `git ts`, `git tb`, `git commit`, Trello API calls, `adopt.py`, or other slash commands
+- **AND** read-only git/openspec inspection is allowed only for `status` and `next` topics
 
 ### Requirement: SDLC diagram section
 
 The help command SHALL provide a dedicated SDLC diagram section separate from the numbered lifecycle text.
 
-#### Scenario: SDLC menu option shows diagram
+#### Scenario: SDLC topic shows diagram
 
-- **WHEN** the user selects the `sdlc` section from the AskQuestion menu
+- **WHEN** the user invokes `/lsi:help sdlc`
 - **THEN** the agent emits a mermaid flowchart of the staging-first feature delivery path (explore through close on `main`, optional release)
-- **AND** the agent does not include the numbered 13-step lifecycle list in the same section response
+- **AND** the agent does not include the numbered 13-step lifecycle list in the same response
 
 ### Requirement: GitHub bundle spec links in help output
 
