@@ -56,5 +56,5 @@ Adopter parity on registered repos is the **real acceptance test** — temp-dir 
 
 ## 7. Long-term (follow-on — not apply deliverables)
 
-- [ ] 7.1 When a copied doc cannot be authored cleanly in the maintainer tree, add an adopter-shaped source under `overlays/lsi/adopter-docs/` (mirroring install path) and wire `adopt.py` — expand beyond `adopt-and-update.md` per design **Long-term direction**
-- [ ] 7.2 Consider bundle lint that diffs **adopter-relevant** `##` headings between maintainer doc and `adopter-docs/` copy (not naive full heading parity — structures intentionally diverge); wire to CI when 2+ dual docs exist
+- [ ] 7.1 When a copied doc cannot be authored cleanly in the maintainer tree, add an adopter-shaped source under `overlays/lsi/adopter-docs/` (mirroring install path) and wire `adopt.py` — expand beyond `adopt-and-update.md` per design **Long-term direction**; **when a second dual doc enters `adopter-docs/`, reconsider task 7.2**
+- [ ] 7.2 **When a second dual doc enters `adopter-docs/`** (follow-on to 7.1 — not before): add bundle lint that diffs **adopter-relevant** `##` headings between each maintainer superset and its `adopter-docs/` copy (not naive full heading parity); wire to CI alongside adopt-link regression (task 4.6). This change seeds one dual doc (`adopt-and-update.md`) — checklist (1.5) + link tests suffice until then

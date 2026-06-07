@@ -90,3 +90,4 @@ Docs consumed only by bundle maintainers (`docs/adopt-new-repo.md`, `patches/REA
 
 - **WHEN** a bundle doc copied into adopters cannot be authored in the maintainer tree without tier 2 hrefs or fragile rewrites
 - **THEN** maintainers add an adopter-shaped copy under `overlays/lsi/adopter-docs/` (mirroring install path) and wire `adopt.py` — rather than extending `LINK_REWRITES`
+- **AND** when a **second** dual doc enters `adopter-docs/`, maintainers implement heading lint per task 7.2

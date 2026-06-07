@@ -174,7 +174,7 @@ Both phases scan the same directories; phase 2 enables the second pattern in the
 
 | Risk | Mitigation |
 |------|------------|
-| Dual `adopt-and-update.md` copies diverge | Maintainer checklist in `docs/adopt-and-update.md` (task 1.5); `adopter-docs/README.md`; `test_adopt_links.py` on adopter copy; future heading lint (task 7.2) when dual-doc set grows |
+| Dual `adopt-and-update.md` copies diverge | Maintainer checklist (task 1.5); `adopter-docs/README.md`; `test_adopt_links.py`; heading lint (task 7.2) **when a second dual doc enters `adopter-docs/`** |
 | `.cursor/commands/` missing during verify if adopt partial | Regression test runs full adopt install including agent stack |
 | Rewrites mask bad source links silently | Pattern rules fail on smuggled tier 2 paths; substring assertion in test; source fixes are primary (§2) |
 | CI snippet copy duplicates bundle | Small tier 3 files; versioned with bundle; acceptable |
@@ -192,6 +192,8 @@ Both phases scan the same directories; phase 2 enables the second pattern in the
 | Small artifact adopters need but bundle does not install by default | Tier 3 copy in `adopt.py`, then tier 1 relative link (CI snippets) |
 
 **This change** seeds the pattern with `adopt-and-update.md` only. Future docs enter `adopter-docs/` when link verify or authoring review shows maintainer layout cannot produce clean adopt output without rewrites. Do not grow `LINK_REWRITES` instead.
+
+**Dual-doc heading lint (task 7.2):** Defer until a **second** dual doc joins `adopter-docs/` (task 7.1). One dual doc does not justify lint tooling — maintainer checklist + link regression is enough.
 
 ## Migration Plan
 
@@ -239,7 +241,7 @@ Run on PRs to protected branches; block merge on non-zero exit. Documents-only r
 
 1. **Now (this change):** Maintainer checklist in `docs/adopt-and-update.md` — banner at top: when editing adopter-facing content, update `overlays/lsi/adopter-docs/adopt-and-update.md`; canonical process in `adopter-docs/README.md`. Cheap, visible at edit time; pairs with task 1.5 cross-reference.
 
-2. **Later (task 7.2):** Optional bundle lint comparing **adopter-relevant** section headings between maintainer superset and `adopter-docs/` copy — **not** naive full `##` parity, because structures intentionally diverge (maintainer keeps `patches/`, `MAINTAINER.md`, `adopt-new-repo.md` sections; adopter copy uses tier 2 GitHub/prose). Lint should warn when maintainer adds or renames shared-topic headings (e.g. Bundle update, Verify after adopt, CI) absent from adopter copy. Defer until 2+ dual docs exist; wire to CI alongside adopt-link regression.
+2. **When a second dual doc enters `adopter-docs/` (task 7.2):** Add bundle lint comparing **adopter-relevant** section headings between each maintainer superset and its `adopter-docs/` copy — **not** naive full `##` parity, because structures intentionally diverge (maintainer keeps `patches/`, `MAINTAINER.md`, `adopt-new-repo.md` sections; adopter copy uses tier 2 GitHub/prose). Lint should warn when maintainer adds or renames shared-topic headings (e.g. Bundle update, Verify after adopt, CI) absent from adopter copy. Wire to CI alongside adopt-link regression (task 4.6). **Trigger:** second doc added under `adopter-docs/` via task 7.1 — not before; one dual doc (`adopt-and-update.md`) relies on checklist (1.5) + link tests only.
 
 **Rationale:** Checklist catches human process immediately; link regression catches broken hrefs but not missing sections; heading lint closes the structural gap once the dual-doc pattern is proven and scope is clear enough to avoid false positives.
 
