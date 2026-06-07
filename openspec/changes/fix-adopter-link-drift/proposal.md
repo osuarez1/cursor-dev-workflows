@@ -28,4 +28,4 @@ Recent LSI overlay updates (card-link, Trello list/branch flows, `/lsi:update`, 
 - **Adopt authoring:** `overlays/lsi/adopter-docs/` (three-tier link policy README + adopter-facing docs)
 - **Verification:** `snippets/adoption-verify-links.py`, `snippets/verify-adopters.py`, new `snippets/test_adopt_links.py` — **required local/CI gate before `VERSION` bump**
 - **Fixtures:** `snippets/fixtures/adoption-verify/` — add post-adopt drift cases
-- **Adopters:** require re-sync (`/lsi:update` or maintainer adopt loop) after bundle release; no application code changes
+- **Adopters:** **`/lsi:update` required** after bundle release — release note (`CHANGELOG.md`) must state this clearly; no application code changes in adopter repos

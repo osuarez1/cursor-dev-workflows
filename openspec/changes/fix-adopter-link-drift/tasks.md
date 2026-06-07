@@ -33,7 +33,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 
 - [ ] 5.1 Update `docs/adoption-verify-architecture.md` — three-tier link policy, pattern rules, `overlays/lsi/adopter-docs/` source path, tier 3 CI copy, **pre-`VERSION` regression gate**
 - [ ] 5.2 Fix `overlays/lsi/docs/ai/openspec.md` at source (tier 1 cross-tree): `../workflows/openspec-git-integration.md` → `../../.lsi/workflows/openspec-git-integration.md` (both occurrences); do **not** add `--extra-dirs docs/ai` to `verify-adopters.py`
-- [ ] 5.3 Bump `VERSION` and `CHANGELOG.md` — **only after §4 tests pass**; note adopter re-sync required (`/lsi:update`) and three-tier link policy
+- [ ] 5.3 Bump `VERSION` and `CHANGELOG.md` — **only after §4 tests pass**; release note **must** include a prominent **Adopters** callout that registered LSI adopters need **`/lsi:update`** after pulling this bundle release (not optional); also summarize three-tier link policy
 - [ ] 5.4 Manual smoke: `adopt.py` against temp repo + `verify-adopters.py --repo-root <tmp>` passes
 
 ## 6. Post-merge (maintainer — not apply deliverables)

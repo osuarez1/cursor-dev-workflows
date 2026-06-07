@@ -41,6 +41,11 @@ The bundle repository SHALL include automated tests that exercise adopt link out
 - **AND** `python3 snippets/test_adopt_links.py` or `python3 snippets/test_adoption_verify_links.py` fails
 - **THEN** the release MUST NOT proceed until both tests pass (local gate and CI when present)
 
+#### Scenario: Release note tells adopters to re-sync
+
+- **WHEN** a bundle release changes adopt output or link policy
+- **THEN** `CHANGELOG.md` for that version includes a prominent **Adopters** callout stating registered LSI adopters must run **`/lsi:update`** after pulling the bundle release
+
 ### Requirement: Maintainer and adopter source docs stay distinguishable
 
 Docs consumed only by bundle maintainers (`docs/adopt-new-repo.md`, `patches/README.md`, `MAINTAINER.md.example`) SHALL NOT be linked from adopted `.lsi/workflows/` with relative paths that assume the bundle repo layout. Adopter-facing guidance SHALL live in or be copied to `.lsi/workflows/` (e.g. `adopt-and-update.md`) with self-contained links.
