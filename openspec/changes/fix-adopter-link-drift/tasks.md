@@ -6,7 +6,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 1.2 Add `overlays/lsi/adopter-docs/README.md` — document three-tier link policy, authoring checklist, `LINK_REWRITES` as transition aid only, **long-term expansion rule**, and **`which-workflow.md` canonicality** (adopter: `.lsi/workflows/` merge output; edit: `overlays/lsi/docs/workflows/which-workflow.md`; dogfood: bundle root optional)
 - [ ] 1.3 Update `copy_core_bundle()` in `snippets/adopt.py` to copy adopter doc instead of `docs/adopt-and-update.md`
 - [ ] 1.4 Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` during every adopt (tier 3; no per-patch conditionals)
-- [ ] 1.5 Add maintainer **dual-copy checklist** in `docs/adopt-and-update.md` (banner at top): when editing adopter-facing sections, update `overlays/lsi/adopter-docs/adopt-and-update.md`; link to `adopter-docs/README.md`
+- [ ] 1.5 Add maintainer **dual-copy checklist** in `docs/adopt-and-update.md` (banner at top): when editing adopter-facing sections (including **new `##` sections**), update `overlays/lsi/adopter-docs/adopt-and-update.md`; link to `adopter-docs/README.md`. **Watch:** heading lint (7.2) is deferred with one dual doc — section additions to maintainer doc without adopter copy updates are the main drift risk
 
 ## 2. Fix workflow cross-links at source (tier 1)
 
@@ -14,7 +14,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 2.2 `docs/workflows/ticket-card-info.md` — same OpenSpec link fix
 - [ ] 2.3 `docs/workflows/branch-workflow.md` — replace overlay git-trello path with `sdlc/git-trello.md`
 - [ ] 2.4 `overlays/lsi/docs/workflows/which-workflow.md` — fix `lsi-help.md` → `../../.cursor/commands/lsi-help.md`; `adopt-and-update.md` → `adopt-and-update.md`
-- [ ] 2.5 **Router canonicality** — document which file is authoritative for adopters; sync `overlays/lsi/which-workflow-lsi.md` with tier 1 link fixes from 2.4; optional review of bundle-root `which-workflow.md` LSI row (dogfood only — may keep maintainer paths):
+- [ ] 2.5 **Router canonicality** — document which file is authoritative for adopters; sync `overlays/lsi/which-workflow-lsi.md` with tier 1 link fixes from 2.4; optional review of bundle-root `which-workflow.md` LSI row (dogfood only — may keep maintainer paths). **PR description checklist (required):** `[ ] which-workflow-lsi.md synced with overlay router (2.4)` — easy to defer accidentally
   - **Adopter canonical (installed):** `.lsi/workflows/which-workflow.md` after adopt
   - **Edit source (authoritative):** `overlays/lsi/docs/workflows/which-workflow.md` — `merge_which_workflow_lsi()` overwrites core copy with this file
   - **Sync helper (not installed):** `overlays/lsi/which-workflow-lsi.md` — keep row/link parity with overlay router; not adopt output
@@ -25,7 +25,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 3.1 Extend `LINK_REWRITES` in `snippets/adopt.py` for accidental tier 2 paths in tier 1 content (`overlays/lsi/docs/workflows/`, `overlays/lsi/docs/sdlc/`, `agent-stack/commands/`, `../../../docs/adopt-and-update.md`) — catch-alls only; do not add rewrites instead of source fixes
 - [ ] 3.2 Add pattern rules in `snippets/adoption-verify-links.py` for `overlays/lsi/` and `agent-stack/` inside canonical tree (tier 2 smuggled as relative)
 - [ ] 3.3 Add fixture + test case for maintainer-path pattern violation under `snippets/fixtures/adoption-verify/`
-- [ ] 3.4 Add bundle-side source grep in `docs/workflows/` and `overlays/lsi/docs/workflows/` — script under `snippets/`; **phase 1:** `](overlays/lsi/`; **phase 2:** extend to `](agent-stack/` once §2 overlay workflow sources are clean (after 2.4); wire as pre-commit and/or CI (fail before adopt; complements §4 regression tests)
+- [ ] 3.4 Add bundle-side source grep script under `snippets/` — **phase 1:** `](overlays/lsi/`; **phase 2:** extend to `](agent-stack/` once §2 overlay workflow sources are clean (after 2.4). **This change:** ship script + document as **manual gate** (pre-PR / pre-`VERSION`); do **not** install repo pre-commit hooks (no shared pre-commit infra today). **When bundle pipeline lands (4.6):** add grep to same CI job as both test modules
 
 ## 4. Bundle regression tests (highest-value deliverable)
 
@@ -33,13 +33,13 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 4.2 Assert **`BUNDLE_VERSION` token parity** after temp adopt — adopter `PROJECT.md` has `BUNDLE_VERSION` matching bundle `VERSION`; adopted tier 2 URLs show `v{VERSION}` with no literal `{{BUNDLE_VERSION}}` (existing `substitute_tokens` + `update_project_md`; one assertion in `test_adopt_links.py`)
 - [ ] 4.3 Assert adopted `.lsi/workflows/**/*.md` contains no `overlays/lsi/` or `../../agent-stack/` substrings (tier 2 paths in tier 1 tree)
 - [ ] 4.4 Run `python3 snippets/test_adoption_verify_links.py` and `python3 snippets/test_adopt_links.py` locally — both must pass before §5 release tasks
-- [ ] 4.5 Document **required release gate**: adopt-link regression tests must pass before `VERSION` bump — update `docs/adoption-verify-architecture.md`, bundle `README.md`, and maintainer pre-release checklist; document source grep (task 3.4) as fast PR/pre-commit check
+- [ ] 4.5 Document **required release gate**: adopt-link regression tests must pass before `VERSION` bump — update `docs/adoption-verify-architecture.md`, bundle `README.md`, and maintainer pre-release checklist; document source grep (task 3.4) as **manual** pre-PR gate until CI (4.6)
 - [ ] 4.6 **When bundle pipeline lands:** add CI step running **both** test modules on every PR / pre-release:
   ```bash
   python3 snippets/test_adoption_verify_links.py
   python3 snippets/test_adopt_links.py
   ```
-  Block merge on failure; same gate as local maintainer pre-`VERSION` checklist (task 4.4). Optionally add source grep (task 3.4) and `test_adopt_tokens.py` in the same job.
+  Block merge on failure; same gate as local maintainer pre-`VERSION` checklist (task 4.4). Add source grep (task 3.4) and optionally `test_adopt_tokens.py` in the same job.
 
 ## 5. Docs and release
 

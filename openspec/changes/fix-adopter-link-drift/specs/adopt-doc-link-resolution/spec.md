@@ -45,7 +45,7 @@ The bundle repository SHALL include automated tests that exercise adopt link out
 
 - **WHEN** a maintainer edits `docs/workflows/**/*.md` or `overlays/lsi/docs/workflows/**/*.md`
 - **AND** the file contains a markdown link with `](overlays/lsi/` (phase 1) or `](agent-stack/` (phase 2, once overlay workflow sources are clean)
-- **THEN** the bundle source grep (pre-commit or CI) fails before adopt runs
+- **THEN** the bundle source grep (manual gate or CI when present) fails before adopt runs
 
 #### Scenario: Bundle release blocked without adopt-link regression pass
 

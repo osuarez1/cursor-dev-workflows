@@ -56,7 +56,7 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 |-------|------|
 | `adoption-verify-links.py` relative resolution under `.lsi/workflows/` | 1 + 3 |
 | Pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree | Blocks tier 2 mistakes smuggled as relative |
-| Bundle source grep for `](overlays/lsi/` and (when §2 clean) `](agent-stack/` in `docs/workflows/`, `overlays/lsi/docs/workflows/` | Fail fast **before adopt** (pre-commit or CI); phased — see decision 6 |
+| Bundle source grep for `](overlays/lsi/` and (when §2 clean) `](agent-stack/` in `docs/workflows/`, `overlays/lsi/docs/workflows/` | Manual gate this change; CI when pipeline lands (decision 6, task 4.6) |
 | `https://` links | Skipped by verify (tier 2 OK) |
 | `BUNDLE_VERSION` in tier 2 GitHub URLs | `substitute_tokens` at adopt time; `update_project_md` writes same value to adopter `PROJECT.md`; assert in `test_adopt_links.py` |
 | `--extra-dirs docs/ai` in verify-adopters | **Out of scope** for adopter parity default; **`test_adopt_links.py`** uses `extra_dirs=["docs/ai"]` to regression-test `openspec.md` cross-tree links after adopt |
@@ -99,6 +99,8 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 | Root `which-workflow.md` (LSI row) | **Optional** bundle dogfood — may keep maintainer paths (e.g. `overlays/lsi/docs/workflows/…`); not adopter canon |
 
 **Router canonicality (`which-workflow.md`):** Adopters read **`.lsi/workflows/which-workflow.md`** after adopt. **`merge_which_workflow_lsi()`** overwrites the core-copied router with **`overlays/lsi/docs/workflows/which-workflow.md`** (after `rewrite_links`) — that overlay file is the **authoritative edit source**. Sync **`overlays/lsi/which-workflow-lsi.md`** with overlay router rows/links for maintainer reference; it is **not** installed to adopters. Bundle-root **`which-workflow.md`** is maintainer dogfood only (optional LSI row review in task 2.5). Document this table in `adopter-docs/README.md` or adoption-verify architecture to prevent future confusion.
+
+**PR checklist (task 2.5):** Implementation PR **Testing** section must include: `[ ] which-workflow-lsi.md synced with overlay router (task 2.4)` — sync is easy to defer when fixing overlay links alone.
 
 ### 3. Extend `LINK_REWRITES` as safety net (transition aid — not primary authoring)
 
@@ -147,9 +149,20 @@ No `VERSION` bump or release tag until this job is green locally and in CI. Sour
 
 **Rationale:** Clearer failure message than "file not found"; encodes tier 1 vs tier 2 boundary in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md). Together with `test_adopt_links.py` substring checks (decision 4), ensures rewrites remain a transition aid — authors must fix sources, not add regex to `LINK_REWRITES`.
 
-### 6. Bundle-side source grep (pre-commit or CI — before adopt)
+### 6. Bundle-side source grep (manual gate now — CI when pipeline lands)
 
-**Choice:** Add a lightweight script (e.g. `snippets/check-workflow-link-sources.sh` or Python equivalent) that fails when any `*.md` under **`docs/workflows/`** or **`overlays/lsi/docs/workflows/`** contains forbidden markdown-link substrings. Wire as **pre-commit hook** and/or **CI step** on the bundle repo.
+**Choice:** Add a lightweight script (e.g. `snippets/check-workflow-link-sources.sh` or Python equivalent) that fails when any `*.md` under **`docs/workflows/`** or **`overlays/lsi/docs/workflows/`** contains forbidden markdown-link substrings.
+
+**Wiring (this change vs later):**
+
+| Mechanism | This change | When pipeline lands (task 4.6) |
+|-----------|-------------|--------------------------------|
+| **Script** | Ship under `snippets/` | Same script |
+| **Pre-commit / git hooks** | **No** — bundle has no shared pre-commit config; maintainer local hooks are optional/gitignored | Optional maintainer install; not a repo deliverable |
+| **Manual gate** | **Yes** — document in README, adoption-verify architecture, pre-release checklist: run before PR / `VERSION` bump | Still valid locally |
+| **CI** | **No** — docs-only repo, no pipeline today | Add to same job as both test modules |
+
+Do not block this change on hook infrastructure — script + documented manual run is sufficient until CI exists.
 
 **Phased patterns:**
 
@@ -174,7 +187,7 @@ Both phases scan the same directories; phase 2 enables the second pattern in the
 
 | Risk | Mitigation |
 |------|------------|
-| Dual `adopt-and-update.md` copies diverge | Maintainer checklist (task 1.5); `adopter-docs/README.md`; `test_adopt_links.py`; heading lint (task 7.2) **when a second dual doc enters `adopter-docs/`** |
+| Dual `adopt-and-update.md` copies diverge | Checklist (1.5) — **watch new `##` sections** in maintainer doc without adopter copy updates; `test_adopt_links.py` catches broken links not missing sections; heading lint (7.2) when second dual doc enters `adopter-docs/` |
 | `.cursor/commands/` missing during verify if adopt partial | Regression test runs full adopt install including agent stack |
 | Rewrites mask bad source links silently | Pattern rules fail on smuggled tier 2 paths; substring assertion in test; source fixes are primary (§2) |
 | CI snippet copy duplicates bundle | Small tier 3 files; versioned with bundle; acceptable |
@@ -227,7 +240,7 @@ python3 snippets/test_adoption_verify_links.py
 python3 snippets/test_adopt_links.py
 ```
 
-Run on PRs to protected branches; block merge on non-zero exit. Documents-only repo today — implement at pipeline introduction, not deferred to adopters.
+Run on PRs to protected branches; block merge on non-zero exit. Include source grep (task 3.4) in the same job. Documents-only repo today — implement at pipeline introduction, not deferred to adopters.
 
 **CHANGELOG requirement:** Every release that changes adopt output or link policy must include a prominent **Adopters** section (or equivalent callout) stating registered LSI adopters need **`/lsi:update`** after pulling the bundle release — not buried in a bullet; adopters must see the action without reading maintainer notes.
 
@@ -239,7 +252,7 @@ Run on PRs to protected branches; block merge on non-zero exit. Documents-only r
 
 **Choice:** **Both, phased.**
 
-1. **Now (this change):** Maintainer checklist in `docs/adopt-and-update.md` — banner at top: when editing adopter-facing content, update `overlays/lsi/adopter-docs/adopt-and-update.md`; canonical process in `adopter-docs/README.md`. Cheap, visible at edit time; pairs with task 1.5 cross-reference.
+1. **Now (this change):** Maintainer checklist in `docs/adopt-and-update.md` — banner at top: when editing adopter-facing content (**including new sections**), update `overlays/lsi/adopter-docs/adopt-and-update.md`; canonical process in `adopter-docs/README.md`. **Acceptable gap:** heading lint (7.2) deferred with one dual doc — **watch** maintainers adding `##` sections to `docs/adopt-and-update.md` without updating adopter copy (link tests won't catch missing sections).
 
 2. **When a second dual doc enters `adopter-docs/` (task 7.2):** Add bundle lint comparing **adopter-relevant** section headings between each maintainer superset and its `adopter-docs/` copy — **not** naive full `##` parity, because structures intentionally diverge (maintainer keeps `patches/`, `MAINTAINER.md`, `adopt-new-repo.md` sections; adopter copy uses tier 2 GitHub/prose). Lint should warn when maintainer adds or renames shared-topic headings (e.g. Bundle update, Verify after adopt, CI) absent from adopter copy. Wire to CI alongside adopt-link regression (task 4.6). **Trigger:** second doc added under `adopter-docs/` via task 7.1 — not before; one dual doc (`adopt-and-update.md`) relies on checklist (1.5) + link tests only.
 
@@ -250,3 +263,7 @@ Run on PRs to protected branches; block merge on non-zero exit. Documents-only r
 **Choice:** Tier 2 GitHub URLs use `v{{BUNDLE_VERSION}}` in adopter-docs source; **existing adopt token path already covers substitution** — `adopt()` reads bundle `VERSION`, builds `tokens["BUNDLE_VERSION"]`, runs `substitute_tokens` on all copied markdown, and `update_project_md()` upserts the same value into adopter `PROJECT.md`. No new token machinery required.
 
 **Test:** `test_adopt_links.py` adds **one assertion** after temp adopt: (1) `PROJECT.md` table contains `BUNDLE_VERSION` equal to bundle `VERSION`; (2) adopted `.lsi/workflows/adopt-and-update.md` (or any file with tier 2 URLs) has no unreplaced `{{BUNDLE_VERSION}}` and contains the pinned version string. Unit coverage for `substitute_tokens` remains in `test_adopt_tokens.py`.
+
+### Source grep wiring (task 3.4)
+
+**Choice:** Ship grep **script only** this change; document as **manual pre-PR / pre-`VERSION` gate**. Do **not** add repo pre-commit hooks — no shared `.pre-commit-config.yaml`, maintainer git hooks are optional. **When bundle pipeline lands (task 4.6):** run grep in CI alongside both test modules. Pre-commit remains optional per-maintainer install, not an apply deliverable.
