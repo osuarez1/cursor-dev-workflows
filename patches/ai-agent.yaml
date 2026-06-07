@@ -43,3 +43,4 @@ bootstrap:
 remove_after_adopt:
   - frontend/openspec/
   - backend/openspec/
+  - .cursor/rules/git-trello-branches.mdc
