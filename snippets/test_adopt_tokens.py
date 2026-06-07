@@ -45,6 +45,15 @@ class AdoptTokenTests(unittest.TestCase):
         self.assertGreater(len(globs), 0)
         self.assertTrue(all(isinstance(item, str) for item in globs))
 
+    def test_load_simple_yaml_web_patch_list_keys(self) -> None:
+        """Stdlib fallback path (no PyYAML) must parse patch list keys."""
+        text = (adopt.BUNDLE_ROOT / "patches" / "web.yaml").read_text(encoding="utf-8")
+        config = adopt._load_simple_yaml(text)
+        self.assertEqual(config["repo"], "web")
+        globs = config.get("scope_exclude_globs")
+        self.assertIsInstance(globs, list)
+        self.assertGreater(len(globs), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -67,6 +67,17 @@ def _load_simple_yaml(text: str) -> dict:
                 stack.append((indent, parent))
                 continue
             if isinstance(parent, dict):
+                if not parent and len(stack) >= 2:
+                    # `key:` with no value — list items replace empty placeholder with a list.
+                    grandparent = stack[-2][1]
+                    if isinstance(grandparent, dict):
+                        for key, placeholder in grandparent.items():
+                            if placeholder is parent:
+                                lst: list = [value]
+                                grandparent[key] = lst
+                                stack[-1] = (indent, lst)
+                                break
+                    continue
                 # Patch YAML uses one list key per indented block; append to the most recent list value.
                 for v in reversed(list(parent.values())):
                     if isinstance(v, list):
