@@ -17,7 +17,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - **`/lsi:trello-list`** — interactive AskQuestion picker with confirm/exit before `git tb`
 - **`snippets/adopt.py`** — inject `BUNDLE_VERSION` from bundle `VERSION` into overlay token substitution; simplify stdlib YAML fallback parser
 - **Overlay** — `openspec-git-integration.md` uses `v{{BUNDLE_VERSION}}` placeholder; workflow docs updated for Trello card routing ([integrations.md](docs/workflows/integrations.md), [git-trello.md](overlays/lsi/docs/sdlc/git-trello.md), [which-workflow-lsi.md](overlays/lsi/which-workflow-lsi.md))
-- **`snippets/verify-adopters.py`** / **`snippets/audit-agent-docs.py`** — parity lists include new slash commands (16× `/lsi:*` in agent stack)
+- **`snippets/verify-adopters.py`** / **`snippets/audit-agent-docs.py`** — parity lists include new slash commands (17× `/lsi:*` in agent stack)
+- **`.gitignore`** — gitignore local `.cursor/` maintainer install (canonical rules in `snippets/cursor-rules/`)
 
 ### Fixed
 

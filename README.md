@@ -122,13 +122,12 @@ snippets/
   adoption-verify-links.py   # Post-adoption link verification (.lsi/workflows/)
   verify-adopters.py         # Parity checklist + audit gate
   test_adoption_verify_links.py  # Regression tests (python3 snippets/test_adoption_verify_links.py)
+  test_adopt_tokens.py           # Adopt token + YAML tests (python3 snippets/test_adopt_tokens.py)
   fixtures/adoption-verify/  # Test fixture trees
-  cursor-rules/
+  cursor-rules/              # Canonical Cursor rules (copied to .cursor/rules/ locally)
   user-rule-only-commit-when-asked.md
   gitignore-local-artifacts.txt
-.cursor/
-  rules/
-    commit-pr-conventions.mdc   # alwaysApply: true (this repo)
+.cursor/                     # gitignored — local install (bootstrap-maintainer-local.sh)
 LICENSE
 ```
 

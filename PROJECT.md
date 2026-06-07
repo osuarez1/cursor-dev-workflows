@@ -12,4 +12,4 @@ Resolved values for **this repository**. Application repos adopting the bundle s
 
 Other tokens (`TITLE_PREFIX`, `TEST_COMMAND`, `SOURCE_ROOT`, `PROTECTED_BRANCHES`, etc.) are meaningful only in adopted application repos. Workflow docs retain placeholder tokens for portability.
 
-Referenced from [AGENTS.md](AGENTS.md) and [.cursor/rules/commit-pr-conventions.mdc](.cursor/rules/commit-pr-conventions.mdc).
+Referenced from [AGENTS.md](AGENTS.md) and [snippets/cursor-rules/commit-pr-conventions.mdc](snippets/cursor-rules/commit-pr-conventions.mdc) (local install: `.cursor/rules/`).
