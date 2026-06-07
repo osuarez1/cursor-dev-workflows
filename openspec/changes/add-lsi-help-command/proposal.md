@@ -39,10 +39,10 @@ LSI adopters have many slash commands and workflow specs under `.lsi/workflows/`
 
 Reviewers: judge **`/lsi:help`** and **v1.4.1** against this change’s proposal/design/spec; treat archive/sync and **v1.4.0** promotion as bundled staging hygiene, not as lsi-help feature scope.
 
-**Routing verification note:** task **5.7** is a **static** pass (decision-table phrase matching), not live Agent dogfood.
+**Routing verification note:** task **5.7** is a **static** pass — decision-table phrase matching is **documented and accepted**; not live Agent dogfood. **Optional follow-up:** three fresh Agent chats with plain-text discovery prompts (`which command should I use?`, `I'm lost on the LSI workflow`, `what should I run next?`) to confirm real routing; implement task **2.4** flowchart branch if any fail.
 
-**PR risk (one line):** Flowchart gap (accepted trade-off) — overlay decision table routes discovery to `/lsi:help`, but the mermaid flowchart still jumps from explore/propose straight to card/branch with no help branch; intentional per closed task **2.4**.
+**PR risk (flowchart gap — no code change unless live dogfood fails):** Overlay decision table routes discovery to `/lsi:help`; overlay mermaid flowchart still omits an early help branch — intentional per closed task **2.4**. Documented here; implement flowchart branch only if optional live routing dogfood (**5.7** follow-up) fails.
 
 **PR testing note:** `python3 snippets/verify-adopters.py --repo-root .` fails on the bundle maintainer repo (no `.lsi/workflows/`) — expected; task **5.5** is adopter parity after adopt re-sync, not bundle maintainer smoke.
 
-**PR risk (agent rendering):** Section output is agent-dependent — delta spec requires reading `## Section:` blocks from command source; no programmatic enforcement. Chat dogfood matched spec (overview, `sdlc`, `lifecycle`, `next`, invalid topic).
+**PR risk (agent-dependent section rendering):** No programmatic enforcement — agents must read `## Section:` blocks from command source. Chat dogfood matched overview, `sdlc`, `lifecycle`, `next`, and invalid topic. **Residual risk for other agents/models only.**

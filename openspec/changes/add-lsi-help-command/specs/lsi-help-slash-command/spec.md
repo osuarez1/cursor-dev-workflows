@@ -4,7 +4,7 @@
 
 Define the `/lsi:help` slash command for LSI workflow discovery — one response per invocation, topic list or section content, SDLC diagram section, GitHub bundle spec links, and adopter parity expectations.
 
-**Verification note:** Topic rendering is **agent-dependent** — agents must read `## Section:` blocks from the command source; there is no programmatic renderer. Apply/review chat dogfood matched scenarios below (overview, `sdlc`, `lifecycle`, `next`, invalid topic).
+**Verification note:** Topic rendering is **agent-dependent** — agents must read `## Section:` blocks from the command source; there is no programmatic renderer. Apply/review chat dogfood matched overview, `sdlc`, `lifecycle`, `next`, and invalid topic. Residual risk for other agents/models only.
 
 ## ADDED Requirements
 
