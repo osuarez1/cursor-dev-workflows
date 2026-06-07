@@ -1,7 +1,5 @@
 # Adopt and update (LSI layout)
 
-> **Dual-copy checklist:** When editing adopter-facing sections below (including **new `##` sections**), update the adopter-shaped copy at [`overlays/lsi/adopter-docs/adopt-and-update.md`](../overlays/lsi/adopter-docs/adopt-and-update.md). Process and three-tier link policy: [`adopter-docs/README.md`](../overlays/lsi/adopter-docs/README.md).
-
 `cursor-dev-workflows/` is the single source of truth. Application repos consume generated copies via `snippets/adopt.py` — do not hand-edit `.lsi/workflows/`.
 
 ## Layout
@@ -12,10 +10,13 @@ All adopt-managed specs live under **`.lsi/workflows/`**:
 - Core specs (pull-requests, branch-workflow, …)
 - LSI overlay (openspec-git-integration, versioning-and-releases)
 - `templates/`, `examples/`, `sdlc/`
+- `ci/` — version-gate pipeline snippets (copied during adopt)
 
 `PROJECT.md` records `CANONICAL_DOCS_PATH=.lsi/workflows/` and `ADOPTION_LAYOUT=lsi`.
 
 ## First adopt
+
+Performed by the bundle maintainer from the bundle repo:
 
 ```bash
 cd cursor-dev-workflows
@@ -52,6 +53,8 @@ python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --ac
 
 ## Verify after adopt
 
+Use **`/lsi:update`** (includes link verify) or, from the bundle repo:
+
 ```bash
 python3 snippets/verify-adopters.py --repo-root ../my-repo
 ```
@@ -62,20 +65,19 @@ Checks: `.lsi/workflows/`, 3 always-on rules, `/lsi:*` slash commands, `CLAUDE.m
 
 Adopt installs `scripts/check_version.py` but **does not edit** `bitbucket-pipelines.yml`. Copy from:
 
-- [docs/ci/check_version-web.yml](ci/check_version-web.yml) — `version.txt`
-- [docs/ci/check_version-ai-agent.yml](ci/check_version-ai-agent.yml) — `VERSION_FILE=VERSION`
+- [ci/check_version-web.yml](ci/check_version-web.yml) — `version.txt`
+- [ci/check_version-ai-agent.yml](ci/check_version-ai-agent.yml) — `VERSION_FILE=VERSION`
 
 ## Ongoing sync (bundle maintainer)
 
-Bundle maintainer adopt loop and local Cursor install are documented in gitignored **`MAINTAINER.md`** (copy from [MAINTAINER.md.example](../MAINTAINER.md.example)).
+Bundle maintainer adopt loop and local Cursor install are documented in gitignored **`MAINTAINER.md`** (copy from bundle maintainer — not installed in application repos).
 
 ## New repo
 
-Full checklist: **[adopt-new-repo.md](adopt-new-repo.md)**.
+Full checklist: [adopt-new-repo.md](https://github.com/osuarez1/cursor-dev-workflows/blob/v{{BUNDLE_VERSION}}/docs/adopt-new-repo.md).
 
 Summary:
 
-1. Copy `patches/_template.yaml` → `patches/<repo>.yaml` and `patches/files/_template/` → `patches/files/<repo>/`
-2. Register in [patches/README.md](../patches/README.md)
-3. `--audit-only` → `audit-resolutions.yaml` if needed → adopt → `verify-adopters.py`
-4. Add to gitignored **`MAINTAINER.md`** (`maintainer-adopters.local.yaml` + adopt loop)
+1. Contact the bundle maintainer to register `patches/<repo>.yaml` and `patches/files/<repo>/`
+2. `--audit-only` → `audit-resolutions.yaml` if needed → adopt → `verify-adopters.py`
+3. Add to gitignored **`MAINTAINER.md`** (`maintainer-adopters.local.yaml` + adopt loop)

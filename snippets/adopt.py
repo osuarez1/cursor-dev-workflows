@@ -245,11 +245,18 @@ def copy_core_bundle(target: Path, tokens: dict[str, str]) -> None:
     copy_tree(BUNDLE_ROOT / "templates", lsi / "templates", transform)
     copy_tree(BUNDLE_ROOT / "examples", lsi / "examples", transform)
 
-    adopt_guide = BUNDLE_ROOT / "docs" / "adopt-and-update.md"
+    adopt_guide = OVERLAY_ROOT / "adopter-docs" / "adopt-and-update.md"
     if adopt_guide.is_file():
         (lsi / "adopt-and-update.md").write_text(
             transform(adopt_guide.read_text(encoding="utf-8")), encoding="utf-8"
         )
+
+    ci_dst = lsi / "ci"
+    ci_dst.mkdir(parents=True, exist_ok=True)
+    for name in ("check_version-web.yml", "check_version-ai-agent.yml"):
+        ci_src = BUNDLE_ROOT / "docs" / "ci" / name
+        if ci_src.is_file():
+            shutil.copy2(ci_src, ci_dst / name)
 
 
 def copy_overlay(target: Path, tokens: dict[str, str], config: dict) -> None:
