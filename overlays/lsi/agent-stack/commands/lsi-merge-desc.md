@@ -86,29 +86,65 @@ Generate the mandatory extended merge description for Bitbucket's merge-commit d
 
 5. **Output**
 
-   Provide a `text` fenced code block for copy-paste into Bitbucket's extended description field.
+   **Mandatory clipboard output (always):** emit the extended description **only** inside a **`text`** fenced block labeled **Extended description (copy below)**. Do not put merge body content in prose, bullets, or un-fenced markdown outside that block.
 
-   **Next steps footer:**
+   **Next steps footer** (after the copy block, not inside it):
    - PR to **`staging`**: "Next: staging QA, then `/lsi:promote`. Do **not** sync or archive."
    - PR to **`main`**: "Next: checkout **`main`**, pull, then `/lsi:close`."
 
 **Output**
 
+Emit in this order:
+
+1. Summary header (metadata only):
+
 ```
 ## Merge extended description: PR #N
 
-**Subject (keep Bitbucket default):** <merge title>
+**Subject (keep platform default):** Merge pull request #N from …
+**Target:** staging | main
+```
 
+2. **Extended description (copy below)** — full merge body, `text` fence only (underline headers, not markdown `##`):
+
+````markdown
 **Extended description (copy below):**
 
 ```text
+<type>(<scope>): <imperative description matching PR title>
+
+Overview
+--------
+...
+
+Changes
+-------
+- ...
+
+Commits (N logical)
+-------------------
+1. ...
+
+Potential risks
+---------------
+- ...
+
+Testing
+-------
+- ...
+
+Related
+-------
 ...
 ```
-```
+````
+
+3. Footer (after the copy block).
 
 **Guardrails**
 
-- Use underline section headers — not markdown `##`.
-- First line of body is PR title in Conventional Commits form.
-- **Do not** use `gh pr view` — Bitbucket only.
+- **Always** emit **Extended description (copy below)** as a single `text` fenced block — never merge body as inline prose only.
+- Use underline section headers inside the block — not markdown `##`.
+- First line of the copy block is PR title in Conventional Commits form.
+- **Do not** use `gh pr view` unless user explicitly asks and `PR_HOST` is GitHub.
 - Squash merge: use PR title as squash subject and shortened Overview — not this extended format.
