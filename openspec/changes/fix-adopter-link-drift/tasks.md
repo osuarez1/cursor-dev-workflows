@@ -14,7 +14,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 2.2 `docs/workflows/ticket-card-info.md` — same OpenSpec link fix
 - [ ] 2.3 `docs/workflows/branch-workflow.md` — replace overlay git-trello path with `sdlc/git-trello.md`
 - [ ] 2.4 `overlays/lsi/docs/workflows/which-workflow.md` — fix `lsi-help.md` → `../../.cursor/commands/lsi-help.md`; `adopt-and-update.md` → `adopt-and-update.md`
-- [ ] 2.5 Review root `which-workflow.md` LSI row — ensure overlay merge output has no tier 2 bundle paths disguised as relative links
+- [ ] 2.5 Review root `which-workflow.md` LSI row; sync `overlays/lsi/which-workflow-lsi.md` with tier 1 link fixes from 2.4 — ensure overlay merge output has no tier 2 bundle paths disguised as relative links
 
 ## 3. Adopt pipeline safety net
 
