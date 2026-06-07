@@ -25,14 +25,43 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 - Link-checking `.cursor/commands/*.md` or `.mdc` rules (out of verify scope today)
 - External URL reachability
 - Retrofitting Profile A/B layouts
+- GitHub URLs for **tier 1** cross-spec links (installed workflow docs stay relative in-repo)
+- Copying maintainer-only bundle docs into adopters just to satisfy link verify
+
+## Three-tier link policy
+
+All content that `adopt.py` installs into adopters MUST follow this policy. Maintainer-only bundle docs (`docs/adopt-and-update.md`, `patches/README.md`, etc.) may use bundle layout paths freely.
+
+| Tier | When | Link style | Examples |
+|------|------|------------|----------|
+| **1 — Installed, in daily use** | Target exists in adopter repo after full adopt; agents read it during workflow routing | **Relative path** valid from the containing file | `.lsi/workflows/` siblings (`openspec-git-integration.md`); cross-tree install paths (`../../.cursor/commands/lsi-help.md`, `../../.lsi/workflows/…` from `docs/ai/`) |
+| **2 — Not installed (maintainer-only)** | Target never copied to adopter (`patches/`, `MAINTAINER.md`, `docs/adopt-new-repo.md`, bundle `overlays/lsi/…` navigation) | **GitHub blob URL** pinned to `v{{BUNDLE_VERSION}}`, or **plain prose** (no broken relative href) | `https://github.com/osuarez1/cursor-dev-workflows/blob/v{{BUNDLE_VERSION}}/docs/adopt-new-repo.md`; "contact bundle maintainer to register a patch" |
+| **3 — Small install extras** | Adopters need a tiny artifact that is not a full spec; copying is cheaper than remote-only | **Copy into adopt output once**, then **tier 1 relative** link | Both `docs/ci/check_version-*.yml` → `.lsi/workflows/ci/`; adopter doc links `ci/check_version-web.yml` |
+
+### Authoring rules
+
+1. **Ask:** Does the target exist in the adopter tree after `adopt.py`? → tier **1** (relative). Does adopt install it elsewhere (`.cursor/`, `docs/ai/`)? → tier **1** with cross-tree relative path.
+2. **Ask:** Is the target bundle-maintainer-only? → tier **2** (GitHub URL with `v{{BUNDLE_VERSION}}` substituted at adopt time, or prose — never `../patches/`, `../../overlays/lsi/`, etc.).
+3. **Ask:** Is it a small file adopters must copy-paste (CI snippet)? → tier **3** (copy in `adopt.py`, link relatively from `.lsi/workflows/`).
+4. **Do not** use GitHub URLs for tier 1 — adopted specs are local canon (`CANONICAL_DOCS_PATH=.lsi/workflows/`); relative links work offline and in IDE `@` navigation. `/lsi:help` chat output may use GitHub URLs (different consumer).
+5. **Source layout:** Author tier 1 content under **`overlays/lsi/adopter-docs/`** when the bundle maintainer layout differs from the adopter layout (start with `adopt-and-update.md`; expand over time toward a full adopter-shaped tree).
+
+### Verify gate alignment
+
+| Check | Tier |
+|-------|------|
+| `adoption-verify-links.py` relative resolution under `.lsi/workflows/` | 1 + 3 |
+| Pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree | Blocks tier 2 mistakes smuggled as relative |
+| `https://` links | Skipped by verify (tier 2 OK) |
+| `--extra-dirs docs/ai` in verify-adopters | **Out of scope** this change; tier 1 fix at source for `openspec.md` |
 
 ## Decisions
 
-### 1. Adopter-shaped source for `adopt-and-update.md`
+### 1. Adopter-shaped source for `adopt-and-update.md` (tiers 1–3)
 
-**Choice:** Add `overlays/lsi/adopter-docs/adopt-and-update.md` written for `.lsi/workflows/` layout; `copy_core_bundle()` copies this file instead of `docs/adopt-and-update.md`. Keep `docs/adopt-and-update.md` as the maintainer-facing superset (may link to bundle paths freely).
+**Choice:** Add `overlays/lsi/adopter-docs/adopt-and-update.md` written for `.lsi/workflows/` layout following the **three-tier link policy**; `copy_core_bundle()` copies this file instead of `docs/adopt-and-update.md`. Keep `docs/adopt-and-update.md` as the maintainer-facing superset (may link to bundle paths freely). Add `overlays/lsi/adopter-docs/README.md` documenting the three tiers for future authors.
 
-**Rationale:** `adopt-and-update.md` has the most maintainer-only links. A dedicated adopter copy avoids regex whack-a-mole and matches the user's "source folder that matches the adopter tree" idea.
+**Rationale:** `adopt-and-update.md` has the most tier 2 violations today. A dedicated adopter copy avoids regex whack-a-mole and is the first step toward a full adopter-shaped source tree.
 
 **Alternatives considered:**
 
@@ -41,16 +70,16 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 
 **Adopter copy content:**
 
-| Maintainer link | Adopter replacement |
-|-----------------|---------------------|
-| `ci/check_version-web.yml` | Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally → `.lsi/workflows/ci/` during every adopt (no per-patch conditionals); adopter doc links both |
-| `../MAINTAINER.md.example` | Prose: "see bundle maintainer `MAINTAINER.md`" — no link, or link to `adopt-and-update.md` § bundle update |
-| `adopt-new-repo.md` | Inline summary + "contact bundle maintainer to register patch" — no broken relative link |
-| `../patches/README.md` | Remove link; adopter uses `/lsi:update`, not patch registry |
+| Maintainer link | Tier | Adopter replacement |
+|-----------------|------|---------------------|
+| `ci/check_version-web.yml` | **3** | Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally → `.lsi/workflows/ci/` during every adopt; adopter doc links both relatively |
+| `../MAINTAINER.md.example` | **2** | Prose only — no relative link |
+| `adopt-new-repo.md` | **2** | GitHub blob URL with `v{{BUNDLE_VERSION}}` or inline summary + "contact bundle maintainer" |
+| `../patches/README.md` | **2** | Remove relative link; adopter uses `/lsi:update`; optional GitHub URL to bundle `patches/README.md` |
 
-### 2. Fix overlay and core workflow cross-links at source
+### 2. Fix overlay and core workflow cross-links at source (tier 1)
 
-**Choice:** Edit source files so links match **post-adopt** locations:
+**Choice:** Edit source files so links match **post-adopt** locations (tier 1 relative only):
 
 | File | Fix |
 |------|-----|
@@ -63,9 +92,9 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 
 Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow_lsi()` — fix the overlay file as primary.
 
-### 3. Extend `LINK_REWRITES` as safety net
+### 3. Extend `LINK_REWRITES` as safety net (tier 1 fallback)
 
-**Choice:** Add catch-all rewrites in `adopt.py` for paths that may reappear:
+**Choice:** Add catch-all rewrites in `adopt.py` for tier 1 paths that may reappear when maintainers accidentally author bundle layout hrefs:
 
 ```python
 (r"\]\(\.\./\.\./overlays/lsi/docs/workflows/", "](",),
@@ -90,11 +119,11 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 - *Fixture-only static files* — does not catch transform regressions in `adopt.py`
 - *Run verify-adopters on real adopters in CI* — out of bundle repo scope; keep as maintainer post-release step
 
-### 5. Optional pattern rule in `adoption-verify-links.py`
+### 5. Pattern rule in `adoption-verify-links.py` (enforce tier boundaries)
 
-**Choice:** Add pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree (same severity as doubled `docs/workflows/` prefix).
+**Choice:** Add pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree (same severity as doubled `docs/workflows/` prefix). These catch **tier 2 paths written as tier 1 relative links**.
 
-**Rationale:** Clearer failure message than "file not found"; documents intent in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md).
+**Rationale:** Clearer failure message than "file not found"; encodes tier 1 vs tier 2 boundary in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md).
 
 ## Risks / Trade-offs
 
@@ -103,7 +132,9 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 | Dual `adopt-and-update.md` copies diverge | Adopter copy is short; maintainer doc links to it; test asserts adopter copy links |
 | `.cursor/commands/` missing during verify if adopt partial | Regression test runs full adopt install including agent stack |
 | Rewrites mask bad source links silently | Pattern rule + substring assertion in test |
-| CI snippet copy duplicates bundle | Small YAML files; versioned with bundle; acceptable |
+| CI snippet copy duplicates bundle | Small tier 3 files; versioned with bundle; acceptable |
+| Tier 2 GitHub URLs stale after adopter lag on re-sync | Pin to `v{{BUNDLE_VERSION}}` in source; adopter `PROJECT.md` updated on re-sync |
+| Authors confuse tier 1 vs tier 2 | `adopter-docs/README.md` + pattern rules + `test_adopt_links.py` |
 
 ## Migration Plan
 
