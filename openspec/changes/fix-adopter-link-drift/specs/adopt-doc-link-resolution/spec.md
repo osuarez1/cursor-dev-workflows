@@ -35,6 +35,12 @@ The bundle repository SHALL include automated tests that exercise adopt link out
 - **WHEN** `adoption-verify-links.py` scans `.lsi/workflows/` containing `](overlays/lsi/` or `](../../agent-stack/`
 - **THEN** the script reports a pattern violation (in addition to or instead of broken-link detection, per design)
 
+#### Scenario: Bundle source grep blocks maintainer paths before adopt
+
+- **WHEN** a maintainer edits `docs/workflows/**/*.md` or `overlays/lsi/docs/workflows/**/*.md`
+- **AND** the file contains a markdown link with `](overlays/lsi/`
+- **THEN** the bundle source grep (pre-commit or CI) fails before adopt runs
+
 #### Scenario: Bundle release blocked without adopt-link regression pass
 
 - **WHEN** a maintainer prepares a bundle `VERSION` / `CHANGELOG.md` bump

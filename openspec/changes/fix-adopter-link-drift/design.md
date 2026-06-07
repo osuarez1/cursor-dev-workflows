@@ -54,6 +54,7 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 |-------|------|
 | `adoption-verify-links.py` relative resolution under `.lsi/workflows/` | 1 + 3 |
 | Pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree | Blocks tier 2 mistakes smuggled as relative |
+| Bundle source grep for `](overlays/lsi/` in `docs/workflows/`, `overlays/lsi/docs/workflows/` | Fail fast **before adopt** (pre-commit or CI) |
 | `https://` links | Skipped by verify (tier 2 OK) |
 | `--extra-dirs docs/ai` in verify-adopters | **Out of scope** for adopter parity default; **`test_adopt_links.py`** uses `extra_dirs=["docs/ai"]` to regression-test `openspec.md` cross-tree links after adopt |
 
@@ -131,6 +132,20 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 **Rationale:** Clearer failure message than "file not found"; encodes tier 1 vs tier 2 boundary in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md). Together with `test_adopt_links.py` substring checks (decision 4), ensures rewrites remain a transition aid — authors must fix sources, not add regex to `LINK_REWRITES`.
 
+### 6. Bundle-side source grep (pre-commit or CI — before adopt)
+
+**Choice:** Add a lightweight script (e.g. `snippets/check-workflow-link-sources.sh` or Python equivalent) that fails when any `*.md` under **`docs/workflows/`** or **`overlays/lsi/docs/workflows/`** contains the markdown-link substring **`](overlays/lsi/`**. Wire as **pre-commit hook** and/or **CI step** on the bundle repo — whichever the maintainer stack supports.
+
+**Scope:** Workflow spec sources that copy into `.lsi/workflows/` only. **Exclude** maintainer-only trees (`docs/adopt-and-update.md`, `openspec/`, root `which-workflow.md`, `patches/`, `README.md`) where bundle-layout navigation is valid.
+
+**Rationale:** Cheapest fail-fast gate — catches tier 2 maintainer paths at commit/PR time, before running temp-adopt regression. Complements (does not replace) post-adopt pattern rules (decision 5) and `test_adopt_links.py` (decision 4). Same pattern family; narrow scope keeps false positives low.
+
+**Alternatives considered:**
+
+- *Post-adopt verify only* — slower feedback; drift may land on branch before full regression runs
+- *Broad repo-wide grep* — false positives in OpenSpec changes, maintainer docs, and CHANGELOG cross-references
+- *Extend grep to `](agent-stack/`* — valid follow-up for overlay workflow sources; start with `](overlays/lsi/` as the highest-signal check
+
 ## Risks / Trade-offs
 
 | Risk | Mitigation |
@@ -140,12 +155,12 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 | Rewrites mask bad source links silently | Pattern rules fail on smuggled tier 2 paths; substring assertion in test; source fixes are primary (§2) |
 | CI snippet copy duplicates bundle | Small tier 3 files; versioned with bundle; acceptable |
 | Tier 2 GitHub URLs stale after adopter lag on re-sync | Pin to `v{{BUNDLE_VERSION}}` in source; adopter `PROJECT.md` updated on re-sync |
-| Authors confuse tier 1 vs tier 2 | `adopter-docs/README.md` + pattern rules + `test_adopt_links.py` |
+| Authors confuse tier 1 vs tier 2 | `adopter-docs/README.md` + pattern rules + source grep + `test_adopt_links.py` |
 
 ## Migration Plan
 
 1. Implement bundle fixes on feature branch (`chore/bundle-fix-adopter-link-drift` or similar — **not on `main`**).
-2. **Run adopt-link regression gate** — `python3 snippets/test_adopt_links.py` and `python3 snippets/test_adoption_verify_links.py` must pass.
+2. **Run adopt-link regression gate** — `python3 snippets/test_adopt_links.py` and `python3 snippets/test_adoption_verify_links.py` must pass; source grep (decision 6) should pass on workflow doc changes.
 3. Bump `VERSION` / `CHANGELOG.md` (only after step 2). **Release note must clearly state:** registered LSI adopters need **`/lsi:update`** after pulling this bundle release.
 4. Maintainer adopt loop: re-sync each registered adopter; `verify-adopters.py --repo-root <adopter>` must pass.
 5. Rollback: revert bundle release; adopters keep previous `.lsi/workflows/` until re-sync.

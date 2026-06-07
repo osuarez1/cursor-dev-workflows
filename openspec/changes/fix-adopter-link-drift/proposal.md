@@ -9,6 +9,7 @@ Recent LSI overlay updates (card-link, Trello list/branch flows, `/lsi:update`, 
 - Introduce an **adopter-shaped source subtree** (or equivalent) for docs that must read correctly at `.lsi/workflows/` without fragile regex rewrites — starting with `adopt-and-update.md` and overlay `which-workflow.md`.
 - Add **bundle-side regression tests** (`test_adopt_links.py`) — **highest-value deliverable** for long-term maintenance; catches adopt link drift before adopter re-sync and before every `VERSION` bump
 - Optionally extend link-verify **pattern rules** to flag bundle-maintainer path prefixes inside `CANONICAL_DOCS_PATH` (fail fast on future drift).
+- Add **bundle-side source grep** for `](overlays/lsi/` in `docs/workflows/` and `overlays/lsi/docs/workflows/` — pre-commit or CI, before adopt (fast fail; complements regression tests).
 - Codify a **three-tier link policy** for adopt output: tier 1 relative in-repo, tier 2 GitHub/prose for maintainer-only, tier 3 copy-then-link for small extras.
 - Update `docs/adoption-verify-architecture.md` and maintainer notes if scan rules or source layout change.
 
@@ -26,6 +27,6 @@ Recent LSI overlay updates (card-link, Trello list/branch flows, `/lsi:update`, 
 
 - **Source docs:** `docs/adopt-and-update.md`, `docs/workflows/integrations.md`, `docs/workflows/ticket-card-info.md`, `docs/workflows/branch-workflow.md`, `overlays/lsi/docs/workflows/which-workflow.md`, possibly `which-workflow.md` (bundle router row)
 - **Adopt authoring:** `overlays/lsi/adopter-docs/` (three-tier link policy README + adopter-facing docs)
-- **Verification:** `snippets/adoption-verify-links.py`, `snippets/verify-adopters.py`, new `snippets/test_adopt_links.py` — **required local/CI gate before `VERSION` bump**
+- **Verification:** `snippets/adoption-verify-links.py`, `snippets/verify-adopters.py`, new `snippets/test_adopt_links.py` — **required local/CI gate before `VERSION` bump**; optional source grep script for workflow doc trees (pre-commit or CI)
 - **Fixtures:** `snippets/fixtures/adoption-verify/` — add post-adopt drift cases
 - **Adopters:** **`/lsi:update` required** after bundle release — release note (`CHANGELOG.md`) must state this clearly; no application code changes in adopter repos
