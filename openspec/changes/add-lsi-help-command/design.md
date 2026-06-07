@@ -107,6 +107,51 @@ Topics: `lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links
 
 **Alternative rejected:** Always mention `TITLE_PREFIX` in status — noise on most phases; reads as bundle-specific lore instead of portable workflow guidance.
 
+### 10. Next and status heuristics (branch → phase → command)
+
+**Choice:** Both **`status`** and **`next`** infer phase from read-only signals, then suggest **one** slash command + short rationale. Same inference table; `status` adds branch/OpenSpec summary; `next` emits the command recommendation only.
+
+**Inputs (read-only):**
+
+1. `git branch --show-current`
+2. `openspec list --json`
+3. Optional: `git status --short`; `openspec/changes/<slug>/design.md` exists; skim `tasks.md` for unchecked boxes
+
+**Branch classification:**
+
+| Pattern | Match |
+|---------|--------|
+| Protected integration | `^(main\|staging)$` |
+| Ticket-linked | `^(feature\|bugfix\|hotfix\|chore)/[a-f0-9]{24}-.+$` |
+| Other | Non-ticket or legacy branch names |
+
+Extract `{id}` and `{change-slug}` from ticket branch suffix. Compare `{change-slug}` to active OpenSpec change name when one change is in progress.
+
+**Phase → suggested command** (first matching row wins; stop at first match):
+
+| Branch class | OpenSpec / signals | Phase label | Suggested command |
+|--------------|-------------------|-------------|-------------------|
+| Other | Active change; branch lacks 24-char id | Wrong branch | `/lsi:branch` — then `/lsi:card-link` if on feature work without id |
+| Protected | No in-progress change | Pre-change | `/opsx:explore` (optional) or `/opsx:propose` |
+| Protected | In-progress; `design.md` present; apply not started | Design review (optional) | `/lsi:senior` — then card setup |
+| Protected | In-progress; ready for card | Card setup | `/lsi:card` from `main`/`staging` — or `/lsi:trello-list` → branch for existing card |
+| Ticket | Suffix ≠ active change slug | Branch mismatch | `/lsi:branch` |
+| Ticket | `tasks.md` has unchecked apply items | Implement | `/opsx:apply` |
+| Ticket | Uncommitted changes; user likely committing | Commit | `/lsi:commit` (only when user asks to commit) |
+| Ticket | Apply complete; pre-PR | Readiness | `/lsi:readiness` |
+| Ticket | After readiness pass | Review | `/lsi:review` |
+| Ticket | After review; ready to open PR | PR to staging | `/lsi:pr` |
+| Protected `main` | Change still in-progress after staging (infer from context) | Promotion | `/lsi:promote` — **only when user context indicates staging QA passed** |
+| Protected `main` | After production merge | Production close | `/lsi:close` |
+
+**Ambiguity rules:**
+
+- When two rows could apply, prefer the **earlier lifecycle step** (implement before readiness).
+- When staging merge / promotion / close cannot be inferred from branch + OpenSpec alone, say **phase unclear** and suggest **`lifecycle`** or **`/lsi:branch`** — do not guess promotion or close.
+- **`next` never auto-runs** the suggested command; name it + one-line why only.
+
+**Rationale:** Gives deterministic guidance without duplicating full lifecycle text; conservative on post-staging phases that need human QA context.
+
 ## Help session flow
 
 ```mermaid
@@ -178,6 +223,8 @@ You are in a **`/lsi:help` session** until the user selects **Exit** from the se
 3. Session start: emit overview only.
 4. Section menu — **AskQuestion** when available; otherwise numbered list + “reply with id” (same ids; do not refuse).
 5. Loop until Exit: section → menu again; Exit → `Exited /lsi:help.` and stop.
+
+**`status` / `next` sections:** apply §10 branch → phase → command heuristics (read-only inputs only).
 
 ### Overview template
 
@@ -262,12 +309,12 @@ Link to [which-workflow.md](https://github.com/osuarez1/cursor-dev-workflows/blo
 | id | Content |
 |----|---------|
 | `lifecycle` | Numbered 1–13 from which-workflow § Recommended order; GitHub links inline |
-| `status` | Branch, active OpenSpec, phase, suggested next command; **conditional** `TITLE_PREFIX` token note only when card setup is the suggested next step (see §9) — never a standing repo-specific line |
+| `status` | Branch class, active OpenSpec, inferred **phase label**, suggested next command (§10 heuristics); **conditional** `TITLE_PREFIX` token note only when card setup is suggested (§9) |
 | `commands` | Phase table with GitHub-linked Spec column |
 | `policies` | Key policies with GitHub spec links |
 | `overlap` | readiness vs review vs PR; card paths; **`/lsi:help` vs implementation** (cite overlay overlap #7) |
 | `links` | Bullet list of all specs from bundle-path map |
-| `next` | One `/lsi:*` or `/opsx:*` + rationale |
+| `next` | One `/lsi:*` or `/opsx:*` + rationale from §10 heuristics — suggest only, never invoke |
 
 End of every section turn: `Pick another section or Exit.` then AskQuestion.
 
