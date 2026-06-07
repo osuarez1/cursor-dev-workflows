@@ -1,0 +1,30 @@
+## Why
+
+Recent LSI overlay updates (card-link, Trello list/branch flows, `/lsi:update`, branch-workflow and OpenSpec integration rules, `AGENTS.md`, and `docs/ai/openspec.md`) introduced markdown links that still target the **bundle maintainer** tree (`overlays/lsi/…`, `agent-stack/commands/…`, `docs/ci/…`, `patches/…`). After `adopt.py` copies specs into `.lsi/workflows/`, `verify-adopters.py` / `adoption-verify-links.py` fail because those paths do not exist in adopter repos.
+
+## What Changes
+
+- Fix **source** workflow docs and adopt transforms so every link inside adopted `.lsi/workflows/**/*.md` resolves within the adopter repo root.
+- Replace or rewrite maintainer-only targets (`../MAINTAINER.md.example`, `../patches/README.md`, `../../overlays/lsi/docs/…`, `../../agent-stack/commands/…`, `ci/check_version-*.yml` without a copied target).
+- Introduce an **adopter-shaped source subtree** (or equivalent) for docs that must read correctly at `.lsi/workflows/` without fragile regex rewrites — starting with `adopt-and-update.md` and overlay `which-workflow.md`.
+- Add **bundle-side regression tests** that run adopt (or link rewrite) against a temp tree and assert `adoption-verify-links.py` passes — catching drift before adopter re-sync.
+- Optionally extend link-verify **pattern rules** to flag bundle-maintainer path prefixes inside `CANONICAL_DOCS_PATH` (fail fast on future drift).
+- Update `docs/adoption-verify-architecture.md` and maintainer notes if scan rules or source layout change.
+
+## Capabilities
+
+### New Capabilities
+
+- `adopt-doc-link-resolution`: Adopt output under `.lsi/workflows/` SHALL have no broken relative links; bundle sources and transforms SHALL be verifiable before adopter re-sync.
+
+### Modified Capabilities
+
+- _(none — no existing spec defines adopt link resolution requirements)_
+
+## Impact
+
+- **Source docs:** `docs/adopt-and-update.md`, `docs/workflows/integrations.md`, `docs/workflows/ticket-card-info.md`, `docs/workflows/branch-workflow.md`, `overlays/lsi/docs/workflows/which-workflow.md`, possibly `which-workflow.md` (bundle router row)
+- **Adopt pipeline:** `snippets/adopt.py` (`LINK_REWRITES`, copy sources, optional new adopter-src tree)
+- **Verification:** `snippets/adoption-verify-links.py`, `snippets/verify-adopters.py`, new `snippets/test_adopt_links.py` (or extend existing tests)
+- **Fixtures:** `snippets/fixtures/adoption-verify/` — add post-adopt drift cases
+- **Adopters:** require re-sync (`/lsi:update` or maintainer adopt loop) after bundle release; no application code changes

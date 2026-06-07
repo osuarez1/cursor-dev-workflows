@@ -1,0 +1,45 @@
+## ADDED Requirements
+
+### Requirement: Adopted workflow docs resolve links within adopter repo
+
+After `snippets/adopt.py` runs against an LSI adopter config, every relative markdown link in `.lsi/workflows/**/*.md` SHALL resolve to an existing file under the adopter `--repo-root`. Links SHALL NOT target bundle-maintainer-only paths (`overlays/lsi/`, `agent-stack/`, `patches/`, `snippets/`, or repo-root `docs/` trees that adopt does not install).
+
+#### Scenario: verify-adopters link gate passes on fresh adopt output
+
+- **WHEN** `adopt.py` completes for a registered patch config (e.g. `patches/_template.yaml` against a temp repo)
+- **AND** `adoption-verify-links.py --repo-root <target> --canonical .lsi/workflows` runs
+- **THEN** exit code is `0` with no `BROKEN LINKS` output
+
+#### Scenario: Known drift paths are fixed
+
+- **WHEN** adopted `.lsi/workflows/adopt-and-update.md` is scanned
+- **THEN** links to CI snippets, maintainer docs, and patch registry do not reference `ci/check_version-*.yml`, `../MAINTAINER.md.example`, `adopt-new-repo.md`, or `../patches/README.md` unless adopt copies those targets into the adopter tree
+
+#### Scenario: Overlay cross-references use canonical sibling paths
+
+- **WHEN** adopted `.lsi/workflows/integrations.md`, `ticket-card-info.md`, or `which-workflow.md` link to OpenSpec or slash-command docs
+- **THEN** hrefs use `.lsi/workflows/` sibling paths (e.g. `openspec-git-integration.md`, `git-trello.md`) or adopter-installed paths (e.g. `.cursor/commands/lsi-help.md`), not `../../overlays/lsi/docs/…` or `../../agent-stack/commands/…`
+
+### Requirement: Bundle regression catches link drift before adopter re-sync
+
+The bundle repository SHALL include automated tests that exercise adopt link output (full adopt or deterministic rewrite pass) and fail when known maintainer-path prefixes appear under the simulated `.lsi/workflows/` tree.
+
+#### Scenario: Bundle CI fails on maintainer path in adopt output
+
+- **WHEN** a source workflow doc contains a relative link to `overlays/lsi/` or `agent-stack/` that adopt would copy unchanged into `.lsi/workflows/`
+- **AND** the bundle link-regression test runs
+- **THEN** the test fails with a message identifying the source file and href
+
+#### Scenario: Pattern rule flags bundle layout inside canonical tree
+
+- **WHEN** `adoption-verify-links.py` scans `.lsi/workflows/` containing `](overlays/lsi/` or `](../../agent-stack/`
+- **THEN** the script reports a pattern violation (in addition to or instead of broken-link detection, per design)
+
+### Requirement: Maintainer and adopter source docs stay distinguishable
+
+Docs consumed only by bundle maintainers (`docs/adopt-new-repo.md`, `patches/README.md`, `MAINTAINER.md.example`) SHALL NOT be linked from adopted `.lsi/workflows/` with relative paths that assume the bundle repo layout. Adopter-facing guidance SHALL live in or be copied to `.lsi/workflows/` (e.g. `adopt-and-update.md`) with self-contained links.
+
+#### Scenario: adopt-and-update is self-contained in adopter tree
+
+- **WHEN** an adopter opens `.lsi/workflows/adopt-and-update.md`
+- **THEN** every relative link targets a file that exists in the adopter repo after adopt (including optional copied CI snippet paths under `.lsi/workflows/` if the design copies them)
