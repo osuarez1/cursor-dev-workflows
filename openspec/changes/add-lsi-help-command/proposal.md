@@ -31,5 +31,5 @@ LSI adopters have many slash commands and workflow specs under `.lsi/workflows/`
 - `overlays/lsi/agent-stack/openspec-git-integration.mdc`, `overlays/lsi/docs/workflows/openspec-git-integration.md` — quick-reference listing
 - `snippets/verify-adopters.py`, `snippets/audit-agent-docs.py` — `lsi-help` in `LSI_COMMANDS`
 - `VERSION`, `PROJECT.md`, `CHANGELOG.md` — release **v1.4.1** and `/lsi:help` changelog entry
-- Overlay flowchart early branch for workflow help → `/lsi:help` — polish follow-up, not this PR (task 2.4 deferred unless dogfood shows routing misses)
+- Overlay flowchart early branch for workflow help → `/lsi:help` — **not in initial apply**; task **2.4** gated by dogfood routing test **5.7** (close 2.4 on pass; implement on fail)
 - Adopters: receive `/lsi:help` after bundle release and `adopt.py` / `/lsi:update` re-sync

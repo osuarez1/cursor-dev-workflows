@@ -4,10 +4,12 @@
 
 ## 2. Routing and rules
 
+**Apply scope:** ship **1.1 + 2.1–2.3** in this change; **do not** implement **2.4** until routing gate **5.7** fails.
+
 - [ ] 2.1 Add `/lsi:help` decision-table row to `overlays/lsi/docs/workflows/which-workflow.md` and `overlays/lsi/which-workflow-lsi.md` — insert **after `/opsx:propose`**; row text per `design.md` §11 (“which command / help / lost …” → `/lsi:help`)
 - [ ] 2.2 Add overlap rule **#7** (`/lsi:help` vs implementation commands) to **LSI overlay** `overlays/lsi/docs/workflows/which-workflow.md` only — one paragraph per `design.md` §8; link to `lsi-help.md`; do not paste full guardrail list. **Same commit:** list `/lsi:help` in `overlays/lsi/agent-stack/openspec-git-integration.mdc` and `overlays/lsi/docs/workflows/openspec-git-integration.md` quick reference (was task 2.5)
 - [ ] 2.3 Extend bundle-root `which-workflow.md` LSI row with “Discovery: `/lsi:help` (overlay)” — **no** full overlap rule at root
-- [ ] 2.4 *(polish)* Overlay flowchart early branch for workflow help / which command → `/lsi:help` — defer unless dogfood (tasks 5.x) shows routing misses
+- [ ] 2.4 *(optional — gated by 5.7)* Overlay flowchart early branch for workflow help / which command → `/lsi:help` — **out of initial apply**; run **5.7** after 2.1–2.3 + bootstrap. **If 5.7 pass:** mark **2.4 closed** (decision table sufficient; no flowchart branch). **If 5.7 fail:** implement 2.4 before release close
 
 ## 3. Parity tooling
 
@@ -28,3 +30,9 @@
 - [ ] 5.4 Manual: all spec links are `github.com/osuarez1/cursor-dev-workflows/blob/v.../...`
 - [ ] 5.5 Run `python3 snippets/verify-adopters.py` after bootstrap (bundle repo smoke)
 - [ ] 5.6 Manual: mid-session user says “create a card” → agent stays read-only until Exit (may suggest `/lsi:card` or relevant help section; does not run Trello API, `git ts`/`git tb`, or other implementation commands)
+- [ ] 5.7 **Routing gate (task 2.4):** after **2.1–2.3** + **4.1** bootstrap, three **fresh Agent** chats — plain user text only (no `/lsi:help` invocation). Agent must route to **`/lsi:help`** via overlay `which-workflow.md` decision table (not `/opsx:explore`, not implementation commands, not a generic doc dump without naming `/lsi:help`):
+  1. `which command should I use?`
+  2. `I'm lost on the LSI workflow`
+  3. `what should I run next?`
+  - **Pass (all 3):** check **2.4 closed** — flowchart branch not needed; record pass in apply notes or PR Testing
+  - **Fail (any):** implement **2.4** before marking change complete
