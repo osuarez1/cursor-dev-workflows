@@ -1,0 +1,43 @@
+repo: ai-agent
+overlay: lsi
+layout: lsi
+canonical: .lsi/workflows
+sync_opsx: false
+project:
+  REPO_NAME: ai-agent
+  TITLE_PREFIX: "AI Agent | "
+  BASE_BRANCH: main
+  PR_TARGET_BRANCH: staging
+  PROTECTED_BRANCHES: "main, staging, test"
+  SOURCE_ROOT: "frontend/, backend/"
+  TEST_ROOT: "frontend/, backend/"
+  TEST_COMMAND: "make test"
+  PR_HOST: Bitbucket
+  BITBUCKET_REMOTE: lsistreaming/ai-agent
+  VERSION_FILE: VERSION
+  PR_WARN_FILES: "15"
+  PR_MAX_FILES: "25"
+  PR_WARN_LINES: "250"
+  PR_MAX_LINES: "400"
+  PR_MAX_COMMITS: "12"
+  PR_MAX_PRIMARY_CONCERNS: "1"
+  PR_MAX_SCOPES: "3"
+preserve:
+  - bitbucket-pipelines.yml
+  - .cursor/rules/*.mdc
+  - frontend/.cursor/rules/*
+  - backend/.cursor/rules/*
+agents_claude:
+  canonical: AGENTS.md
+  claude_symlink: true
+  reconcile_sources:
+    - CLAUDE.md
+merge:
+  AGENTS.md:
+    markers: [lsi:workflows, lsi:domain]
+bootstrap:
+  VERSION: "0.4.0"
+  VERSION_FILE: VERSION
+remove_after_adopt:
+  - frontend/openspec/
+  - backend/openspec/

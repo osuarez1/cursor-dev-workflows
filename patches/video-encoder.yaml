@@ -1,0 +1,38 @@
+repo: video-encoder
+overlay: lsi
+layout: lsi
+canonical: .lsi/workflows
+sync_opsx: false
+project:
+  REPO_NAME: video-encoder
+  TITLE_PREFIX: "VE | "
+  BASE_BRANCH: main
+  PR_TARGET_BRANCH: staging
+  PROTECTED_BRANCHES: "main, staging"
+  SOURCE_ROOT: "src/"
+  TEST_ROOT: tests/
+  TEST_COMMAND: "pytest"
+  PR_HOST: Bitbucket
+  BITBUCKET_REMOTE: lsistreaming/video-encoder
+  PR_WARN_FILES: "15"
+  PR_MAX_FILES: "25"
+  PR_WARN_LINES: "250"
+  PR_MAX_LINES: "400"
+  PR_MAX_COMMITS: "12"
+  PR_MAX_PRIMARY_CONCERNS: "1"
+  PR_MAX_SCOPES: "3"
+preserve:
+  - bitbucket-pipelines.yml
+  - .cursor/rules/ffmpeg.mdc
+agents_claude:
+  canonical: AGENTS.md
+  claude_symlink: true
+merge:
+  AGENTS.md:
+    markers: [lsi:workflows, lsi:domain]
+  cursorrules:
+    marker_block: lsi:workflows
+bootstrap:
+  version.txt: "0.1.0"
+remove_after_adopt:
+  - docs/ai/cursor-dev-workflows.md

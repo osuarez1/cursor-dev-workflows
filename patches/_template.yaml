@@ -1,0 +1,19 @@
+repo: my-repo
+overlay: lsi
+layout: lsi
+canonical: .lsi/workflows
+project:
+  REPO_NAME: my-repo
+  TITLE_PREFIX: "My Repo | "
+  BASE_BRANCH: main
+  PR_TARGET_BRANCH: staging
+  PROTECTED_BRANCHES: "main, staging"
+  SOURCE_ROOT: "src/"
+  TEST_COMMAND: "npm test"
+preserve:
+  - bitbucket-pipelines.yml
+agents_claude:
+  canonical: AGENTS.md
+  claude_symlink: true
+bootstrap:
+  version.txt: "0.1.0"

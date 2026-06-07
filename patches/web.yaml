@@ -1,0 +1,57 @@
+repo: web
+overlay: lsi
+layout: lsi
+canonical: .lsi/workflows
+sync_opsx: false
+project:
+  REPO_NAME: web
+  TITLE_PREFIX: "Web | "
+  BASE_BRANCH: main
+  PR_TARGET_BRANCH: staging
+  PROTECTED_BRANCHES: "main, staging, master"
+  SOURCE_ROOT: "app/, lib/"
+  TEST_ROOT: spec/
+  TEST_COMMAND: "bin/check-schema-sync && bin/rspec-changed"
+  PR_HOST: Bitbucket
+  BITBUCKET_REMOTE: lsistreaming/web
+  PR_WARN_FILES: "15"
+  PR_MAX_FILES: "25"
+  PR_WARN_LINES: "250"
+  PR_MAX_LINES: "400"
+  PR_MAX_COMMITS: "12"
+  PR_MAX_PRIMARY_CONCERNS: "1"
+  PR_MAX_SCOPES: "3"
+scope_exclude_globs:
+  - Gemfile.lock
+  - db/schema.rb
+preserve:
+  - docs/workflows/migrations.md
+  - docs/workflows/testing.md
+  - docs/workflows/postgres-app-test-database.md
+  - docs/workflows/video-encoder-*.md
+  - PROJECT.md
+  - bitbucket-pipelines.yml
+overlay_files:
+  test-requirements.md: patches/files/web/test-requirements.md
+  versioning-and-releases.md: patches/files/web/versioning-and-releases.md
+  ticket-card-info.md: patches/files/web/ticket-card-info.md
+remove_after_adopt:
+  - docs/workflows/git-trello-task-cards.md
+  - .cursor/rules/git-trello-task-cards.mdc
+  - .cursor/rules/openspec.mdc
+agents_claude:
+  canonical: AGENTS.md
+  claude_symlink: true
+  reconcile_sources:
+    - CLAUDE.md
+    - docs/agents/coding-agents.md
+  stub_after_merge: docs/agents/coding-agents.md
+merge:
+  AGENTS.md:
+    markers: [lsi:workflows, lsi:domain]
+  cursorrules:
+    marker_block: lsi:workflows
+bootstrap:
+  version.txt: "0.1.0"
+ci_hook:
+  add_check_version: true
