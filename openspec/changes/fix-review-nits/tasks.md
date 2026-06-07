@@ -26,16 +26,21 @@
 
 - [x] 6.1 Add `lsi-card-link.md`, `lsi-trello-list.md`, `lsi-trello-branch.md` under `overlays/lsi/agent-stack/commands/`
 - [x] 6.2 Update routing docs (`integrations.md`, `git-trello.md`, `which-workflow.md`, `which-workflow-lsi.md`, `ticket-card-info.md`)
-- [x] 6.3 Extend `verify-adopters.py` and `audit-agent-docs.py` parity lists (17× `/lsi:*`)
+- [x] 6.3 Extend `verify-adopters.py` and `audit-agent-docs.py` parity lists (18× `/lsi:*`)
 - [x] 6.4 Fix protected-branch guardrails — card-setup commands include trello-list and trello-branch
+- [x] 6.5 Genericize `/lsi:branch` opening line — remove adopter-specific copy from overlay command source
 
 ## 7. Maintainer `.cursor/` gitignore
 
 - [x] 7.1 Add `.cursor/` to `.gitignore` and remove tracked rules from git index
 - [x] 7.2 Update `AGENTS.md`, `PROJECT.md`, `README.md` to reference `snippets/cursor-rules/commit-pr-conventions.mdc`
-- [x] 7.3 Add `bootstrap-maintainer-local.sh` to sync `.cursor/commands/` from overlay (install docs in gitignored `MAINTAINER.md`)
+- [x] 7.3 Add `bootstrap-maintainer-local.sh` and `install-maintainer-local.py` to sync `.cursor/commands/` from overlay (install docs in gitignored `MAINTAINER.md`)
+- [x] 7.4 Add `/lsi:update` and `update-workflows.py` — auto-detect bundle maintainer vs adopter re-sync
+- [x] 7.5 Gitignore `maintainer-adopters.local.yaml`; load adopter targets from that file in `update-workflows.py` / `verify-all-adopters.sh`; org paths documented in gitignored `MAINTAINER.md` only
+- [x] 7.6 Genericize `/lsi:update` tracked examples — no org-specific adopter paths in slash command copy
 
 ## 8. Regression tests
 
 - [x] 8.1 Add `snippets/test_adopt_tokens.py` — `BUNDLE_VERSION` substitution and `patches/web.yaml` list keys
 - [x] 8.2 Run `python3 snippets/test_adoption_verify_links.py` and `python3 snippets/test_adopt_tokens.py`
+- [x] 8.3 Add `snippets/test_update_workflows.py` — adopter target loader and repo detection

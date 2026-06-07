@@ -11,7 +11,9 @@ Promotion readiness and code review for bundle **v1.3.0** surfaced minor inconsi
 - Allow **`/lsi:card`** from **`staging`** as well as **`main`** (staging-first repos start card + branch from integration branch).
 - Add **`/lsi:card-link`**, **`/lsi:trello-list`**, and **`/lsi:trello-branch`** — OpenSpec-gated, redacted Trello card copy for existing branches and To Do cards.
 - Gitignore **`.cursor/`** in the bundle repo; remove tracked rules from version control; point maintainer docs at `snippets/cursor-rules/`.
+- Add **`/lsi:update`** and maintainer re-sync helpers — `update-workflows.py`, `install-maintainer-local.py`, `bootstrap-maintainer-local.sh` — with org-specific adopter clone paths in gitignored **`maintainer-adopters.local.yaml`** (documented in gitignored **`MAINTAINER.md`** only, not tracked slash commands).
 - Add regression tests for `BUNDLE_VERSION` token injection and patch YAML list loading.
+- Genericize overlay command copy where review surfaced adopter-specific wording (e.g. `/lsi:branch` opening line).
 
 ## Capabilities
 
@@ -19,7 +21,7 @@ Promotion readiness and code review for bundle **v1.3.0** surfaced minor inconsi
 
 - `adopt-bundle-version-token`: Overlay and adopt pipeline substitute `{{BUNDLE_VERSION}}` from bundle `VERSION` during LSI adopt.
 - `trello-card-slash-commands`: Card-link and trello list/branch slash commands with OpenSpec-gated redacted card copy.
-- `maintainer-cursor-gitignore`: Local `.cursor/` install gitignored; canonical rules in `snippets/cursor-rules/`.
+- `maintainer-cursor-gitignore`: Local `.cursor/` install gitignored; canonical rules in `snippets/cursor-rules/`; maintainer re-sync via `/lsi:update` and gitignored adopter path config.
 
 ### Modified Capabilities
 
@@ -28,9 +30,9 @@ Promotion readiness and code review for bundle **v1.3.0** surfaced minor inconsi
 ## Impact
 
 - `PROJECT.md`, `AGENTS.md`, `README.md` — dogfood paths and `.cursor/` gitignore note
-- `.gitignore` — `.cursor/`, `.git-trello/`
+- `.gitignore` — `.cursor/`, `.git-trello/`, `maintainer-adopters.local.yaml`
 - `overlays/lsi/docs/workflows/openspec-git-integration.md` — overlay header and card routing
-- `overlays/lsi/agent-stack/commands/` — `lsi-card`, `lsi-card-link`, `lsi-trello-list`, `lsi-trello-branch`
+- `overlays/lsi/agent-stack/commands/` — `lsi-card`, `lsi-card-link`, `lsi-trello-list`, `lsi-trello-branch`, `lsi-update`, `lsi-branch` (generic copy)
 - `docs/workflows/integrations.md`, `overlays/lsi/docs/sdlc/git-trello.md`, routing tables
-- `snippets/adopt.py`, `verify-adopters.py`, `audit-agent-docs.py`, `test_adopt_tokens.py`
-- Adopters re-syncing after merge will get new slash commands and correct bundle version in adopted overlay docs
+- `snippets/adopt.py`, `update-workflows.py`, `install-maintainer-local.py`, `verify-adopters.py`, `audit-agent-docs.py`, `test_adopt_tokens.py`, `test_update_workflows.py`
+- Adopters re-syncing after merge will get new slash commands, resolved bundle version strings in adopted overlay docs, and updated `BUNDLE_VERSION` in `PROJECT.md`

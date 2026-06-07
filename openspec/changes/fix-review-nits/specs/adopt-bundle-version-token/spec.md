@@ -23,6 +23,11 @@ LSI overlay workflow docs that cite the upstream bundle version SHALL use `{{BUN
 - **WHEN** maintainers inspect `overlays/lsi/docs/workflows/openspec-git-integration.md` in the bundle repo
 - **THEN** the upstream bundle version reference uses `{{BUNDLE_VERSION}}`, not a fixed version like `v1.0.0`
 
+#### Scenario: Placeholders remain in bundle source until adopt
+
+- **WHEN** maintainers read overlay markdown in the bundle repo (not an adopted copy)
+- **THEN** `v{{BUNDLE_VERSION}}` appears unreplaced — substitution happens at adopt time; adopters must re-sync to pick up resolved version strings
+
 ### Requirement: Dogfood PROJECT.md matches VERSION
 
 The bundle maintainer `PROJECT.md` SHALL record `BUNDLE_VERSION` consistent with the root `VERSION` file after each release bump.

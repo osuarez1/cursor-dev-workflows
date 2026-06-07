@@ -15,6 +15,7 @@ Bundle **v1.3.0** promotion review (`/lsi:review`) flagged three fixable nits: s
 - Align `/lsi:card` protected-branch policy with staging-first workflow (`main` or `staging`).
 - Add Trello slash commands for existing branches and To Do cards (`/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`) with OpenSpec-gated redacted card copy.
 - Gitignore local `.cursor/` maintainer install; canonical rules in `snippets/cursor-rules/`.
+- Provide maintainer re-sync tooling (`/lsi:update`, `update-workflows.py`, `install-maintainer-local.py`) with org-specific adopter paths in gitignored `maintainer-adopters.local.yaml`.
 
 **Non-Goals:**
 
@@ -67,17 +68,36 @@ Bundle **v1.3.0** promotion review (`/lsi:review`) flagged three fixable nits: s
 
 **Rationale:** Slash commands and maintainer-local rules are install artifacts, not bundle source.
 
+### 7. Maintainer re-sync helpers
+
+**Choice:** Add `/lsi:update`, `update-workflows.py` (auto-detect bundle maintainer vs adopter), and `install-maintainer-local.py` (invoked by `bootstrap-maintainer-local.sh`).
+
+**Rationale:** After gitignoring `.cursor/`, maintainers need a repeatable path to re-sync slash commands from overlay source and re-run adopt across registered adopters after bundle releases.
+
+**Alternative rejected:** Document manual `adopt.py` loops only in MAINTAINER.md — error-prone and duplicates bootstrap + adopt steps.
+
+### 8. Gitignored adopter path config
+
+**Choice:** Org-specific clone paths live in gitignored `maintainer-adopters.local.yaml` at bundle root; `update-workflows.py` and `verify-all-adopters.sh` load targets from that file. Tracked slash commands and public docs reference gitignored `MAINTAINER.md` only — no hardcoded `../<repo>` paths in tracked command examples.
+
+**Rationale:** Maintainer tooling may ship in the bundle repo, but clone layout is machine- and org-specific; should not appear in PRs or adopted copies.
+
+**Alternative rejected:** Hardcode `MAINTAINER_ADOPTER_TARGETS` in tracked `update-workflows.py` — leaks org layout into version control.
+
 ## Risks / Trade-offs
 
-- **[Risk] Bundle repo reads overlay with unreplaced `{{BUNDLE_VERSION}}`** → Expected in source overlay; only adopted copies substitute. Document in review if needed.
+- **[Risk] Bundle repo reads overlay with unreplaced `{{BUNDLE_VERSION}}`** → Expected in source overlay; only adopted copies substitute. Adopters must re-sync after merge to pick up resolved version strings.
 - **[Risk] Working tree already contains fixes** → `/opsx:apply` should verify idempotently and commit only if diffs remain.
+- **[Risk] Missing `maintainer-adopters.local.yaml`** → `/lsi:update` still bootstraps `.cursor/` but skips adopter sync loop until maintainer creates the file per `MAINTAINER.md`.
 
 ## Migration Plan
 
 1. Implement on ticket branch from `staging`.
-2. Run `python3 snippets/test_adoption_verify_links.py` and YAML smoke load of `patches/web.yaml`.
+2. Run `python3 snippets/test_adoption_verify_links.py`, `python3 snippets/test_adopt_tokens.py`, and `python3 snippets/test_update_workflows.py`.
 3. Commit via `/lsi:commit`; merge to `staging`; include in promotion PR to `main`.
+4. **Post-merge:** re-sync all LSI adopters via `/lsi:update` so adopted overlay docs resolve `v{{BUNDLE_VERSION}}` and new slash commands install.
 
 ## Open Questions
 
-- None — scope is bounded review nits.
+- None blocking merge.
+- **Deferred:** add a second patch-YAML fixture test for another list-key shape in `_load_simple_yaml` stdlib fallback (e.g. nested list under dict in `patches/ai-agent.yaml`); current coverage uses `web.yaml` / `scope_exclude_globs` only.
