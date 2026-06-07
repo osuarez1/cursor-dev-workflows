@@ -513,6 +513,42 @@ def build_tokens(config: dict) -> dict[str, str]:
     return {k: str(v) for k, v in project.items()}
 
 
+def resolve_audit_resolutions(
+    config: dict,
+    config_path: Path,
+    cli_path: Path | None,
+) -> Path | None:
+    if cli_path is not None:
+        return cli_path.resolve()
+    rel = config.get("audit_resolutions")
+    if not rel:
+        return None
+    candidate = Path(rel)
+    if candidate.is_file():
+        return candidate.resolve()
+    bundle_relative = (BUNDLE_ROOT / rel).resolve()
+    if bundle_relative.is_file():
+        return bundle_relative
+    config_relative = (config_path.parent / rel).resolve()
+    if config_relative.is_file():
+        return config_relative
+    return bundle_relative
+
+
+def audit_cli_args(
+    target: Path,
+    *,
+    accept_resolutions: Path | None = None,
+    accept_policy_defaults: bool = False,
+) -> list[str]:
+    args = ["--repo-root", str(target)]
+    if accept_resolutions is not None:
+        args.extend(["--accept-resolutions", str(accept_resolutions)])
+    if accept_policy_defaults:
+        args.append("--accept-policy-defaults")
+    return args
+
+
 def adopt(
     target: Path,
     config_path: Path,
@@ -520,17 +556,23 @@ def adopt(
     dry_run: bool = False,
     skip_audit: bool = False,
     accept_policy_defaults: bool = False,
+    accept_resolutions: Path | None = None,
 ) -> int:
     config = load_config(config_path)
     tokens = build_tokens(config)
     bundle_version = (BUNDLE_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    resolutions = resolve_audit_resolutions(config, config_path, accept_resolutions)
 
     if not skip_audit and AUDIT_SCRIPT.is_file():
-        audit_args = ["--repo-root", str(target)]
-        if accept_policy_defaults:
-            pass  # post-resolution re-run only skips blocking in future
-        code = run_script(AUDIT_SCRIPT, *audit_args)
-        if code != 0 and not accept_policy_defaults:
+        code = run_script(
+            AUDIT_SCRIPT,
+            *audit_cli_args(
+                target,
+                accept_resolutions=resolutions,
+                accept_policy_defaults=accept_policy_defaults,
+            ),
+        )
+        if code != 0:
             print(
                 "Audit found blocking issues. Fix or re-run with "
                 "--accept-policy-defaults / --accept-resolutions after review.",
@@ -569,7 +611,16 @@ def adopt(
             return code
 
     if AUDIT_SCRIPT.is_file():
-        code = run_script(AUDIT_SCRIPT, "--repo-root", str(target), "--fail-on", "error")
+        code = run_script(
+            AUDIT_SCRIPT,
+            *audit_cli_args(
+                target,
+                accept_resolutions=resolutions,
+                accept_policy_defaults=accept_policy_defaults,
+            ),
+            "--fail-on",
+            "error",
+        )
         if code != 0:
             print("Post-adopt audit failed.", file=sys.stderr)
             return code
@@ -598,15 +649,29 @@ def main(argv: list[str] | None = None) -> int:
         print("Only --overlay lsi is supported.", file=sys.stderr)
         return 2
 
+    config_path = args.config.resolve()
+    config = load_config(config_path)
+    resolutions = resolve_audit_resolutions(
+        config, config_path, args.accept_resolutions
+    )
+
     if args.audit_only:
-        return run_script(AUDIT_SCRIPT, "--repo-root", str(args.target.resolve()))
+        return run_script(
+            AUDIT_SCRIPT,
+            *audit_cli_args(
+                args.target.resolve(),
+                accept_resolutions=resolutions,
+                accept_policy_defaults=args.accept_policy_defaults,
+            ),
+        )
 
     return adopt(
         args.target.resolve(),
-        args.config.resolve(),
+        config_path,
         dry_run=args.dry_run,
-        skip_audit=args.skip_audit or args.accept_policy_defaults,
+        skip_audit=args.skip_audit,
         accept_policy_defaults=args.accept_policy_defaults,
+        accept_resolutions=args.accept_resolutions,
     )
 
 

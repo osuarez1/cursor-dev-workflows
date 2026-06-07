@@ -6,36 +6,29 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
-### Added
-
-- `snippets/verify-adopters.py` — parity checklist + link/audit gate for LSI adopters
-- `snippets/verify-all-adopters.sh` — verify video-encoder, web, ai-agent in one command
-- `docs/ci/check_version-web.yml`, `docs/ci/check_version-ai-agent.yml` — Bitbucket pipeline snippets
-- `docs/adopt-new-repo.md` — step-by-step guide for registering new LSI repos
-- `patches/files/_template/` — overlay examples + `audit-resolutions.yaml.example`
-
-### Changed
-
-- `patches/_template.yaml` — full patch schema with comments
-- `patches/README.md` — registered repos table and patch key reference
-- `adoption-checklist.md` — LSI adopt.py path at top; legacy manual steps deprecated
-- `MAINTAINER.md.example` — LSI adopt loop and verify commands (replaces Profile A/B)
-
 ## [1.3.0] - 2026-06-06
 
 ### Added
 
 - **LSI overlay** — `overlays/lsi/` with OpenSpec + Git integration, release scripts, agent stack (3 always-on rules, 13× `/lsi:*`, 5× `/opsx:*` commands)
-- **`snippets/adopt.py`** — single adopt entry point for `.lsi/workflows/` layout
-- **`snippets/audit-agent-docs.py`** — pre/post adopt contradiction scan (v1 token/path checks)
-- **`patches/`** — per-repo YAML registry (`video-encoder`, `web`, `ai-agent`, `_template`)
-- **Docs** — [docs/adopt-and-update.md](docs/adopt-and-update.md), [docs/token-registry.md](docs/token-registry.md), [docs/adopter-boundaries.md](docs/adopter-boundaries.md), [overlays/lsi/docs/workflows/branch-reviewability.md](overlays/lsi/docs/workflows/branch-reviewability.md)
+- **`snippets/adopt.py`** — single adopt entry point for `.lsi/workflows/` layout; `--accept-resolutions` wired to audit
+- **`snippets/audit-agent-docs.py`** — pre/post adopt contradiction scan (v1 token/path checks); `--accept-resolutions` and `--accept-policy-defaults`
+- **`snippets/verify-adopters.py`** — parity checklist + link/audit gate for LSI adopters
+- **`snippets/verify-all-adopters.sh`** — verify video-encoder, web, ai-agent in one command
+- **`patches/`** — per-repo YAML registry (`video-encoder`, `web`, `ai-agent`, `_template`) with `audit_resolutions` paths
+- **`patches/files/_template/`** — overlay examples + `audit-resolutions.yaml.example`
+- **Docs** — [docs/adopt-and-update.md](docs/adopt-and-update.md), [docs/adopt-new-repo.md](docs/adopt-new-repo.md), [docs/token-registry.md](docs/token-registry.md), [docs/adopter-boundaries.md](docs/adopter-boundaries.md), [overlays/lsi/docs/workflows/branch-reviewability.md](overlays/lsi/docs/workflows/branch-reviewability.md)
+- **CI snippets** — `docs/ci/check_version-web.yml`, `docs/ci/check_version-ai-agent.yml`
 
 ### Changed
 
-- **Adoption layout** — LSI only (`.lsi/workflows/`); Profile A/B retired
+- **Adoption layout** — LSI only (`.lsi/workflows/`); Profile A/B retired; verify test fixtures updated
 - **`snippets/adoption-verify-links.py`** — LSI layout only; removed `--profile` flag
 - **`check_version.py`** — supports `VERSION_FILE` env var (e.g. `VERSION` for ai-agent)
+- **`patches/_template.yaml`** — full patch schema with comments
+- **`patches/README.md`** — registered repos table and patch key reference
+- **`adoption-checklist.md`** — LSI adopt.py path at top; legacy manual steps deprecated
+- **`MAINTAINER.md.example`** — LSI adopt loop and verify commands (replaces Profile A/B)
 
 ### Adopter note (1.3.0)
 

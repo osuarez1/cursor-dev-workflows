@@ -12,6 +12,17 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+try:
+    import yaml  # type: ignore
+except ImportError:
+    yaml = None  # type: ignore
+
+POLICY_DEFAULT_CHOICES: dict[str, str] = {
+    "pr_target": "staging_first",
+    "claude_symlink": "symlink_to_agents",
+    "openspec_archive_timing": "lsi_close_on_main",
+}
+
 SEVERITY_ERROR = "error"
 SEVERITY_WARN = "warn"
 SEVERITY_INFO = "info"
@@ -248,6 +259,60 @@ def default_scan_paths(repo_root: Path) -> list[Path]:
     return sorted(set(paths))
 
 
+def load_resolutions(path: Path | None) -> dict[str, str]:
+    """Return accepted finding categories (resolution id -> choice)."""
+    if path is None or not path.is_file():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    entries: list[object]
+    if yaml is not None:
+        data = yaml.safe_load(text)
+        entries = data if isinstance(data, list) else []
+    else:
+        entries = []
+        current: dict[str, str] | None = None
+        for raw in text.splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("- id:"):
+                if current:
+                    entries.append(current)
+                current = {"id": line.split(":", 1)[1].strip()}
+            elif current is not None and ":" in line:
+                key, value = line.split(":", 1)
+                current[key.strip()] = value.strip().strip("'\"")
+        if current:
+            entries.append(current)
+
+    accepted: dict[str, str] = {}
+    for entry in entries:
+        if isinstance(entry, dict) and entry.get("id"):
+            accepted[str(entry["id"])] = str(entry.get("choice", "accepted"))
+    return accepted
+
+
+def apply_resolutions(
+    findings: list[Finding],
+    *,
+    accepted: dict[str, str],
+    policy_defaults: bool = False,
+) -> tuple[list[Finding], list[Finding]]:
+    """Split findings into unresolved and accepted (suppressed) lists."""
+    effective = dict(accepted)
+    if policy_defaults:
+        effective.update(POLICY_DEFAULT_CHOICES)
+
+    unresolved: list[Finding] = []
+    suppressed: list[Finding] = []
+    for finding in findings:
+        if finding.category in effective:
+            suppressed.append(finding)
+        else:
+            unresolved.append(finding)
+    return unresolved, suppressed
+
+
 def audit(repo_root: Path, extra_paths: list[Path] | None = None) -> list[Finding]:
     repo_root = repo_root.resolve()
     tokens = project_tokens(repo_root)
@@ -265,8 +330,12 @@ def audit(repo_root: Path, extra_paths: list[Path] | None = None) -> list[Findin
     return findings
 
 
-def format_report(findings: list[Finding]) -> str:
-    if not findings:
+def format_report(
+    findings: list[Finding],
+    *,
+    accepted: list[Finding] | None = None,
+) -> str:
+    if not findings and not accepted:
         return "OK: no findings"
     lines: list[str] = []
     by_cat: dict[str, list[Finding]] = {}
@@ -281,6 +350,11 @@ def format_report(findings: list[Finding]) -> str:
                 lines.append(f"  {f.message}")
             if f.suggestion:
                 lines.append(f"    → {f.suggestion}")
+    if accepted:
+        lines.append("[ACCEPTED]")
+        for f in accepted:
+            loc = f" {f.location}" if f.location else ""
+            lines.append(f"  {f.category}:{loc} {f.message[:80]}")
     return "\n".join(lines)
 
 
@@ -293,11 +367,30 @@ def main(argv: list[str] | None = None) -> int:
         default="error",
         help="Exit 1 when findings at or above this severity (default: error)",
     )
+    parser.add_argument(
+        "--accept-resolutions",
+        type=Path,
+        default=None,
+        help="YAML file of accepted contradiction resolutions (category id -> choice)",
+    )
+    parser.add_argument(
+        "--accept-policy-defaults",
+        action="store_true",
+        help="Accept confirmed LSI policy resolutions (staging-first, symlink, /lsi:close)",
+    )
     parser.add_argument("--report-file", type=Path, default=None)
     args = parser.parse_args(argv)
 
-    findings = audit(args.repo_root.resolve())
-    report = format_report(findings)
+    raw_findings = audit(args.repo_root.resolve())
+    accepted_map = load_resolutions(
+        args.accept_resolutions.resolve() if args.accept_resolutions else None
+    )
+    findings, suppressed = apply_resolutions(
+        raw_findings,
+        accepted=accepted_map,
+        policy_defaults=args.accept_policy_defaults,
+    )
+    report = format_report(findings, accepted=suppressed or None)
     print(report)
 
     if args.report_file:

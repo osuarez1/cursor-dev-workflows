@@ -2,6 +2,7 @@ repo: web
 overlay: lsi
 layout: lsi
 canonical: .lsi/workflows
+audit_resolutions: patches/files/web/audit-resolutions.yaml
 sync_opsx: false
 project:
   REPO_NAME: web
