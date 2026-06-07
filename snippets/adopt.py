@@ -417,6 +417,19 @@ def merge_cursorrules(target: Path) -> None:
         cr.write_text(block + "\n", encoding="utf-8")
 
 
+def reconcile_agents_before_symlink(target: Path, config: dict) -> None:
+    """If CLAUDE.md is a regular file, preserve its text before symlink replaces it."""
+    agents_cfg = config.get("agents_claude") or {}
+    if not agents_cfg.get("claude_symlink", True):
+        return
+    claude = target / "CLAUDE.md"
+    backup = target / ".adopt-claude-backup.md"
+    if claude.is_file() and not claude.is_symlink():
+        backup.write_text(claude.read_text(encoding="utf-8"), encoding="utf-8")
+        # Reconcile hook: maintainer merges backup into AGENTS.md domain block manually
+        # or via patches/files/<repo>/AGENTS.domain.md overlay on future adopt runs.
+
+
 def symlink_claude(target: Path, config: dict) -> None:
     agents_cfg = config.get("agents_claude") or {}
     if not agents_cfg.get("claude_symlink", True):
@@ -537,6 +550,7 @@ def adopt(
     merge_convention(target)
     merge_agents_markers(target)
     merge_cursorrules(target)
+    reconcile_agents_before_symlink(target, config)
     symlink_claude(target, config)
     update_project_md(target, config, bundle_version)
     bootstrap_files(target, config)
