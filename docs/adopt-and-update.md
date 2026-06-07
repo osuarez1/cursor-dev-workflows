@@ -25,7 +25,7 @@ python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --ac
 ## Bundle update
 
 1. Bump `VERSION` and `CHANGELOG.md` in cursor-dev-workflows
-2. Re-run adopt against each adopter repo
+2. Re-run adopt against each adopter repo — agent: **`/lsi:update`** or `python3 snippets/update-workflows.py` (with `WORKFLOWS_BUNDLE_PATH` or `--bundle /path/to/cursor-dev-workflows`)
 3. Commit adopted files in each app repo
 
 ## Always-on rules (installed by adopt)
@@ -52,7 +52,7 @@ python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --ac
 python3 snippets/verify-adopters.py --repo-root ../my-repo
 ```
 
-Checks: `.lsi/workflows/`, 3 always-on rules, 14× `lsi-*` commands, `CLAUDE.md` symlink, `PROJECT.md`, `scripts/check_version.py`, link verify, audit.
+Checks: `.lsi/workflows/`, 3 always-on rules, `/lsi:*` slash commands, `CLAUDE.md` symlink, `PROJECT.md`, `scripts/check_version.py`, link verify, audit.
 
 ## CI: version gate
 
@@ -61,9 +61,9 @@ Adopt installs `scripts/check_version.py` but **does not edit** `bitbucket-pipel
 - [docs/ci/check_version-web.yml](ci/check_version-web.yml) — `version.txt`
 - [docs/ci/check_version-ai-agent.yml](ci/check_version-ai-agent.yml) — `VERSION_FILE=VERSION`
 
-## Ongoing sync (maintainer)
+## Ongoing sync (bundle maintainer)
 
-See [MAINTAINER.md.example](../MAINTAINER.md.example) — re-run `adopt.py` on every bundle tag for each adopter repo.
+Bundle maintainer adopt loop and local Cursor install are documented in gitignored **`MAINTAINER.md`** (copy from [MAINTAINER.md.example](../MAINTAINER.md.example)).
 
 ## New repo
 

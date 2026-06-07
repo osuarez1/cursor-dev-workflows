@@ -26,6 +26,7 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 | merge extended description (Bitbucket) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:merge-desc` | Extended merge body |
 | commit plan, logical commits | [commits-logical-order.md](commits-logical-order.md) | `/lsi:commit` | Commit plan; commit only if asked |
 | version bump, changelog, release tag | [versioning-and-releases.md](versioning-and-releases.md) | `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release` | Release train on `main` |
+| re-sync bundle, adopt update, workflow update | [adopt-and-update.md](../../../docs/adopt-and-update.md) | `/lsi:update` | Re-sync adopted workflows from bundle |
 | when are tests required | [test-requirements.md](test-requirements.md) | — | Policy |
 | OpenSpec apply / archive | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:apply`, `/opsx:archive` | Archive on `main` only — see overlay |
 

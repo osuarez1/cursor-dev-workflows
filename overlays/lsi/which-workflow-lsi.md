@@ -15,4 +15,5 @@ Merge these rows into the decision table when adopting with `--overlay lsi`.
 | production close (sync + archive on main) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:close` | Close change after main merge |
 | merge extended description (Bitbucket) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:merge-desc` | Extended merge body |
 | version bump, changelog, release tag | [versioning-and-releases.md](versioning-and-releases.md) | `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release` | Release train on `main` |
+| re-sync bundle / adopt update | [adopt-and-update.md](../../../docs/adopt-and-update.md) | `/lsi:update` | Re-sync adopted workflows from bundle |
 | OpenSpec apply / archive | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:apply`, `/opsx:archive` | Archive on `main` only — see overlay |

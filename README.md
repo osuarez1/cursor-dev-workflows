@@ -124,10 +124,10 @@ snippets/
   test_adoption_verify_links.py  # Regression tests (python3 snippets/test_adoption_verify_links.py)
   test_adopt_tokens.py           # Adopt token + YAML tests (python3 snippets/test_adopt_tokens.py)
   fixtures/adoption-verify/  # Test fixture trees
-  cursor-rules/              # Canonical Cursor rules (copied to .cursor/rules/ locally)
+  cursor-rules/              # Canonical Cursor rules (adopters + local install)
   user-rule-only-commit-when-asked.md
   gitignore-local-artifacts.txt
-.cursor/                     # gitignored — local install (bootstrap-maintainer-local.sh)
+.cursor/                     # gitignored — local Cursor install (see MAINTAINER.md)
 LICENSE
 ```
 
