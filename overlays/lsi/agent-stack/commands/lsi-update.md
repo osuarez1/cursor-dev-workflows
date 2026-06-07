@@ -39,13 +39,12 @@ Re-sync the **cursor-dev-workflows** bundle after a release or overlay command e
 
 3. **Bundle maintainer — registered adopters (default unless `--local-only`)**
 
-   Read gitignored [MAINTAINER.md](../../MAINTAINER.md) for custom adopt paths if present; otherwise use registered targets from [patches/README.md](../../patches/README.md):
+   Read gitignored [MAINTAINER.md](../../MAINTAINER.md) for `maintainer-adopters.local.yaml` and the adopt loop. If that file is missing, only bootstrap runs.
 
    ```bash
    python3 snippets/update-workflows.py
-   # or explicitly:
-   python3 snippets/adopt.py --target ../web --config patches/web.yaml --accept-policy-defaults
-   python3 snippets/verify-adopters.py --repo-root ../web
+   # adopters-only (skip bootstrap):
+   python3 snippets/update-workflows.py --adopters-only
    ```
 
    Skip missing adopter directories with a warning. After adopt, remind maintainer to commit + open PR in each adopter repo with updated `BUNDLE_VERSION` in `PROJECT.md`.
@@ -85,7 +84,7 @@ Re-sync the **cursor-dev-workflows** bundle after a release or overlay command e
 ## Workflow update — bundle maintainer
 
 **Bootstrap:** 22 commands → .cursor/commands/
-**Adopters synced:** web, video-encoder (ai-agent skipped — not found)
+**Adopters synced:** <from maintainer-adopters.local.yaml; skipped if missing>
 **Bundle version:** 1.3.0
 
 Review adopter repo diffs and commit when asked.
@@ -96,8 +95,8 @@ Review adopter repo diffs and commit when asked.
 ```
 ## Workflow update — adopter
 
-**Repo:** web
-**Bundle:** ../cursor-dev-workflows @ 1.3.0
+**Repo:** <REPO_NAME>
+**Bundle:** <path-to-cursor-dev-workflows> @ 1.3.0
 **Verify:** PASS
 
 Next: review diff; `/lsi:commit` when ready.
