@@ -8,13 +8,15 @@ Portable **Cursor agent workflows** for any language or framework: ticket cards,
 
 **Agents:** start at [AGENTS.md](AGENTS.md).
 
-**LSI adopters** (video-encoder, web, ai-agent):
+**LSI adopters** ([registered repos](patches/README.md)):
 
 1. Maintain `patches/<repo>.yaml` in this bundle.
 2. Run [docs/adopt-and-update.md](docs/adopt-and-update.md) — `snippets/adopt.py` installs `.lsi/workflows/` and agent stack.
 3. Do **not** hand-edit `.lsi/workflows/` in application repos.
 
-**Bundle maintainers:** read [MAINTAINER.md.example](MAINTAINER.md.example) and [docs/adoption-layout.md](docs/adoption-layout.md).
+**New repo:** [docs/adopt-new-repo.md](docs/adopt-new-repo.md).
+
+**Bundle maintainers:** [MAINTAINER.md.example](MAINTAINER.md.example) · verify all: `./snippets/verify-all-adopters.sh`
 
 ## Placeholder registry
 
@@ -34,8 +36,9 @@ Set these once per target repository. Search/replace tokens in docs after copyin
 | `TICKET_ID_PATTERN` | `24-char hex` / `PROJ-123` | Required id in branch names, if enforced |
 | `BRANCH_PATTERN` | `feature/<id>-slug` | Branch naming convention |
 | `PR_HOST` | `GitHub` / `GitLab` / `Bitbucket` | Where pull requests live |
-| `CANONICAL_DOCS_PATH` | `docs/workflows/` | Where adopted copies of these specs live in the target repo (use in rules and agent docs) |
-| `ADOPTION_PROFILE` | `A` | Layout profile: **A** mirror bundle (default) or **B** flatten — see [docs/adoption-layout.md](docs/adoption-layout.md) |
+| `CANONICAL_DOCS_PATH` | `.lsi/workflows/` | Adopt-managed specs in LSI repos ([docs/adoption-layout.md](docs/adoption-layout.md)) |
+| `ADOPTION_LAYOUT` | `lsi` | Single layout for all LSI adopters |
+| `VERSION_FILE` | `version.txt` or `VERSION` | App semver file for `check_version.py` |
 | `BUNDLE_VERSION` | `v1.0.0` or commit SHA | Version of this bundle recorded in adopted `PROJECT.md` when copying or re-syncing |
 | `WORKFLOWS_BUNDLE_PATH` | `~/src/cursor-dev-workflows` | Optional: where you cloned this bundle locally; for maintainer notes only — do not commit machine-specific paths |
 
