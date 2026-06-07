@@ -67,6 +67,13 @@ Docs consumed only by bundle maintainers (`docs/adopt-new-repo.md`, `patches/REA
 - **WHEN** an adopter opens `.lsi/workflows/adopt-and-update.md`
 - **THEN** every relative link targets a file that exists in the adopter repo after adopt (including optional copied CI snippet paths under `.lsi/workflows/` if the design copies them)
 
+#### Scenario: Tier 2 URLs receive BUNDLE_VERSION at adopt
+
+- **WHEN** adopter-docs source contains a tier 2 GitHub URL with `v{{BUNDLE_VERSION}}`
+- **AND** `adopt.py` completes against a temp adopter repo
+- **THEN** adopted markdown contains `v{VERSION}` with no literal `{{BUNDLE_VERSION}}` placeholder
+- **AND** adopter `PROJECT.md` includes `BUNDLE_VERSION` matching the bundle `VERSION` file used for substitution
+
 #### Scenario: Future docs use adopter-docs when layouts diverge
 
 - **WHEN** a bundle doc copied into adopters cannot be authored in the maintainer tree without tier 2 hrefs or fragile rewrites

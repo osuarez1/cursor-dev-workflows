@@ -58,6 +58,7 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 | Pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree | Blocks tier 2 mistakes smuggled as relative |
 | Bundle source grep for `](overlays/lsi/` in `docs/workflows/`, `overlays/lsi/docs/workflows/` | Fail fast **before adopt** (pre-commit or CI) |
 | `https://` links | Skipped by verify (tier 2 OK) |
+| `BUNDLE_VERSION` in tier 2 GitHub URLs | `substitute_tokens` at adopt time; `update_project_md` writes same value to adopter `PROJECT.md`; assert in `test_adopt_links.py` |
 | `--extra-dirs docs/ai` in verify-adopters | **Out of scope** for adopter parity default; **`test_adopt_links.py`** uses `extra_dirs=["docs/ai"]` to regression-test `openspec.md` cross-tree links after adopt |
 
 ## Decisions
@@ -123,6 +124,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 3. Runs `adoption-verify-links.verify()` on `.lsi/workflows/` and asserts `broken == []`
 4. Runs the same `verify(..., extra_dirs=[Path("docs/ai")])` and asserts `broken == []` — catches regressions in `docs/ai/openspec.md` cross-tree links to `../../.lsi/workflows/openspec-git-integration.md` (bundle test only; `verify-adopters.py` default unchanged per task 5.2)
 5. Asserts no `overlays/lsi/` or `agent-stack/` substrings in `.lsi/workflows/**/*.md`
+6. Asserts **`BUNDLE_VERSION` token parity** — after adopt, adopter `PROJECT.md` includes `BUNDLE_VERSION` matching bundle `VERSION`; adopted docs with tier 2 GitHub URLs contain `v{VERSION}` and no literal `{{BUNDLE_VERSION}}` placeholder (existing `substitute_tokens` + `update_project_md` path; one assertion — no new adopt logic)
 
 **Alternatives considered:**
 
@@ -158,7 +160,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 | `.cursor/commands/` missing during verify if adopt partial | Regression test runs full adopt install including agent stack |
 | Rewrites mask bad source links silently | Pattern rules fail on smuggled tier 2 paths; substring assertion in test; source fixes are primary (§2) |
 | CI snippet copy duplicates bundle | Small tier 3 files; versioned with bundle; acceptable |
-| Tier 2 GitHub URLs stale after adopter lag on re-sync | Pin to `v{{BUNDLE_VERSION}}` in source; adopter `PROJECT.md` updated on re-sync |
+| Tier 2 GitHub URLs stale after adopter lag on re-sync | Pin to `v{{BUNDLE_VERSION}}` in source; `substitute_tokens` at adopt; `update_project_md` upserts `BUNDLE_VERSION` in adopter `PROJECT.md`; `test_adopt_links.py` asserts parity |
 | Authors confuse tier 1 vs tier 2 | `adopter-docs/README.md` + pattern rules + source grep + `test_adopt_links.py` |
 
 ## Long-term direction
@@ -194,7 +196,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 **Choice:** Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` on every adopt. Cheap, avoids per-patch conditionals, matches adopter doc linking both snippets.
 
-### Release gate (task 4.4, 5.3)
+### Release gate (task 4.5, 5.3)
 
 **Choice:** `test_adopt_links.py` + `test_adoption_verify_links.py` are **required** before any bundle `VERSION` bump — local maintainer gate and CI step when a pipeline exists. Do not tag or bump `VERSION` on failing adopt-link regression.
 
@@ -213,3 +215,9 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 2. **Later (task 7.2):** Optional bundle lint comparing **adopter-relevant** section headings between maintainer superset and `adopter-docs/` copy — **not** naive full `##` parity, because structures intentionally diverge (maintainer keeps `patches/`, `MAINTAINER.md`, `adopt-new-repo.md` sections; adopter copy uses tier 2 GitHub/prose). Lint should warn when maintainer adds or renames shared-topic headings (e.g. Bundle update, Verify after adopt, CI) absent from adopter copy. Defer until 2+ dual docs exist; wire to CI alongside adopt-link regression.
 
 **Rationale:** Checklist catches human process immediately; link regression catches broken hrefs but not missing sections; heading lint closes the structural gap once the dual-doc pattern is proven and scope is clear enough to avoid false positives.
+
+### Tier 2 `BUNDLE_VERSION` substitution (task 4.2)
+
+**Choice:** Tier 2 GitHub URLs use `v{{BUNDLE_VERSION}}` in adopter-docs source; **existing adopt token path already covers substitution** — `adopt()` reads bundle `VERSION`, builds `tokens["BUNDLE_VERSION"]`, runs `substitute_tokens` on all copied markdown, and `update_project_md()` upserts the same value into adopter `PROJECT.md`. No new token machinery required.
+
+**Test:** `test_adopt_links.py` adds **one assertion** after temp adopt: (1) `PROJECT.md` table contains `BUNDLE_VERSION` equal to bundle `VERSION`; (2) adopted `.lsi/workflows/adopt-and-update.md` (or any file with tier 2 URLs) has no unreplaced `{{BUNDLE_VERSION}}` and contains the pinned version string. Unit coverage for `substitute_tokens` remains in `test_adopt_tokens.py`.
