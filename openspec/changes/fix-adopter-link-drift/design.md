@@ -43,7 +43,7 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 
 | Maintainer link | Adopter replacement |
 |-----------------|---------------------|
-| `ci/check_version-web.yml` | Copy `docs/ci/check_version-*.yml` → `.lsi/workflows/ci/` and link `ci/check_version-web.yml` |
+| `ci/check_version-web.yml` | Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally → `.lsi/workflows/ci/` during every adopt (no per-patch conditionals); adopter doc links both |
 | `../MAINTAINER.md.example` | Prose: "see bundle maintainer `MAINTAINER.md`" — no link, or link to `adopt-and-update.md` § bundle update |
 | `adopt-new-repo.md` | Inline summary + "contact bundle maintainer to register patch" — no broken relative link |
 | `../patches/README.md` | Remove link; adopter uses `/lsi:update`, not patch registry |
@@ -58,6 +58,7 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 | `docs/workflows/ticket-card-info.md` | `openspec-git-integration.md` (sibling) |
 | `docs/workflows/branch-workflow.md` | `git-trello.md` → `sdlc/git-trello.md` |
 | `overlays/lsi/docs/workflows/which-workflow.md` | `lsi-help.md` → `../../.cursor/commands/lsi-help.md`; `adopt-and-update.md` → `adopt-and-update.md` |
+| `overlays/lsi/docs/ai/openspec.md` | `../workflows/openspec-git-integration.md` → `../../.lsi/workflows/openspec-git-integration.md` (valid from `docs/ai/` after adopt) |
 | Root `which-workflow.md` (LSI row) | `openspec-git-integration.md` overlay note — use sibling name only in overlay copy; bundle root may keep maintainer path for dogfood |
 
 Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow_lsi()` — fix the overlay file as primary.
@@ -111,7 +112,14 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 3. Maintainer adopt loop: re-sync each registered adopter; `verify-adopters.py --repo-root <adopter>` must pass.
 4. Rollback: revert bundle release; adopters keep previous `.lsi/workflows/` until re-sync.
 
-## Open Questions
+## Resolved decisions
 
-- Should `docs/ai/openspec.md` links be scanned via `--extra-dirs docs/ai` in verify-adopters? (Currently only `.lsi/workflows/` + `AGENTS.md` — `openspec.md` uses `../workflows/` paths that resolve in adopter `docs/ai/`. Confirm in apply task.)
-- Copy both CI snippets to `.lsi/workflows/ci/` or only the one referenced in each adopter's patch overlay?
+### `docs/ai/openspec.md` links (task 5.2)
+
+**Choice:** Fix at source — change `../workflows/openspec-git-integration.md` → `../../.lsi/workflows/openspec-git-integration.md` in `overlays/lsi/docs/ai/openspec.md` (both occurrences).
+
+**Do not** add `--extra-dirs docs/ai` to `verify-adopters.py` yet — outside the current failure set; proactive source fix is sufficient.
+
+### CI snippet copy (task 1.3)
+
+**Choice:** Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` on every adopt. Cheap, avoids per-patch conditionals, matches adopter doc linking both snippets.

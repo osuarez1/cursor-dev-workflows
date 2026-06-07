@@ -2,7 +2,7 @@
 
 - [ ] 1.1 Create `overlays/lsi/adopter-docs/adopt-and-update.md` with adopter-relative links (no `patches/`, `MAINTAINER.md.example`, or bundle-root `docs/` paths)
 - [ ] 1.2 Update `copy_core_bundle()` in `snippets/adopt.py` to copy adopter doc instead of `docs/adopt-and-update.md`
-- [ ] 1.3 Copy `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` into `.lsi/workflows/ci/` during adopt (or document inline CI steps if copy is skipped — must still pass link verify)
+- [ ] 1.3 Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` during every adopt (no per-patch conditionals)
 - [ ] 1.4 Add cross-reference in `docs/adopt-and-update.md` pointing maintainers at `overlays/lsi/adopter-docs/adopt-and-update.md` as the adopter-facing source
 
 ## 2. Fix workflow cross-links at source
@@ -28,7 +28,7 @@
 ## 5. Docs and release
 
 - [ ] 5.1 Update `docs/adoption-verify-architecture.md` with new pattern rules and adopter-doc source path
-- [ ] 5.2 Verify `overlays/lsi/docs/ai/openspec.md` links resolve in adopter layout (`docs/ai/` after adopt); fix or add `--extra-dirs` guidance if needed
+- [ ] 5.2 Fix `overlays/lsi/docs/ai/openspec.md` at source: `../workflows/openspec-git-integration.md` → `../../.lsi/workflows/openspec-git-integration.md` (both occurrences); do **not** add `--extra-dirs docs/ai` to `verify-adopters.py`
 - [ ] 5.3 Bump `VERSION` and `CHANGELOG.md` — note adopter re-sync required (`/lsi:update`)
 - [ ] 5.4 Manual smoke: `adopt.py` against temp repo + `verify-adopters.py --repo-root <tmp>` passes
 
