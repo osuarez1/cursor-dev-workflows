@@ -18,4 +18,4 @@ Tokens are set in `patches/<repo>.yaml` → `PROJECT.md` by `adopt.py`.
 | `ADOPTION_LAYOUT` | `lsi` |
 | `BUNDLE_VERSION` | Adopted cursor-dev-workflows version |
 
-Substitution in overlay templates uses `{{TOKEN}}` syntax.
+Substitution in overlay templates uses `{{TOKEN}}` syntax. During **`adopt.py`**, `BUNDLE_VERSION` is read from the bundle root **`VERSION`** file and substituted into overlay markdown (e.g. `v{{BUNDLE_VERSION}}` in workflow docs) and written to adopter **`PROJECT.md`**.
