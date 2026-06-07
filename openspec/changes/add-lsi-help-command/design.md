@@ -99,6 +99,20 @@ Topics: `lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links
 
 **Alternative rejected:** Full overlap rule in bundle-root `which-workflow.md` — root overlap rules are workflow-spec disambiguation (PR vs readiness vs review), not slash-command session behavior.
 
+### 11. Decision-table row (discovery → `/lsi:help`)
+
+**Choice:** Add a decision-table row to **LSI overlay** `which-workflow.md` and `which-workflow-lsi.md` — **yes**, placed **after `/opsx:propose`** (discovery before card/implementation). Do **not** add a full row to bundle-root `which-workflow.md`; optional one-line pointer in the existing LSI row only (see task 2.3).
+
+**Suggested row** (same text in overlay + `which-workflow-lsi.md`):
+
+| User says (examples) | Use | Command | Output / verdict |
+|----------------------|-----|---------|------------------|
+| which command, workflow help, lost, LSI onboarding, what should I run next (discovery) | [`lsi-help.md`](../../agent-stack/commands/lsi-help.md) | `/lsi:help` | Interactive overview + menu; read-only until Exit |
+
+**Rationale:** Routes “which command / help / lost” before agents pick an implementation slash command or ask a generic clarifying question. Complements overlap rule #7 (help explains; does not run). Distinct from `/opsx:explore` (problem exploration, single-turn docs).
+
+**Alternative rejected:** Rely on flowchart-only routing — table is what agents scan first; row is the canonical discovery entry.
+
 ### 9. Status section — conditional `TITLE_PREFIX` note only
 
 **Choice:** The **`status`** section shows branch, active OpenSpec, phase, and suggested next command. Do **not** emit a standing line about whether this repo defines `TITLE_PREFIX`. When the inferred phase or suggested next step involves **card setup** (`/lsi:card`, `/lsi:card-link`, `/lsi:trello-list` → branch), add one conditional note framed as a **token rule**: read `TITLE_PREFIX` from `PROJECT.md` for card titles; when the token is absent, use `REPO_NAME |` per [ticket-card-info.md](docs/workflows/ticket-card-info.md).
