@@ -1,0 +1,28 @@
+---
+description: Protected branches — bundle maintainer (main only)
+alwaysApply: true
+---
+
+# Protected branches (bundle)
+
+![Stop](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Stop_sign_MUTCD.svg/240px-Stop_sign_MUTCD.svg.png)
+
+**Never implement bundle features on `main`.**
+
+Protected branch: **`main`**
+
+Canonical spec: [branch-workflow.md](../../docs/workflows/branch-workflow.md) and [overlays/lsi/docs/workflows/branch-workflow.md](../../overlays/lsi/docs/workflows/branch-workflow.md) when present.
+
+## Refuse feature work
+
+On **`main`**, in Agent, Plan, Ask, and Debug modes:
+
+1. **Stop** — do not edit `docs/`, `overlays/`, `snippets/`, `templates/`, or `examples/` for feature work.
+2. Show the stop image and tell the user to check out `feat/<slug>` or `chore/bundle-<slug>`.
+3. Docs-only exploration on `main` is allowed for `/opsx:explore` when not implementing.
+
+## Verify branch
+
+```bash
+git branch --show-current
+```

@@ -1,0 +1,10 @@
+# Recorded decisions for web first adopt (staging-first LSI overlay)
+- id: claude_symlink
+  choice: symlink_to_agents
+  note: "Merge CLAUDE.md domain into AGENTS.md; symlink after reconcile"
+- id: openspec_archive_timing
+  choice: lsi_close_on_main
+  note: "Retire docs/workflows/openspec.md; use .lsi/workflows/openspec-git-integration.md"
+- id: pr_target
+  choice: staging_first
+  note: "Feature PRs target staging; /lsi:promote to main"

@@ -1,0 +1,51 @@
+---
+description: OpenSpec + Git overlay — lifecycle and LSI commands
+alwaysApply: true
+---
+
+# OpenSpec + Git (LSI)
+
+**Canonical overlay:** [`.lsi/workflows/openspec-git-integration.md`](../../.lsi/workflows/openspec-git-integration.md)
+
+OpenSpec changes under `openspec/changes/<change-slug>/` define **what to build**. Trello + branch id define **delivery tracking**.
+
+**Branch policy:** [`.cursor/rules/branch-workflow.mdc`](branch-workflow.mdc) — do not duplicate protected-branch refusal here.
+
+## Workflow commands
+
+**OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive`
+
+**LSI (git):** `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`, `/lsi:update`
+
+| Step | Command |
+|------|---------|
+| Explore | `/opsx:explore` |
+| Propose | `/opsx:propose` |
+| Card + branch | `/lsi:card` (from `main` or `staging`) |
+| Link card to existing branch | `/lsi:card-link` (on feature branch without Trello id) |
+| List / branch from To Do card | `/lsi:trello-list` (picker; confirm → `git tb`), `/lsi:trello-branch` (from `main`/`staging`) |
+| Senior analysis | `/lsi:senior` (large changes) |
+| Implement | `/opsx:apply` |
+| Commit | `/lsi:commit` (when asked) |
+| Pre-PR | `/lsi:readiness` → `/lsi:review` |
+| PR to staging | `/lsi:pr` |
+| Promote to main | `/lsi:promote` (after staging QA) |
+| Merge desc | `/lsi:merge-desc` |
+| Release | `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release` |
+| Close | `/lsi:close` on **`main`** (after promotion) |
+
+## Before implementation
+
+1. Confirm ticket branch with Trello id + OpenSpec slug suffix.
+2. Read `proposal.md`, `design.md`, delta specs for active change.
+3. **`tasks.md` must not** list `/opsx:sync`, `/opsx:archive`, or `/lsi:close` — production-close steps on **`main`** via `/lsi:close`, not `/opsx:apply` deliverables.
+
+## Commits and PRs
+
+- On commit requests: `/lsi:commit` — plan from `tasks.md` sections.
+- On PR prep: `/lsi:readiness` then `/lsi:review` before `/lsi:pr`.
+- PR **Related:** `openspec/changes/<slug>/` + Trello card id.
+- Do not auto-commit or auto-open PRs.
+- When policy is ambiguous, ask one focused question before proceeding.
+
+See [openspec-git-integration.md § Full lifecycle](../../.lsi/workflows/openspec-git-integration.md).

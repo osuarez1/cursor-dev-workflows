@@ -1,0 +1,7 @@
+# Copy into bitbucket-pipelines.yml (web) — version regression + CHANGELOG gate
+#
+# Requires: scripts/check_version.py, version.txt, CHANGELOG.md
+# Default image atlassian/default-image:4 includes python3.
+
+# Inside an existing PR step script: (e.g. RSpec related specs)
+#   - python3 scripts/check_version.py

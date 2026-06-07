@@ -6,6 +6,56 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+
+- **LSI slash commands** — `/lsi:card-link` (Trello card + rename existing branch), `/lsi:trello-list` (interactive To Do picker), `/lsi:trello-branch` (`git tb` from existing card), `/lsi:update` (re-sync adopt or maintainer bootstrap)
+- **OpenSpec-gated card copy** — card-link, trello-branch, and trello-list (confirm path) require an in-progress OpenSpec change; Trello title/body drafted from `proposal.md` / `tasks.md` / `design.md` and redacted before API calls
+
+### Changed
+
+- **`/lsi:card`** — allowed from **`staging`** as well as **`main`**; contrast docs for card-link vs trello flows
+- **`/lsi:trello-list`** — interactive AskQuestion picker with confirm/exit before `git tb`
+- **`snippets/adopt.py`** — inject `BUNDLE_VERSION` from bundle `VERSION` into overlay token substitution; simplify stdlib YAML fallback parser; fix list-key parsing without PyYAML
+- **Overlay** — `openspec-git-integration.md` uses `v{{BUNDLE_VERSION}}` placeholder; workflow docs updated for Trello card routing ([integrations.md](docs/workflows/integrations.md), [git-trello.md](overlays/lsi/docs/sdlc/git-trello.md), [which-workflow-lsi.md](overlays/lsi/which-workflow-lsi.md))
+- **`snippets/verify-adopters.py`** / **`snippets/audit-agent-docs.py`** — parity lists include new slash commands (18× `/lsi:*` in agent stack)
+- **`.gitignore`** — gitignore local `.cursor/` maintainer install (canonical rules in `snippets/cursor-rules/`; install playbook in gitignored `MAINTAINER.md`)
+- **`snippets/bootstrap-maintainer-local.sh`**, **`snippets/update-workflows.py`**, **`/lsi:update`** — maintainer/adopter re-sync helpers; org-specific adopter paths in gitignored `maintainer-adopters.local.yaml` (see gitignored `MAINTAINER.md`)
+
+### Fixed
+
+- **`PROJECT.md`** dogfood — `BUNDLE_VERSION` synced with `VERSION`
+- **`snippets/adopt.py`** stdlib YAML fallback — parse `key:` + indented list items in patch configs when PyYAML is unavailable
+
+## [1.3.0] - 2026-06-06
+
+### Added
+
+- **LSI overlay** — `overlays/lsi/` with OpenSpec + Git integration, release scripts, agent stack (3 always-on rules, 13× `/lsi:*`, 5× `/opsx:*` commands)
+- **`snippets/adopt.py`** — single adopt entry point for `.lsi/workflows/` layout; `--accept-resolutions` wired to audit
+- **`snippets/audit-agent-docs.py`** — pre/post adopt contradiction scan (v1 token/path checks); `--accept-resolutions` and `--accept-policy-defaults`
+- **`snippets/verify-adopters.py`** — parity checklist + link/audit gate for LSI adopters
+- **`snippets/verify-all-adopters.sh`** — verify video-encoder, web, ai-agent in one command
+- **`patches/`** — per-repo YAML registry (`video-encoder`, `web`, `ai-agent`, `_template`) with `audit_resolutions` paths
+- **`patches/files/_template/`** — overlay examples + `audit-resolutions.yaml.example`
+- **Docs** — [docs/adopt-and-update.md](docs/adopt-and-update.md), [docs/adopt-new-repo.md](docs/adopt-new-repo.md), [docs/token-registry.md](docs/token-registry.md), [docs/adopter-boundaries.md](docs/adopter-boundaries.md), [overlays/lsi/docs/workflows/branch-reviewability.md](overlays/lsi/docs/workflows/branch-reviewability.md)
+- **CI snippets** — `docs/ci/check_version-web.yml`, `docs/ci/check_version-ai-agent.yml`
+
+### Changed
+
+- **Adoption layout** — LSI only (`.lsi/workflows/`); Profile A/B retired; verify test fixtures updated
+- **`snippets/adoption-verify-links.py`** — LSI layout only; removed `--profile` flag
+- **`check_version.py`** — supports `VERSION_FILE` env var (e.g. `VERSION` for ai-agent)
+- **`patches/_template.yaml`** — full patch schema with comments
+- **`patches/README.md`** — registered repos table and patch key reference
+- **`adoption-checklist.md`** — LSI adopt.py path at top; legacy manual steps deprecated
+- **`MAINTAINER.md.example`** — LSI adopt loop and verify commands (replaces Profile A/B)
+
+### Adopter note (1.3.0)
+
+- Add `patches/<repo>.yaml` if missing; run `python3 snippets/adopt.py --target ../<repo> --config patches/<repo>.yaml`
+- Review audit report before first adopt; use `--accept-policy-defaults` on video-encoder re-sync after sign-off
+- `/lsi:ask` deferred to v1.3.1
+
 ## [1.2.0] - 2026-06-01
 
 ### Added

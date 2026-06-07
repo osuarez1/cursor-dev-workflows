@@ -1,3 +1,8 @@
 # Private maintainer / agent playbooks (copy from *.example)
 MAINTAINER.md
 AGENTS-LOCAL.md
+maintainer-adopters.local.yaml
+.git-trello/
+
+# Local Cursor install (see gitignored MAINTAINER.md)
+.cursor/

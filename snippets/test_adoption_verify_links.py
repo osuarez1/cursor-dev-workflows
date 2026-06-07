@@ -1,4 +1,4 @@
-"""Tests for snippets/adoption-verify-links.py."""
+"""Tests for snippets/adoption-verify-links.py (LSI layout)."""
 
 from __future__ import annotations
 
@@ -31,86 +31,56 @@ def fixture(name: str) -> Path:
     return FIXTURES / name
 
 
+def canonical(root: Path) -> Path:
+    return (root / ".lsi" / "workflows").resolve()
+
+
 class VerifyFunctionTests(unittest.TestCase):
-    def test_profile_a_pass(self) -> None:
-        root = fixture("profile-a-pass")
-        broken, patterns, warnings = verify(
-            root.resolve(),
-            (root / "docs/workflows").resolve(),
-            "A",
-            True,
-        )
+    def test_lsi_pass(self) -> None:
+        root = fixture("lsi-pass")
+        broken, patterns, warnings = verify(root.resolve(), canonical(root))
         self.assertEqual(broken, [])
         self.assertEqual(patterns, [])
         self.assertEqual(warnings, [])
 
-    def test_profile_a_broken_router(self) -> None:
-        root = fixture("profile-a-broken-router")
-        broken, patterns, _ = verify(
-            root.resolve(),
-            (root / "docs/workflows").resolve(),
-            "A",
-            True,
-        )
+    def test_lsi_broken_router(self) -> None:
+        root = fixture("lsi-broken-router")
+        broken, patterns, _ = verify(root.resolve(), canonical(root))
         self.assertTrue(any("which-workflow.md" in item for item in broken))
         self.assertEqual(patterns, [])
 
-    def test_profile_a_broken_agents(self) -> None:
-        root = fixture("profile-a-broken-agents")
-        broken, patterns, _ = verify(
-            root.resolve(),
-            (root / "docs/workflows").resolve(),
-            "A",
-            True,
-        )
+    def test_lsi_broken_agents(self) -> None:
+        root = fixture("lsi-broken-agents")
+        broken, patterns, _ = verify(root.resolve(), canonical(root))
         self.assertTrue(any("AGENTS.md" in item for item in broken))
         self.assertEqual(patterns, [])
 
-    def test_profile_b_doubled_prefix(self) -> None:
-        root = fixture("profile-b-doubled-prefix")
-        broken, patterns, _ = verify(
-            root.resolve(),
-            (root / "docs/workflows").resolve(),
-            "B",
-            True,
-        )
+    def test_lsi_doubled_prefix(self) -> None:
+        root = fixture("lsi-doubled-prefix")
+        broken, patterns, _ = verify(root.resolve(), canonical(root))
         self.assertEqual(broken, [])
         self.assertTrue(any("doubled prefix" in item for item in patterns))
 
     def test_out_of_repo_link(self) -> None:
         root = fixture("out-of-repo-link")
-        broken, patterns, _ = verify(
-            root.resolve(),
-            (root / "docs/workflows").resolve(),
-            "A",
-            True,
-        )
+        broken, patterns, _ = verify(root.resolve(), canonical(root))
         self.assertTrue(any("outside repo root" in item for item in broken))
         self.assertEqual(patterns, [])
 
-    def test_profile_b_extra_dirs_pass(self) -> None:
-        root = fixture("profile-b-extra-dirs-pass")
+    def test_lsi_extra_dirs_pass(self) -> None:
+        root = fixture("lsi-extra-dirs-pass")
         broken, patterns, _ = verify(
             root.resolve(),
-            (root / "docs/workflows").resolve(),
-            "B",
-            True,
+            canonical(root),
             extra_dirs=[Path("docs/templates")],
         )
         self.assertEqual(broken, [])
         self.assertEqual(patterns, [])
 
-    def test_profile_a_missing_router_warns(self) -> None:
-        root = fixture("profile-b-doubled-prefix")
-        _, _, warnings = verify(
-            root.resolve(),
-            (root / "docs/workflows").resolve(),
-            "A",
-            True,
-        )
-        self.assertTrue(
-            any("which-workflow.md not found" in item for item in warnings)
-        )
+    def test_lsi_missing_router_warns(self) -> None:
+        root = fixture("lsi-doubled-prefix")
+        _, _, warnings = verify(root.resolve(), canonical(root))
+        self.assertFalse(any("which-workflow.md not found" in item for item in warnings))
 
 
 class MainCliTests(unittest.TestCase):
@@ -121,31 +91,29 @@ class MainCliTests(unittest.TestCase):
             "--repo-root",
             str(root),
             "--canonical",
-            "docs/workflows",
+            ".lsi/workflows",
             *args,
         ]
         return subprocess.run(cmd, capture_output=True, text=True, check=False)
 
-    def test_cli_profile_a_pass(self) -> None:
-        result = self.run_script(fixture("profile-a-pass"), "--profile", "A")
+    def test_cli_lsi_pass(self) -> None:
+        result = self.run_script(fixture("lsi-pass"))
         self.assertEqual(result.returncode, 0)
         self.assertIn("OK:", result.stdout)
 
-    def test_cli_profile_a_broken_router(self) -> None:
-        result = self.run_script(fixture("profile-a-broken-router"), "--profile", "A")
+    def test_cli_lsi_broken_router(self) -> None:
+        result = self.run_script(fixture("lsi-broken-router"))
         self.assertEqual(result.returncode, 1)
         self.assertIn("BROKEN LINKS:", result.stderr)
 
-    def test_main_profile_b_extra_dirs(self) -> None:
-        root = fixture("profile-b-extra-dirs-pass")
+    def test_main_lsi_extra_dirs(self) -> None:
+        root = fixture("lsi-extra-dirs-pass")
         code = main(
             [
                 "--repo-root",
                 str(root),
                 "--canonical",
-                "docs/workflows",
-                "--profile",
-                "B",
+                ".lsi/workflows",
                 "--extra-dirs",
                 "docs/templates",
             ]

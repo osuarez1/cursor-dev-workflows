@@ -1,65 +1,24 @@
 # Maintainer playbook (local only)
 
-Copy this file to **`MAINTAINER.md`** in the bundle root. `MAINTAINER.md` is gitignored — do not commit org names, internal repo slugs, or machine-specific paths.
+Copy this file to **`MAINTAINER.md`** in the bundle root. **`MAINTAINER.md` is gitignored** — do not commit org names, internal repo slugs, or machine-specific paths.
 
-## Local setup
+**Full maintainer playbook** (local Cursor bootstrap, adopt loop, verify, release checklists) lives in **`MAINTAINER.md` only**. Copy from a teammate’s `MAINTAINER.md` or ask a bundle maintainer for the standard sections.
+
+## Local setup (fill in after copy)
 
 | Field | Your value |
 |-------|------------|
 | `WORKFLOWS_BUNDLE_PATH` | e.g. `~/Repos/lsi/current/cursor-dev-workflows` |
-| Internal source repo (if any) | `ORG/internal-cursor-dev-workflows` |
-| Default adoption target(s) | App repo name(s), `CANONICAL_DOCS_PATH`, `ADOPTION_PROFILE` (A or B) |
-| Default profile | **A — mirror bundle** (see [docs/adoption-layout.md](docs/adoption-layout.md)) |
+| Adopter repos | e.g. `video-encoder`, `web` |
+| Layout | **LSI only** — `.lsi/workflows/` (see [docs/adoption-layout.md](docs/adoption-layout.md)) |
 
-## Sync mapping
+## Sections to add in gitignored MAINTAINER.md
 
-Bundle path → adopted path in application repo(s). Default is **Profile A** ([docs/adoption-layout.md](docs/adoption-layout.md)):
+- **`maintainer-adopters.local.yaml`** — org-specific adopter clone paths for `update-workflows.py` / `/lsi:update` / `verify-all-adopters.sh` (never commit; not documented in tracked slash commands)
+- Local Cursor install (`bootstrap-maintainer-local.sh`, `/lsi:update --local-only`)
+- Adopt / re-sync loop (`adopt.py`, `update-workflows.py`, `/lsi:update`)
+- Verify all adopters
+- Register new adopter
+- Pre-release and release checklists
 
-| Bundle | Adopted in `<APP_REPO>` (Profile A) |
-|--------|-------------------------------------|
-| `docs/workflows/*.md` | `docs/workflows/*.md` (or your `CANONICAL_DOCS_PATH`) |
-| `which-workflow.md` | **app repo root** |
-| `templates/`, `examples/` | **app repo root** |
-| `snippets/cursor-rules/*.mdc` | `.cursor/rules/*.mdc` |
-| `AGENTS.md` | `AGENTS.md` (merge or replace per team) |
-
-Profile **B** (flatten): router, templates, and examples under `CANONICAL_DOCS_PATH` with mandatory link rewrites — document in this table if a target uses B.
-
-Add rows for any team-specific overrides.
-
-## Pre-release checklist
-
-Before bumping [VERSION](VERSION) or tagging:
-
-- [ ] Diff `docs/workflows/`, `snippets/cursor-rules/`, `templates/`, `examples/` against last release
-- [ ] Classify changes per [docs/versioning.md](docs/versioning.md) (MAJOR / MINOR / PATCH)
-- [ ] Update `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) with **Adopter action** bullets for MAJOR changes
-- [ ] Run `python3 snippets/adoption-verify-links.py --profile A --canonical docs/workflows` on a sample app repo (Profile A), plus §9 agent smoke in [adoption-checklist.md](adoption-checklist.md)
-- [ ] Run `python3 -m unittest snippets.test_adoption_verify_links -v`
-
-## Release checklist
-
-- [ ] Move `[Unreleased]` entries to `## [X.Y.Z] - YYYY-MM-DD` in [CHANGELOG.md](CHANGELOG.md)
-- [ ] Set [VERSION](VERSION) to `X.Y.Z`
-- [ ] Commit on `main` (e.g. `chore(release): mark bundle vX.Y.Z`)
-- [ ] Tag: `git tag -a vX.Y.Z -m "cursor-dev-workflows vX.Y.Z"`
-- [ ] Push tag when ready: `git push origin vX.Y.Z`
-- [ ] Optional: GitHub Release — paste the `X.Y.Z` section from the changelog
-
-## Adopter comms (MAJOR releases)
-
-When shipping a **MAJOR** bump, tell adopters to:
-
-1. Re-sync `CANONICAL_DOCS_PATH` from `docs/workflows/`
-2. Re-copy and path-fix `snippets/cursor-rules/*.mdc`
-3. Update `BUNDLE_VERSION` in their `PROJECT.md`
-4. Read **Adopter action** in [CHANGELOG.md](CHANGELOG.md) for that version
-
-## Sync from upstream (ongoing)
-
-When merging bundle updates into an adopted app repo:
-
-1. Diff each workflow file under `CANONICAL_DOCS_PATH` (and root `which-workflow.md`, `templates/`, `examples/` if Profile A)
-2. Re-run link verification per [docs/adoption-layout.md](docs/adoption-layout.md) before merge
-3. Record sync date and `BUNDLE_VERSION` (tag or SHA) in the app repo commit message or `PROJECT.md`
-4. Do not commit this file or absolute clone paths into the app repo
+Public adopter docs: [docs/adopt-and-update.md](docs/adopt-and-update.md). Patch registry: [patches/README.md](patches/README.md).

@@ -6,12 +6,28 @@ Optional tooling around [cursor-dev-workflows](../../README.md). **None of this 
 
 [git-trello-tool](https://github.com/osuarez1/git-trello-tool) links branches, commit footers, and Trello comments.
 
+**Agent note:** `git ts`, `git tb`, etc. are **local Git aliases** to `.git-trello/bin/git-trello` — run **`git ts`** (two words). There is no `git-ts` binary; do not run `which git-ts` or similar probes.
+
 | Command | Purpose |
 |---------|---------|
-| `git ts` | Trello Start — create/link card and checkout branch |
-| `git tl` | List cards with ids |
-| `git tb <id>` | Branch from existing card |
+| `git ts` | Trello Start — create card and checkout **new** branch (from `main`/`staging`) |
+| `/lsi:card-link` | Agent command — create card and rename **current** branch to match OpenSpec slug |
+| `git tl` | List To Do cards — agent: **`/lsi:trello-list`** (interactive picker → confirm → `git tb`) |
+| `git tb <id>` | Branch from existing card — agent: **`/lsi:trello-branch`** |
 | `git tc` | Comment on card (e.g. review summary) |
+
+### LSI agent commands (OpenSpec + Trello)
+
+When the LSI overlay is adopted, agents use slash commands instead of raw CLI for card/branch setup:
+
+| Slash command | Git / API | When |
+|---------------|-----------|------|
+| `/lsi:card` | `git ts` | New card + branch from `main`/`staging` |
+| `/lsi:card-link` | Trello API + `git branch -m` | OpenSpec exists; work already on branch without Trello id |
+| `/lsi:trello-list` | `git tl` + picker | List To Do cards; confirm → sync card + `git tb` |
+| `/lsi:trello-branch` | Trello PUT + `git tb` | Existing card id from `main`/`staging` |
+
+**OpenSpec required** for `/lsi:card-link`, `/lsi:trello-branch`, and `/lsi:trello-list` (confirm path): an in-progress change with `proposal.md` must exist. Card description is built from OpenSpec artifacts and **redacted** (no secrets, credentials, org-only paths) before Trello create/update. Full routing: [overlays/lsi/docs/workflows/openspec-git-integration.md](../../overlays/lsi/docs/workflows/openspec-git-integration.md).
 
 Card field format for `git ts`: [ticket-card-info.md](ticket-card-info.md).
 
