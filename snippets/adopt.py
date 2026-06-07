@@ -119,7 +119,10 @@ LINK_REWRITES = [
     (re.compile(r"\]\(\.\./\.\./docs/workflows/"), "](",),
     (re.compile(r"\]\(\.\./docs/workflows/"), "](",),
     (re.compile(r"\]\(docs/workflows/"), "](",),
+    (re.compile(r"\]\(\.\./\.\./overlays/lsi/docs/workflows/"), "](",),
     (re.compile(r"\]\(\.\./\.\./which-workflow\.md\)"), "](which-workflow.md)"),
+    (re.compile(r"\]\(\.\./\.\./\.\./docs/adopt-and-update\.md\)"), "](adopt-and-update.md)"),
+    (re.compile(r"\]\(\.\./workflows/ticket-card-info\.md\)"), "](../ticket-card-info.md)"),
     (re.compile(r"\]\(\.\./\.\./PROJECT\.md\)"), "](../../PROJECT.md)"),
     (re.compile(r"\]\(\.\./\.\./templates/"), "](templates/",),
     (re.compile(r"\]\(\.\./\.\./examples/"), "](examples/",),
@@ -183,6 +186,21 @@ def rewrite_links(text: str, *, in_subdir: str | None = None) -> str:
     text = re.sub(
         r"\]\(\.\./\.\./snippets/[^)]+\)",
         "](adopt-and-update.md)",
+        text,
+    )
+    text = re.sub(
+        r"\[MAINTAINER\.md\.example\]\(\.\./MAINTAINER\.md\.example\)",
+        "`MAINTAINER.md` (cursor-dev-workflows bundle, gitignored)",
+        text,
+    )
+    text = re.sub(
+        r"\[patches/README\.md\]\(\.\./patches/README\.md\)",
+        "`patches/README.md` (cursor-dev-workflows bundle)",
+        text,
+    )
+    text = re.sub(
+        r"\[adopt-new-repo\.md\]\(adopt-new-repo\.md\)",
+        "`docs/adopt-new-repo.md` (cursor-dev-workflows bundle)",
         text,
     )
     return text
@@ -250,6 +268,10 @@ def copy_core_bundle(target: Path, tokens: dict[str, str]) -> None:
         (lsi / "adopt-and-update.md").write_text(
             transform(adopt_guide.read_text(encoding="utf-8")), encoding="utf-8"
         )
+
+    ci_src = BUNDLE_ROOT / "docs" / "ci"
+    if ci_src.is_dir():
+        copy_tree(ci_src, lsi / "ci", transform)
 
 
 def copy_overlay(target: Path, tokens: dict[str, str], config: dict) -> None:
