@@ -3,7 +3,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 ## 1. Adopter-shaped source docs
 
 - [ ] 1.1 Create `overlays/lsi/adopter-docs/adopt-and-update.md` per three-tier policy: tier 1 relative links only within adopt output; tier 2 for `patches/`, `MAINTAINER.md`, `adopt-new-repo.md` (GitHub `v{{BUNDLE_VERSION}}` or prose); tier 3 links to `ci/*.yml`
-- [ ] 1.2 Add `overlays/lsi/adopter-docs/README.md` — document three-tier link policy, authoring checklist, `LINK_REWRITES` as transition aid only, and **long-term expansion rule**: add adopter-shaped copies under `adopter-docs/` for any doc where maintainer layout diverges from post-adopt layout (this change seeds `adopt-and-update.md` only)
+- [ ] 1.2 Add `overlays/lsi/adopter-docs/README.md` — document three-tier link policy, authoring checklist, `LINK_REWRITES` as transition aid only, **long-term expansion rule**, and **`which-workflow.md` canonicality** (adopter: `.lsi/workflows/` merge output; edit: `overlays/lsi/docs/workflows/which-workflow.md`; dogfood: bundle root optional)
 - [ ] 1.3 Update `copy_core_bundle()` in `snippets/adopt.py` to copy adopter doc instead of `docs/adopt-and-update.md`
 - [ ] 1.4 Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` during every adopt (tier 3; no per-patch conditionals)
 - [ ] 1.5 Add maintainer **dual-copy checklist** in `docs/adopt-and-update.md` (banner at top): when editing adopter-facing sections, update `overlays/lsi/adopter-docs/adopt-and-update.md`; link to `adopter-docs/README.md`
@@ -14,14 +14,18 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 2.2 `docs/workflows/ticket-card-info.md` — same OpenSpec link fix
 - [ ] 2.3 `docs/workflows/branch-workflow.md` — replace overlay git-trello path with `sdlc/git-trello.md`
 - [ ] 2.4 `overlays/lsi/docs/workflows/which-workflow.md` — fix `lsi-help.md` → `../../.cursor/commands/lsi-help.md`; `adopt-and-update.md` → `adopt-and-update.md`
-- [ ] 2.5 Review root `which-workflow.md` LSI row; sync `overlays/lsi/which-workflow-lsi.md` with tier 1 link fixes from 2.4 — ensure overlay merge output has no tier 2 bundle paths disguised as relative links
+- [ ] 2.5 **Router canonicality** — document which file is authoritative for adopters; sync `overlays/lsi/which-workflow-lsi.md` with tier 1 link fixes from 2.4; optional review of bundle-root `which-workflow.md` LSI row (dogfood only — may keep maintainer paths):
+  - **Adopter canonical (installed):** `.lsi/workflows/which-workflow.md` after adopt
+  - **Edit source (authoritative):** `overlays/lsi/docs/workflows/which-workflow.md` — `merge_which_workflow_lsi()` overwrites core copy with this file
+  - **Sync helper (not installed):** `overlays/lsi/which-workflow-lsi.md` — keep row/link parity with overlay router; not adopt output
+  - **Bundle dogfood (optional):** root `which-workflow.md` — maintainer navigation only; do not treat as adopter canon
 
 ## 3. Adopt pipeline safety net (transition aid — §2 source fixes are primary)
 
 - [ ] 3.1 Extend `LINK_REWRITES` in `snippets/adopt.py` for accidental tier 2 paths in tier 1 content (`overlays/lsi/docs/workflows/`, `overlays/lsi/docs/sdlc/`, `agent-stack/commands/`, `../../../docs/adopt-and-update.md`) — catch-alls only; do not add rewrites instead of source fixes
 - [ ] 3.2 Add pattern rules in `snippets/adoption-verify-links.py` for `overlays/lsi/` and `agent-stack/` inside canonical tree (tier 2 smuggled as relative)
 - [ ] 3.3 Add fixture + test case for maintainer-path pattern violation under `snippets/fixtures/adoption-verify/`
-- [ ] 3.4 Add bundle-side source grep for `](overlays/lsi/` in `docs/workflows/` and `overlays/lsi/docs/workflows/` — script under `snippets/`; wire as pre-commit and/or CI when bundle pipeline or local hooks exist (fail before adopt; complements §4 regression tests)
+- [ ] 3.4 Add bundle-side source grep in `docs/workflows/` and `overlays/lsi/docs/workflows/` — script under `snippets/`; **phase 1:** `](overlays/lsi/`; **phase 2:** extend to `](agent-stack/` once §2 overlay workflow sources are clean (after 2.4); wire as pre-commit and/or CI (fail before adopt; complements §4 regression tests)
 
 ## 4. Bundle regression tests (highest-value deliverable)
 

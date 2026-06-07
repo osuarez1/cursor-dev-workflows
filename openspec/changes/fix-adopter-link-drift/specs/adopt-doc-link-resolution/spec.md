@@ -20,6 +20,12 @@ After `snippets/adopt.py` runs against an LSI adopter config, every relative mar
 - **WHEN** adopted `.lsi/workflows/integrations.md`, `ticket-card-info.md`, or `which-workflow.md` link to OpenSpec or slash-command docs
 - **THEN** hrefs use `.lsi/workflows/` sibling paths (e.g. `openspec-git-integration.md`, `git-trello.md`) or adopter-installed paths (e.g. `.cursor/commands/lsi-help.md`), not `../../overlays/lsi/docs/…` or `../../agent-stack/commands/…`
 
+#### Scenario: Adopter router source is overlay merge output
+
+- **WHEN** an LSI adopter runs `adopt.py` with overlay
+- **THEN** `.lsi/workflows/which-workflow.md` matches `overlays/lsi/docs/workflows/which-workflow.md` (after link rewrite), not bundle-root `which-workflow.md`
+- **AND** maintainers edit the overlay router as authoritative source; bundle-root router remains optional dogfood only
+
 ### Requirement: Bundle regression catches link drift before adopter re-sync
 
 The bundle repository SHALL include automated tests that exercise adopt link output (full adopt or deterministic rewrite pass) and fail when known maintainer-path prefixes appear under the simulated `.lsi/workflows/` tree.
@@ -38,7 +44,7 @@ The bundle repository SHALL include automated tests that exercise adopt link out
 #### Scenario: Bundle source grep blocks maintainer paths before adopt
 
 - **WHEN** a maintainer edits `docs/workflows/**/*.md` or `overlays/lsi/docs/workflows/**/*.md`
-- **AND** the file contains a markdown link with `](overlays/lsi/`
+- **AND** the file contains a markdown link with `](overlays/lsi/` (phase 1) or `](agent-stack/` (phase 2, once overlay workflow sources are clean)
 - **THEN** the bundle source grep (pre-commit or CI) fails before adopt runs
 
 #### Scenario: Bundle release blocked without adopt-link regression pass

@@ -56,7 +56,7 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 |-------|------|
 | `adoption-verify-links.py` relative resolution under `.lsi/workflows/` | 1 + 3 |
 | Pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree | Blocks tier 2 mistakes smuggled as relative |
-| Bundle source grep for `](overlays/lsi/` in `docs/workflows/`, `overlays/lsi/docs/workflows/` | Fail fast **before adopt** (pre-commit or CI) |
+| Bundle source grep for `](overlays/lsi/` and (when §2 clean) `](agent-stack/` in `docs/workflows/`, `overlays/lsi/docs/workflows/` | Fail fast **before adopt** (pre-commit or CI); phased — see decision 6 |
 | `https://` links | Skipped by verify (tier 2 OK) |
 | `BUNDLE_VERSION` in tier 2 GitHub URLs | `substitute_tokens` at adopt time; `update_project_md` writes same value to adopter `PROJECT.md`; assert in `test_adopt_links.py` |
 | `--extra-dirs docs/ai` in verify-adopters | **Out of scope** for adopter parity default; **`test_adopt_links.py`** uses `extra_dirs=["docs/ai"]` to regression-test `openspec.md` cross-tree links after adopt |
@@ -96,9 +96,9 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 | `docs/workflows/branch-workflow.md` | `git-trello.md` → `sdlc/git-trello.md` |
 | `overlays/lsi/docs/workflows/which-workflow.md` | `lsi-help.md` → `../../.cursor/commands/lsi-help.md`; `adopt-and-update.md` → `adopt-and-update.md` |
 | `overlays/lsi/docs/ai/openspec.md` | `../workflows/openspec-git-integration.md` → `../../.lsi/workflows/openspec-git-integration.md` (valid from `docs/ai/` after adopt) |
-| Root `which-workflow.md` (LSI row) | `openspec-git-integration.md` overlay note — use sibling name only in overlay copy; bundle root may keep maintainer path for dogfood |
+| Root `which-workflow.md` (LSI row) | **Optional** bundle dogfood — may keep maintainer paths (e.g. `overlays/lsi/docs/workflows/…`); not adopter canon |
 
-Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow_lsi()` — fix the overlay file as primary.
+**Router canonicality (`which-workflow.md`):** Adopters read **`.lsi/workflows/which-workflow.md`** after adopt. **`merge_which_workflow_lsi()`** overwrites the core-copied router with **`overlays/lsi/docs/workflows/which-workflow.md`** (after `rewrite_links`) — that overlay file is the **authoritative edit source**. Sync **`overlays/lsi/which-workflow-lsi.md`** with overlay router rows/links for maintainer reference; it is **not** installed to adopters. Bundle-root **`which-workflow.md`** is maintainer dogfood only (optional LSI row review in task 2.5). Document this table in `adopter-docs/README.md` or adoption-verify architecture to prevent future confusion.
 
 ### 3. Extend `LINK_REWRITES` as safety net (transition aid — not primary authoring)
 
@@ -140,17 +140,26 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 ### 6. Bundle-side source grep (pre-commit or CI — before adopt)
 
-**Choice:** Add a lightweight script (e.g. `snippets/check-workflow-link-sources.sh` or Python equivalent) that fails when any `*.md` under **`docs/workflows/`** or **`overlays/lsi/docs/workflows/`** contains the markdown-link substring **`](overlays/lsi/`**. Wire as **pre-commit hook** and/or **CI step** on the bundle repo — whichever the maintainer stack supports.
+**Choice:** Add a lightweight script (e.g. `snippets/check-workflow-link-sources.sh` or Python equivalent) that fails when any `*.md` under **`docs/workflows/`** or **`overlays/lsi/docs/workflows/`** contains forbidden markdown-link substrings. Wire as **pre-commit hook** and/or **CI step** on the bundle repo.
 
-**Scope:** Workflow spec sources that copy into `.lsi/workflows/` only. **Exclude** maintainer-only trees (`docs/adopt-and-update.md`, `openspec/`, root `which-workflow.md`, `patches/`, `README.md`) where bundle-layout navigation is valid.
+**Phased patterns:**
 
-**Rationale:** Cheapest fail-fast gate — catches tier 2 maintainer paths at commit/PR time, before running temp-adopt regression. Complements (does not replace) post-adopt pattern rules (decision 5) and `test_adopt_links.py` (decision 4). Same pattern family; narrow scope keeps false positives low.
+| Phase | Pattern | When |
+|-------|---------|------|
+| **1** | `](overlays/lsi/` | Ship with this change (after §2 source fixes) |
+| **2** | `](agent-stack/` | **Extend grep once overlay workflow sources are clean** (after task 2.4 — e.g. `which-workflow.md` `lsi-help` → `../../.cursor/commands/`) |
+
+Both phases scan the same directories; phase 2 enables the second pattern in the same script — not a separate tool.
+
+**Scope:** Workflow spec sources that copy into `.lsi/workflows/` only. **Exclude** maintainer-only trees (`docs/adopt-and-update.md`, `openspec/`, root `which-workflow.md`, `patches/`, `README.md`) where bundle-layout navigation is valid. Do **not** grep `overlays/lsi/agent-stack/` — commands install to `.cursor/commands/`, not workflow docs tree.
+
+**Rationale:** Cheapest fail-fast gate — catches tier 2 maintainer paths at commit/PR time, before running temp-adopt regression. Phase 1 targets the highest-signal drift; phase 2 closes the `agent-stack/commands/` smuggling path once §2 removes existing violations (avoid grep failing on known-in-flight fixes).
 
 **Alternatives considered:**
 
 - *Post-adopt verify only* — slower feedback; drift may land on branch before full regression runs
 - *Broad repo-wide grep* — false positives in OpenSpec changes, maintainer docs, and CHANGELOG cross-references
-- *Extend grep to `](agent-stack/`* — valid follow-up for overlay workflow sources; start with `](overlays/lsi/` as the highest-signal check
+- *Enable both patterns day one* — would fail until §2.4 completes; phased rollout keeps CI green during apply
 
 ## Risks / Trade-offs
 
