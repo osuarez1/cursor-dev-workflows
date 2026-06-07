@@ -11,7 +11,7 @@ Create a Trello card and ticket-linked branch for the active OpenSpec change usi
 
 **Contrast with `/lsi:card-link`:** Use **`/lsi:card-link`** when work already exists on a branch without a Trello id (e.g. after `/opsx:propose` on a manual branch). **`/lsi:card`** always creates a **new** branch via `git ts`.
 
-**Protected-branch exception:** This is the **only** `/lsi:*` card-setup command allowed on a protected branch — on **`main`** or **`staging`** only. Card + branch creation only; no `src/` edits. For existing feature branches, use **`/lsi:card-link`** instead.
+**Protected-branch exception:** Card-setup commands **`/lsi:card`**, **`/lsi:trello-list`**, and **`/lsi:trello-branch`** are allowed on **`main`** or **`staging`** only (no `src/` edits). For existing feature branches without a Trello id, use **`/lsi:card-link`** instead.
 
 **Input:** Optionally specify change slug after `/lsi:card`. Invoking this command counts as explicit consent to run `git ts`.
 
@@ -105,7 +105,7 @@ Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists a
 
 **Guardrails**
 
-- **Only** `/lsi:*` command permitted on **`main`** or **`staging`** (card setup only); all others refuse until on ticket branch.
+- **Card-setup commands only** on **`main`** or **`staging`** — `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch`; all other `/lsi:*` commands refuse until on ticket branch.
 - **Never** use `git checkout -b feature/<slug>` without Trello id — breaks git-trello hooks and Bitbucket pipelines.
 - **Never** invent a change slug — use OpenSpec folder name or ask the user.
 - For "draft card only" requests (no `/lsi:card`), output blocks per ticket-card-info **without** running `git ts`.
