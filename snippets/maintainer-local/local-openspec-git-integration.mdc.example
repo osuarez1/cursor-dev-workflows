@@ -1,0 +1,40 @@
+---
+description: OpenSpec + bundle maintainer workflow (tracked openspec/)
+alwaysApply: true
+---
+
+# OpenSpec (bundle maintainer)
+
+**Canonical overlay:** [openspec-git-integration.md](../../overlays/lsi/docs/workflows/openspec-git-integration.md)
+
+Tracked changes: **`openspec/changes/<change-slug>/`**
+
+Config: [openspec/config.yaml](../../openspec/config.yaml)
+
+**Branch policy:** [local-branch-workflow.mdc](local-branch-workflow.mdc)
+
+## Workflow commands
+
+Installed under `.cursor/commands/` (gitignored) by `./snippets/bootstrap-maintainer-local.sh`.
+
+**OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive`
+
+**LSI (git):** `/lsi:card`, `/lsi:branch`, `/lsi:commit`, `/lsi:pr`, `/lsi:close`, etc.
+
+| Step | Command |
+|------|---------|
+| Explore | `/opsx:explore` |
+| Propose | `/opsx:propose` |
+| Implement | `/opsx:apply` |
+| Commit | `/lsi:commit` (when asked) |
+| Close on main | `/lsi:close` after merge |
+
+## Before implementation
+
+1. Read `openspec/changes/<slug>/proposal.md`, `design.md`, `tasks.md`.
+2. **`tasks.md` must not** list `/opsx:sync`, `/opsx:archive`, or `/lsi:close` as apply deliverables.
+
+## Commits
+
+- Only `git commit` when the user explicitly asks.
+- Commit `openspec/` changes with implementation PRs.

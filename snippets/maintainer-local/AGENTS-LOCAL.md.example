@@ -1,0 +1,68 @@
+# Agent playbook — bundle release and OpenSpec (local only)
+
+Copy to **`AGENTS-LOCAL.md`** via `./snippets/bootstrap-maintainer-local.sh`. Gitignored. Do not commit.
+
+## When to use this playbook
+
+- Release or version the bundle (“bump version”, “prepare vX.Y.Z”, “update changelog”)
+- Cut a git tag for cursor-dev-workflows
+- Implement bundle features tracked in **`openspec/changes/<slug>/`**
+
+For normal workflow routing, use [AGENTS.md](AGENTS.md) and [which-workflow.md](which-workflow.md).
+
+## Read order (release)
+
+1. [docs/versioning.md](docs/versioning.md)
+2. [CHANGELOG.md](CHANGELOG.md) — `## [Unreleased]`
+3. [VERSION](VERSION)
+4. Git diff / status
+
+## Read order (feature work)
+
+1. Gitignored [MAINTAINER.md](MAINTAINER.md) if present
+2. Active change under `openspec/changes/<slug>/` — `proposal.md`, `design.md`, `tasks.md`
+3. [docs/ai/openspec.md](docs/ai/openspec.md) and [overlays/lsi/docs/workflows/openspec-git-integration.md](overlays/lsi/docs/workflows/openspec-git-integration.md)
+4. Canonical bundle specs: [docs/workflows/](docs/workflows/) + [overlays/lsi/](overlays/lsi/)
+
+## OpenSpec (tracked)
+
+- Changes: **`openspec/changes/<slug>/`**
+- Config: [openspec/config.yaml](openspec/config.yaml)
+- `/opsx:sync` → `openspec/specs/`
+- `/opsx:archive` → `openspec/changes/archive/`
+
+## Edit rules
+
+- Changelog under `## [Unreleased]`; **Adopter action** subsection on MAJOR
+- Update [VERSION](VERSION) only when cutting a release
+- Never stage `MAINTAINER.md`, `AGENTS-LOCAL.md`, `.cursor/commands/`, or machine paths
+- Commit `openspec/` with feature PRs when deltas change
+
+## Suggested commit plan (user must explicitly ask)
+
+1. `docs(changelog): note <summary>`
+2. `chore(release): mark bundle vX.Y.Z`
+
+Per [docs/workflows/commits-logical-order.md](docs/workflows/commits-logical-order.md).
+
+## Tagging (only when user asks)
+
+```bash
+git tag -a vX.Y.Z -m "cursor-dev-workflows vX.Y.Z"
+```
+
+Do not push unless explicitly asked.
+
+## Release steps
+
+1. Work on release branch off `main`
+2. Finalize `## [Unreleased]` → `## [X.Y.Z] - YYYY-MM-DD`
+3. Set [VERSION](VERSION)
+4. Commit when asked; tag when asked
+5. Re-sync adopters per [MAINTAINER.md](MAINTAINER.md)
+
+## Boundaries
+
+- Docs-only repo — no `TEST_COMMAND` for bundle releases
+- Do not duplicate release steps into tracked [AGENTS.md](AGENTS.md)
+- Do not run `adopt.py --target .` on the bundle

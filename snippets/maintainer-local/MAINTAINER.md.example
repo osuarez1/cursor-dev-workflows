@@ -1,0 +1,97 @@
+# Maintainer playbook (local only)
+
+Copy to **`MAINTAINER.md`** in the bundle root via `./snippets/bootstrap-maintainer-local.sh`. Gitignored — do not commit org names, internal repo slugs, or machine-specific paths.
+
+## Bootstrap
+
+```bash
+cd "$WORKFLOWS_BUNDLE_PATH"
+./snippets/bootstrap-maintainer-local.sh
+./snippets/verify-maintainer-local.sh
+```
+
+Re-run `./snippets/bootstrap-maintainer-local.sh --refresh-commands` after bundle bumps to refresh local slash commands.
+
+## Local setup
+
+| Field | Your value |
+|-------|------------|
+| `WORKFLOWS_BUNDLE_PATH` | e.g. `~/Repos/lsi/current/cursor-dev-workflows` |
+| Adopter repos | `../video-encoder`, `../web`, `../agents/ai-agent` |
+| OpenSpec | `openspec/changes/<slug>/` (tracked) |
+| Layout (adopters) | **LSI only** — `.lsi/workflows/` (see [docs/adoption-layout.md](docs/adoption-layout.md)) |
+| Layout (this repo) | **Source** — `docs/workflows/` + `overlays/lsi/` (no `.lsi/workflows/`) |
+
+## Anti-patterns
+
+- **Never** run `python3 snippets/adopt.py --target .` on the bundle.
+- **Never** commit `MAINTAINER.md`, `AGENTS-LOCAL.md`, or `.cursor/commands/`.
+
+## OpenSpec workflow (tracked)
+
+Changes live under **`openspec/`** (committed with implementation):
+
+```text
+openspec/
+  config.yaml
+  changes/<slug>/proposal.md, design.md, tasks.md
+  specs/                    # after /opsx:sync
+  changes/archive/          # after close/archive
+```
+
+1. `/opsx:propose <slug>` or copy `openspec/changes/_template/` → `openspec/changes/<slug>/`
+2. Branch `feat/<slug>` or `chore/bundle-<slug>` off `main`
+3. `/opsx:apply` then commit tracked files including `openspec/` deltas
+4. `/lsi:close` on **`main`** after merge — sync + archive per overlay
+
+Trello/git-trello is optional for bundle work; branch slug may match OpenSpec slug alone.
+
+## Adopt / re-sync loop
+
+After every bundle release (`VERSION` + tag):
+
+```bash
+cd "$WORKFLOWS_BUNDLE_PATH"
+
+python3 snippets/adopt.py --target ../video-encoder --config patches/video-encoder.yaml --accept-policy-defaults
+python3 snippets/adopt.py --target ../web --config patches/web.yaml
+python3 snippets/adopt.py --target ../agents/ai-agent --config patches/ai-agent.yaml
+```
+
+First adopt on a repo with drift: `--audit-only` first, commit `patches/files/<repo>/audit-resolutions.yaml`, then adopt with `--accept-resolutions` if needed.
+
+## Verify all adopters
+
+```bash
+./snippets/verify-all-adopters.sh
+```
+
+Per repo: `python3 snippets/verify-adopters.py --repo-root ../web`
+
+## Register a new adopter
+
+[docs/adopt-new-repo.md](docs/adopt-new-repo.md) — add `patches/<repo>.yaml`, update [patches/README.md](patches/README.md), add adopt line above.
+
+## CI: `check_version.py`
+
+Adopt copies `scripts/check_version.py` — pipelines are not auto-edited. Snippets: [docs/ci/check_version-web.yml](docs/ci/check_version-web.yml), [docs/ci/check_version-ai-agent.yml](docs/ci/check_version-ai-agent.yml).
+
+## Pre-release checklist (bundle)
+
+- [ ] Update `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md)
+- [ ] `./snippets/verify-all-adopters.sh` after adopt dry-run on each adopter
+- [ ] `python3 snippets/test_adoption_verify_links.py`
+- [ ] Classify bump per [docs/versioning.md](docs/versioning.md)
+
+## Release checklist (bundle)
+
+- [ ] `## [X.Y.Z] - YYYY-MM-DD` in CHANGELOG; set [VERSION](VERSION)
+- [ ] Tag `vX.Y.Z` on release branch
+- [ ] Re-sync all adopters; open app-repo PRs with `BUNDLE_VERSION` bump in `PROJECT.md`
+
+## Manual smoke (local kit)
+
+1. `./snippets/bootstrap-maintainer-local.sh` on fresh clone
+2. `git status` — no staged gitignored paths
+3. Cursor: `local-maintainer.mdc` + `commit-pr-conventions.mdc` active; `/opsx:propose` visible
+4. `/opsx:propose test-slug` creates `openspec/changes/test-slug/`; smoke `/opsx:apply` (docs-only)

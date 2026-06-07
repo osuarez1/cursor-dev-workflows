@@ -1,3 +1,7 @@
 # Private maintainer / agent playbooks (copy from *.example)
 MAINTAINER.md
 AGENTS-LOCAL.md
+
+# Local maintainer kit (see snippets/maintainer-local/README.md)
+.cursor/rules/local-*.mdc
+.cursor/commands/
