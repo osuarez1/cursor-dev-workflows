@@ -2,39 +2,43 @@
 name: /lsi-help
 id: lsi-help
 category: Workflow
-description: Interactive LSI workflow help — stay in menu until Exit
+description: LSI workflow help — one topic per invocation
 ---
 
-Interactive LSI workflow discovery — overview first, section menu until **Exit**. Read-only consultation; no implementation side effects.
+LSI workflow discovery — one response per invocation. Read-only reference; no implementation side effects.
 
 **Canonical source:** [which-workflow.md](../../docs/workflows/which-workflow.md) · [openspec-git-integration.md](../../docs/workflows/openspec-git-integration.md)
 
-**Help session — agent guardrails**
+**One-shot help guardrails**
 
-You are in a **`/lsi:help` session** until the user selects **Exit** from the section menu.
+- **One response per invocation:** no multi-turn help state; do not treat later messages as help navigation unless the user runs `/lsi:help` again.
+- **Topic arg required for content:** when `<topic>` is provided, **read this file**, find `## Section: \`{topic}\``, substitute `{ref}`, and **emit the full section in chat** (optional one-line intro only).
+- **No menu after topic:** after rendering a section, stop — do not re-show the topic list.
+- **Read-only:** no `git commit`, `git ts`, `git tb`, Trello API, `adopt.py`, or running other `/lsi:*` / `/opsx:*`.
+- **Suggest, don't run:** the `next` topic names one command + rationale only — never auto-invoke it.
+- **No dump:** on no-arg invocation, never emit section bodies — overview + topic list only.
 
-- **Stay in session:** treat follow-up turns as help navigation until Exit; do not end after one section.
-- **Read-only:** no `git commit`, `git ts`, `git tb`, Trello API, `adopt.py`, or running other `/lsi:*` / `/opsx:*` from within help.
-- **Suggest, don't run:** the `next` section names one command + rationale only — never auto-invoke it.
-- **One section per turn:** full overview once at session start; then section content + menu only.
-- **No dump:** never emit all sections, full lifecycle, command table, and SDLC diagram in one response.
-- **Fresh session:** a new `/lsi:help` invocation starts over; prior session state does not carry over.
-- **Menu fallback:** prefer AskQuestion; if unavailable, numbered list + reply with id (same menu ids; do not refuse).
-
-**Input:** Optional topic — `lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links`, `next`. With a topic: short overview + named section + mandatory menu.
+**Input:** Optional topic — `lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links`, `next`.
 
 **Steps**
 
 1. Read `PROJECT.md` → `{ref}` = `v{BUNDLE_VERSION}` when present, else `main`.
-2. Optional read-only: `git branch --show-current`, `openspec list --json`.
-3. **Session start:** emit overview only (unless topic arg — then overview + that section).
-4. **Section menu** — **AskQuestion** when available; otherwise numbered list + “reply with id”.
-5. **Loop until Exit:** section → menu again; **Exit** → `Exited /lsi:help.` and stop.
+2. **If `<topic>` arg:** run read-only git/openspec when topic is `status` or `next`; locate `## Section: \`{topic}\`` in this file; substitute `{ref}`; emit full section in chat; stop.
+3. **If no arg:** emit overview template + numbered topic list; stop.
+4. **Invalid topic:** one-line error + numbered topic list (still one response).
 
-**Follow-up text while in session**
+**Topic list**
 
-- Unambiguous text (e.g. `policies`) → map to menu id → section → AskQuestion again.
-- Ambiguous → AskQuestion menu (do not guess; do not exit).
+| # | id | label | invoke |
+|---|-----|-------|--------|
+| 1 | `sdlc` | SDLC diagram | `/lsi:help sdlc` |
+| 2 | `lifecycle` | Full lifecycle (13 steps) | `/lsi:help lifecycle` |
+| 3 | `status` | Where you are now | `/lsi:help status` |
+| 4 | `commands` | Command reference by phase | `/lsi:help commands` |
+| 5 | `policies` | Key policies | `/lsi:help policies` |
+| 6 | `overlap` | Overlap rules and card paths | `/lsi:help overlap` |
+| 7 | `links` | Deep dive spec links | `/lsi:help links` |
+| 8 | `next` | Suggested next command | `/lsi:help next` |
 
 ---
 
@@ -73,7 +77,7 @@ Do **not** use relative `.lsi/workflows/` paths or adopter Bitbucket URLs in hel
 
 ---
 
-## Overview template (session start only)
+## Overview template (no-arg invocation only)
 
 ```markdown
 ## LSI workflow overview
@@ -82,34 +86,16 @@ Do **not** use relative `.lsi/workflows/` paths or adopter Bitbucket URLs in hel
 - **Typical path:** propose → card/branch → apply → commit → readiness/review → PR → promote → close
 - **Bundle:** [cursor-dev-workflows](https://github.com/osuarez1/cursor-dev-workflows) @ `{ref}`
 
-Pick a section below, or Exit when done.
+Run `/lsi:help <topic>` for a section (see topic list below).
 ```
 
 Optional one-line context hint (branch / phase) after the overview.
 
 ---
 
-## AskQuestion menu
-
-- **Prompt:** `What do you want to see? (Exit to leave help)`
-
-| id | label |
-|----|-------|
-| `sdlc` | SDLC diagram |
-| `lifecycle` | Full lifecycle (13 steps) |
-| `status` | Where you are now |
-| `commands` | Command reference by phase |
-| `policies` | Key policies |
-| `overlap` | Overlap rules and card paths |
-| `links` | Deep dive spec links |
-| `next` | Suggested next command |
-| `exit` | Exit help |
-
-After every section (except Exit): `Pick another section or Exit.` then AskQuestion.
-
----
-
 ## Section: `sdlc`
+
+When topic is `sdlc`, emit this entire block in the chat response (substitute `{ref}`).
 
 Emit **mermaid only** (no numbered lifecycle list):
 
@@ -161,6 +147,8 @@ Link to [which-workflow.md](https://github.com/osuarez1/cursor-dev-workflows/blo
 
 ## Section: `lifecycle`
 
+When topic is `lifecycle`, emit this entire block in the chat response (substitute `{ref}`).
+
 Numbered 1–13 (GitHub links inline):
 
 1. `/opsx:explore` (optional) — clarify problem — [openspec-git-integration.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/openspec-git-integration.md)
@@ -179,7 +167,9 @@ Numbered 1–13 (GitHub links inline):
 
 ---
 
-## Section: `status` and `next` — branch → phase → command
+## Section: `status`
+
+When topic is `status`, emit this entire block in the chat response (substitute `{ref}`). Run read-only inputs first.
 
 **Read-only inputs:** `git branch --show-current`, `openspec list --json`; optional `git status --short`, check `design.md` / unchecked `tasks.md`.
 
@@ -210,17 +200,25 @@ Extract `{id}` and `{change-slug}` from ticket branch. Compare `{change-slug}` t
 | Protected `main` | Change still in-progress after staging (infer from context) | Promotion | `/lsi:promote` — **only when user context indicates staging QA passed** |
 | Protected `main` | After production merge | Production close | `/lsi:close` |
 
-**Ambiguity:** prefer earlier lifecycle step; when staging merge / promotion / close cannot be inferred, say **phase unclear** and suggest **`lifecycle`** or **`/lsi:branch`** — do not guess.
+**Ambiguity:** prefer earlier lifecycle step; when staging merge / promotion / close cannot be inferred, say **phase unclear** and suggest **`/lsi:help lifecycle`** or **`/lsi:branch`** — do not guess.
 
-**`status` output:** branch class, active OpenSpec, inferred phase label, suggested next command + one-line why.
+**Output:** branch class, active OpenSpec, inferred phase label, suggested next command + one-line why.
 
-**`next` output:** one `/lsi:*` or `/opsx:*` + rationale only — **never invoke**.
+**Conditional `TITLE_PREFIX` note:** when suggested next step is card setup (`/lsi:card`, `/lsi:card-link`, `/lsi:trello-list` → branch), add: read `TITLE_PREFIX` from `PROJECT.md` for card titles; when absent, use `REPO_NAME |` per [ticket-card-info.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/docs/workflows/ticket-card-info.md). Do **not** emit this note on other phases.
 
-**Conditional `TITLE_PREFIX` note (status only):** when suggested next step is card setup (`/lsi:card`, `/lsi:card-link`, `/lsi:trello-list` → branch), add: read `TITLE_PREFIX` from `PROJECT.md` for card titles; when absent, use `REPO_NAME |` per [ticket-card-info.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/docs/workflows/ticket-card-info.md). Do **not** emit this note on other phases.
+---
+
+## Section: `next`
+
+When topic is `next`, emit this entire block in the chat response (substitute `{ref}`). Run read-only inputs first (same heuristics as `status`).
+
+Apply the branch → phase → command table from **`status`** (same inputs and rows). **Output:** one `/lsi:*` or `/opsx:*` + rationale only — **never invoke**.
 
 ---
 
 ## Section: `commands`
+
+When topic is `commands`, emit this entire block in the chat response (substitute `{ref}`).
 
 | Phase | Command | Spec |
 |-------|---------|------|
@@ -249,6 +247,8 @@ Extract `{id}` and `{change-slug}` from ticket branch. Compare `{change-slug}` t
 
 ## Section: `policies`
 
+When topic is `policies`, emit this entire block in the chat response (substitute `{ref}`).
+
 - **Protected branches** — no task work on `main`/`staging` except card-setup commands — [branch-workflow.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/branch-workflow.md)
 - **Ticket branch pattern** — `feature|bugfix|hotfix|chore/{24-char-id}-<change-slug>` — [openspec-git-integration.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/openspec-git-integration.md)
 - **Staging-first PRs** — feature PRs target **`staging`**; promotion targets **`main`**
@@ -262,6 +262,8 @@ Extract `{id}` and `{change-slug}` from ticket branch. Compare `{change-slug}` t
 
 ## Section: `overlap`
 
+When topic is `overlap`, emit this entire block in the chat response (substitute `{ref}`).
+
 Summarize overlay [which-workflow.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/which-workflow.md) overlap rules:
 
 1. **PR conventions vs readiness vs code review** — format vs checklist vs deep review; readiness before PR, review before merge.
@@ -270,16 +272,12 @@ Summarize overlay [which-workflow.md](https://github.com/osuarez1/cursor-dev-wor
 4. **`/lsi:card` vs `/lsi:card-link` vs trello commands** — new card (`git ts`) vs link existing vs picker → `git tb`.
 5. **Commit plan vs commit execution** — plan first; `git commit` only when user asks.
 6. **`tasks.md` vs production close** — `/opsx:apply` completes tasks only; `/lsi:close` on **`main`** after promotion.
-7. **`/lsi:help` vs implementation commands** — read-only consultation until **Exit**; explains routing and may suggest the next command but does **not** run `/lsi:*`, `/opsx:*`, `git ts`/`git tb`, Trello API, `adopt.py`, or commits. When the user wants to **do** work, use the implementation command. After **Exit**, a fresh explicit slash invocation applies. Detail: [lsi-help.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/agent-stack/commands/lsi-help.md).
+7. **`/lsi:help` vs implementation commands** — read-only reference output (one response per invocation); may suggest the next command but does **not** run `/lsi:*`, `/opsx:*`, `git ts`/`git tb`, Trello API, `adopt.py`, or commits. When the user wants to **do** work, use the implementation command. Detail: [lsi-help.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/agent-stack/commands/lsi-help.md).
 
 ---
 
 ## Section: `links`
 
+When topic is `links`, emit this entire block in the chat response (substitute `{ref}`).
+
 Bullet list — all bundle-path map entries as GitHub blob links (use `{ref}` from step 1).
-
----
-
-## Section: `exit`
-
-Acknowledge briefly: `Exited /lsi:help.` Do not present the menu again.
