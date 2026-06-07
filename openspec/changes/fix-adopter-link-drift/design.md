@@ -53,7 +53,7 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 | `adoption-verify-links.py` relative resolution under `.lsi/workflows/` | 1 + 3 |
 | Pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree | Blocks tier 2 mistakes smuggled as relative |
 | `https://` links | Skipped by verify (tier 2 OK) |
-| `--extra-dirs docs/ai` in verify-adopters | **Out of scope** this change; tier 1 fix at source for `openspec.md` |
+| `--extra-dirs docs/ai` in verify-adopters | **Out of scope** for adopter parity default; **`test_adopt_links.py`** uses `extra_dirs=["docs/ai"]` to regression-test `openspec.md` cross-tree links after adopt |
 
 ## Decisions
 
@@ -111,8 +111,9 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 1. Creates temp dir with minimal adopter skeleton (`PROJECT.md`, patch config from `_template.yaml`)
 2. Runs `adopt.py --target <tmp> --config patches/_template.yaml --accept-policy-defaults` (or invokes `copy_core_bundle` + `copy_overlay` helpers if full adopt is heavy)
-3. Runs `adoption-verify-links.verify()` and asserts `broken == []`
-4. Optionally asserts no `overlays/lsi/` or `agent-stack/` substrings in `.lsi/workflows/**/*.md`
+3. Runs `adoption-verify-links.verify()` on `.lsi/workflows/` and asserts `broken == []`
+4. Runs the same `verify(..., extra_dirs=[Path("docs/ai")])` and asserts `broken == []` — catches regressions in `docs/ai/openspec.md` cross-tree links to `../../.lsi/workflows/openspec-git-integration.md` (bundle test only; `verify-adopters.py` default unchanged per task 5.2)
+5. Optionally asserts no `overlays/lsi/` or `agent-stack/` substrings in `.lsi/workflows/**/*.md`
 
 **Alternatives considered:**
 
@@ -149,7 +150,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 **Choice:** Fix at source — change `../workflows/openspec-git-integration.md` → `../../.lsi/workflows/openspec-git-integration.md` in `overlays/lsi/docs/ai/openspec.md` (both occurrences).
 
-**Do not** add `--extra-dirs docs/ai` to `verify-adopters.py` yet — outside the current failure set; proactive source fix is sufficient.
+**Do not** add `--extra-dirs docs/ai` to `verify-adopters.py` default — outside the current adopter parity gate. **`test_adopt_links.py`** (task 4.1) calls `verify(..., extra_dirs=[Path("docs/ai")])` after temp adopt to catch cross-tree link regressions in bundle CI.
 
 ### CI snippet copy (task 1.3)
 

@@ -24,7 +24,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 
 ## 4. Bundle regression tests
 
-- [ ] 4.1 Add `snippets/test_adopt_links.py` — temp adopt + `adoption-verify-links.verify()` asserts zero broken links
+- [ ] 4.1 Add `snippets/test_adopt_links.py` — temp adopt + `adoption-verify-links.verify()` asserts zero broken links under `.lsi/workflows/`; same test calls `verify(..., extra_dirs=[Path("docs/ai")])` to cover `docs/ai/openspec.md` cross-tree links to `../../.lsi/workflows/openspec-git-integration.md` (bundle regression only — does not change `verify-adopters.py` default per 5.2)
 - [ ] 4.2 Assert adopted `.lsi/workflows/**/*.md` contains no `overlays/lsi/` or `../../agent-stack/` substrings (tier 2 paths in tier 1 tree)
 - [ ] 4.3 Run `python3 snippets/test_adoption_verify_links.py` and new adopt link tests locally
 
