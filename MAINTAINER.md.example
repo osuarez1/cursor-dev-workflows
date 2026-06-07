@@ -19,6 +19,12 @@ Copy this file to **`MAINTAINER.md`** in the bundle root. **`MAINTAINER.md` is g
 - Adopt / re-sync loop (`adopt.py`, `update-workflows.py`, `/lsi:update`)
 - Verify all adopters
 - Register new adopter
-- Pre-release and release checklists
+- Pre-release and release checklists — **required before `VERSION` bump:**
+  ```bash
+  python3 snippets/test_adoption_verify_links.py
+  python3 snippets/test_adopt_links.py
+  python3 snippets/check-workflow-link-sources.py
+  ```
+  When bundle CI lands, run the same three in one pipeline job on every PR.
 
 Public adopter docs: [docs/adopt-and-update.md](docs/adopt-and-update.md). Patch registry: [patches/README.md](patches/README.md).

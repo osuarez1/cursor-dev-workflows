@@ -47,7 +47,7 @@ Appends a `Trello-Card:` line to each commit message.
 
 ## Card descriptions (assistants)
 
-When drafting a card description for a milestone or OpenSpec phase, follow [docs/workflows/ticket-card-info.md](../workflows/ticket-card-info.md) (**Task type / Task title / Task description (copy below)** blocks). Source scope from `openspec/changes/*/tasks.md`, `docs/roadmap/milestones-v1.md`, and `docs/contracts/` when relevant.
+When drafting a card description for a milestone or OpenSpec phase, follow [docs/workflows/ticket-card-info.md](../ticket-card-info.md) (**Task type / Task title / Task description (copy below)** blocks). Source scope from `openspec/changes/*/tasks.md`, `docs/roadmap/milestones-v1.md`, and `docs/contracts/` when relevant.
 
 ## Workflow
 

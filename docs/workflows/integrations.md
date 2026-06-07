@@ -27,7 +27,7 @@ When the LSI overlay is adopted, agents use slash commands instead of raw CLI fo
 | `/lsi:trello-list` | `git tl` + picker | List To Do cards; confirm → sync card + `git tb` |
 | `/lsi:trello-branch` | Trello PUT + `git tb` | Existing card id from `main`/`staging` |
 
-**OpenSpec required** for `/lsi:card-link`, `/lsi:trello-branch`, and `/lsi:trello-list` (confirm path): an in-progress change with `proposal.md` must exist. Card description is built from OpenSpec artifacts and **redacted** (no secrets, credentials, org-only paths) before Trello create/update. Full routing: [overlays/lsi/docs/workflows/openspec-git-integration.md](../../overlays/lsi/docs/workflows/openspec-git-integration.md).
+**OpenSpec required** for `/lsi:card-link`, `/lsi:trello-branch`, and `/lsi:trello-list` (confirm path): an in-progress change with `proposal.md` must exist. Card description is built from OpenSpec artifacts and **redacted** (no secrets, credentials, org-only paths) before Trello create/update. Full routing: [openspec-git-integration.md](openspec-git-integration.md).
 
 Card field format for `git ts`: [ticket-card-info.md](ticket-card-info.md).
 

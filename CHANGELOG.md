@@ -7,6 +7,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [1.4.2] - 2026-06-07
+
+### Adopters
+
+**Registered LSI adopters must run `/lsi:update`** (or the maintainer adopt loop) after pulling this bundle release. Adopt output changed: adopter-shaped `adopt-and-update.md`, CI snippets under `.lsi/workflows/ci/`, and tier 1 link fixes across workflow docs.
+
+### Added
+
+- **`overlays/lsi/adopter-docs/`** — adopter-shaped source tree with three-tier link policy README; `adopt-and-update.md` copied instead of maintainer `docs/adopt-and-update.md`
+- **`snippets/test_adopt_links.py`** — end-to-end temp adopt + link verify regression (required before `VERSION` bump)
+- **`snippets/check-workflow-link-sources.py`** — manual pre-PR grep for `](overlays/lsi/` and `](agent-stack/` in workflow spec sources
+- **Pattern rules** — `adoption-verify-links.py` flags smuggled maintainer paths inside `.lsi/workflows/`
+- **CI snippets** — both `docs/ci/check_version-*.yml` copy to `.lsi/workflows/ci/` on every adopt
+
+### Changed
+
+- **Three-tier link policy** — tier 1 relative in-repo, tier 2 GitHub/prose for maintainer-only, tier 3 copy-then-link; documented in [adoption-verify-architecture.md](docs/adoption-verify-architecture.md)
+- **Workflow cross-links** — tier 1 fixes in core and overlay specs (`integrations.md`, `which-workflow.md`, `branch-workflow.md`, `docs/ai/openspec.md`, etc.)
+- **`LINK_REWRITES`** — catch-all safety net for accidental bundle-layout hrefs (transition aid; source fixes are primary)
+- **Pre-release gate** — `test_adopt_links.py`, `test_adoption_verify_links.py`, and `check-workflow-link-sources.py` required before bumping `VERSION`
+
 ## [1.4.1] - 2026-06-07
 
 ### Added

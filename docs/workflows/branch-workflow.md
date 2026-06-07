@@ -43,7 +43,7 @@ Agents should:
 - Confirm the branch name embeds the ticket id before substantive work.
 - Not invent ticket ids; ask the user to create/link a card in `TICKET_TOOL`.
 
-Optional Trello/git-trello setup and LSI slash commands (`/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`): [integrations.md](integrations.md). LSI adopters: [overlays/lsi/docs/sdlc/git-trello.md](../../overlays/lsi/docs/sdlc/git-trello.md).
+Optional Trello/git-trello setup and LSI slash commands (`/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`): [integrations.md](integrations.md). LSI adopters: [git-trello.md](sdlc/git-trello.md).
 
 ## Before you branch
 

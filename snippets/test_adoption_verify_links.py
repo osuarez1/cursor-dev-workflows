@@ -61,6 +61,13 @@ class VerifyFunctionTests(unittest.TestCase):
         self.assertEqual(broken, [])
         self.assertTrue(any("doubled prefix" in item for item in patterns))
 
+    def test_lsi_maintainer_path(self) -> None:
+        root = fixture("lsi-maintainer-path")
+        broken, patterns, _ = verify(root.resolve(), canonical(root))
+        self.assertTrue(broken)  # unresolved maintainer paths
+        self.assertTrue(any("overlays/lsi/" in item for item in patterns))
+        self.assertTrue(any("agent-stack/" in item for item in patterns))
+
     def test_out_of_repo_link(self) -> None:
         root = fixture("out-of-repo-link")
         broken, patterns, _ = verify(root.resolve(), canonical(root))
