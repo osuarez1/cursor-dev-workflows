@@ -21,3 +21,20 @@
 
 - [x] 5.1 Update `overlays/lsi/agent-stack/commands/lsi-card.md` — allow `main` or `staging`; pull current branch before `git ts`
 - [x] 5.2 Update related overlay docs and rules (`openspec-git-integration.md`, `branch-workflow.md`, `branch-workflow.mdc`, `lsi-branch.md`, `opsx-propose.md`, `which-workflow.md`, `openspec.md`, `branch-reviewability.md`)
+
+## 6. Trello card slash commands
+
+- [x] 6.1 Add `lsi-card-link.md`, `lsi-trello-list.md`, `lsi-trello-branch.md` under `overlays/lsi/agent-stack/commands/`
+- [x] 6.2 Update routing docs (`integrations.md`, `git-trello.md`, `which-workflow.md`, `which-workflow-lsi.md`, `ticket-card-info.md`)
+- [x] 6.3 Extend `verify-adopters.py` and `audit-agent-docs.py` parity lists (17× `/lsi:*`)
+- [x] 6.4 Fix protected-branch guardrails — card-setup commands include trello-list and trello-branch
+
+## 7. Maintainer `.cursor/` gitignore
+
+- [x] 7.1 Add `.cursor/` to `.gitignore` and remove tracked rules from git index
+- [x] 7.2 Update `AGENTS.md`, `PROJECT.md`, `README.md` to reference `snippets/cursor-rules/commit-pr-conventions.mdc`
+
+## 8. Regression tests
+
+- [x] 8.1 Add `snippets/test_adopt_tokens.py` — `BUNDLE_VERSION` substitution and `patches/web.yaml` list keys
+- [x] 8.2 Run `python3 snippets/test_adoption_verify_links.py` and `python3 snippets/test_adopt_tokens.py`

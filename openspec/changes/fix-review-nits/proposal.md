@@ -1,6 +1,6 @@
 ## Why
 
-Promotion readiness and code review for bundle **v1.3.0** surfaced minor inconsistencies: dogfood `PROJECT.md` lagged `VERSION`, the LSI overlay cited a stale bundle version, and `adopt.py` had dead code in its stdlib YAML fallback. These nits block a clean `/lsi:commit` on a ticket branch and would drift again on the next release unless the overlay version is tokenized.
+Promotion readiness and code review for bundle **v1.3.0** surfaced minor inconsistencies: dogfood `PROJECT.md` lagged `VERSION`, the LSI overlay cited a stale bundle version, and `adopt.py` had dead code in its stdlib YAML fallback. Implementation also needed Trello card flows for branches created before card setup and for existing To Do cards, plus gitignore of the local `.cursor/` maintainer install.
 
 ## What Changes
 
@@ -9,12 +9,17 @@ Promotion readiness and code review for bundle **v1.3.0** surfaced minor inconsi
 - Inject `BUNDLE_VERSION` from bundle `VERSION` file into adopt token substitution so overlay docs resolve correctly on every adopt.
 - Remove dead/broken list parsing branch in `_load_simple_yaml` fallback (PyYAML-unavailable path).
 - Allow **`/lsi:card`** from **`staging`** as well as **`main`** (staging-first repos start card + branch from integration branch).
+- Add **`/lsi:card-link`**, **`/lsi:trello-list`**, and **`/lsi:trello-branch`** — OpenSpec-gated, redacted Trello card copy for existing branches and To Do cards.
+- Gitignore **`.cursor/`** in the bundle repo; remove tracked rules from version control; point maintainer docs at `snippets/cursor-rules/`.
+- Add regression tests for `BUNDLE_VERSION` token injection and patch YAML list loading.
 
 ## Capabilities
 
 ### New Capabilities
 
 - `adopt-bundle-version-token`: Overlay and adopt pipeline substitute `{{BUNDLE_VERSION}}` from bundle `VERSION` during LSI adopt.
+- `trello-card-slash-commands`: Card-link and trello list/branch slash commands with OpenSpec-gated redacted card copy.
+- `maintainer-cursor-gitignore`: Local `.cursor/` install gitignored; canonical rules in `snippets/cursor-rules/`.
 
 ### Modified Capabilities
 
@@ -22,8 +27,10 @@ Promotion readiness and code review for bundle **v1.3.0** surfaced minor inconsi
 
 ## Impact
 
-- `PROJECT.md` — dogfood placeholder table
-- `overlays/lsi/docs/workflows/openspec-git-integration.md` — overlay header
-- `overlays/lsi/agent-stack/commands/lsi-card.md` and related workflow docs — staging-first card policy
-- `snippets/adopt.py` — token build and YAML fallback parser
-- Adopters re-syncing after merge will get correct bundle version in adopted overlay docs
+- `PROJECT.md`, `AGENTS.md`, `README.md` — dogfood paths and `.cursor/` gitignore note
+- `.gitignore` — `.cursor/`, `.git-trello/`
+- `overlays/lsi/docs/workflows/openspec-git-integration.md` — overlay header and card routing
+- `overlays/lsi/agent-stack/commands/` — `lsi-card`, `lsi-card-link`, `lsi-trello-list`, `lsi-trello-branch`
+- `docs/workflows/integrations.md`, `overlays/lsi/docs/sdlc/git-trello.md`, routing tables
+- `snippets/adopt.py`, `verify-adopters.py`, `audit-agent-docs.py`, `test_adopt_tokens.py`
+- Adopters re-syncing after merge will get new slash commands and correct bundle version in adopted overlay docs

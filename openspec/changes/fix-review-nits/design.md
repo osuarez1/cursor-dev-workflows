@@ -13,6 +13,8 @@ Bundle **v1.3.0** promotion review (`/lsi:review`) flagged three fixable nits: s
 - Sync maintainer `PROJECT.md` with `VERSION`.
 - Simplify `_load_simple_yaml` list-item handling; verify patch YAML still loads.
 - Align `/lsi:card` protected-branch policy with staging-first workflow (`main` or `staging`).
+- Add Trello slash commands for existing branches and To Do cards (`/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`) with OpenSpec-gated redacted card copy.
+- Gitignore local `.cursor/` maintainer install; canonical rules in `snippets/cursor-rules/`.
 
 **Non-Goals:**
 
@@ -52,6 +54,18 @@ Bundle **v1.3.0** promotion review (`/lsi:review`) flagged three fixable nits: s
 **Rationale:** Staging-first repos integrate on `staging`; requiring checkout to `main` for every new card adds friction and conflicts with "implement from staging" in the migration plan.
 
 **Alternative rejected:** `main` only — blocks card creation when maintainer is already on `staging` for promotion catch-up work.
+
+### 5. Trello card slash commands
+
+**Choice:** Add `/lsi:card-link` (rename in place), `/lsi:trello-list` (picker + confirm), `/lsi:trello-branch` (`git tb` + OpenSpec sync). Require in-progress OpenSpec change and redact before Trello API.
+
+**Rationale:** Staging-first and propose-before-card flows left branches without Trello ids; existing To Do cards need `git tb` with consistent OpenSpec card bodies.
+
+### 6. Gitignore `.cursor/` in bundle repo
+
+**Choice:** Track rules in `snippets/cursor-rules/`; install to `.cursor/` locally via bootstrap; gitignore `.cursor/`.
+
+**Rationale:** Slash commands and maintainer-local rules are install artifacts, not bundle source.
 
 ## Risks / Trade-offs
 
