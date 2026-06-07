@@ -87,7 +87,7 @@ When using **`/lsi:card`**, **`/lsi:card-link`**, **`/lsi:trello-branch`**, or *
 3. **Redact** before Trello API: secrets, `.env`, credentials, absolute home paths, org-only slugs; link `openspec/changes/<slug>/`.
 4. Branch suffix after card setup = OpenSpec change slug (kebab-case).
 
-See [integrations.md](integrations.md) and adopted [openspec-git-integration.md](../../overlays/lsi/docs/workflows/openspec-git-integration.md).
+See [integrations.md](integrations.md) and [openspec-git-integration.md](openspec-git-integration.md).
 
 ## Examples
 
