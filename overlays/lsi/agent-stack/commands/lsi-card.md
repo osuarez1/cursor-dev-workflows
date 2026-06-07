@@ -49,7 +49,13 @@ Create a Trello card and ticket-linked branch for the active OpenSpec change usi
 
 4. **Draft ticket-card fields (required before `git ts`)**
 
-   Output exactly per [ticket-card-info.md](../../docs/workflows/ticket-card-info.md) — three separate fenced blocks:
+   Output exactly per [ticket-card-info.md](../../docs/workflows/ticket-card-info.md) — **mandatory clipboard blocks** in order:
+
+   1. **Task type (copy below)** — `text` fence only
+   2. **Task title (copy below)** — `text` fence only
+   3. **Task description (copy below)** — `markdown` fence only
+
+   Do **not** put type, title, or description values outside those three labeled blocks.
 
    | Field | Rules |
    |-------|-------|
@@ -67,7 +73,7 @@ Create a Trello card and ticket-linked branch for the active OpenSpec change usi
 
 5. **Confirm with user**
 
-   Show the three blocks and proposed branch suffix. Ask once to confirm before running `git ts` unless the user already invoked `/lsi:card` with "create now" intent.
+   Show the three **Task type / Task title / Task description (copy below)** blocks and proposed branch suffix. Ask once to confirm before running `git ts` unless the user already invoked `/lsi:card` with "create now" intent.
 
 6. **Run `git ts`**
 
@@ -108,6 +114,6 @@ Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists a
 - **Card-setup commands only** on **`main`** or **`staging`** — `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch`; all other `/lsi:*` commands refuse until on ticket branch.
 - **Never** use `git checkout -b feature/<slug>` without Trello id — breaks git-trello hooks and Bitbucket pipelines.
 - **Never** invent a change slug — use OpenSpec folder name or ask the user.
-- For "draft card only" requests (no `/lsi:card`), output blocks per ticket-card-info **without** running `git ts`.
+- For "draft card only" requests (no `/lsi:card`), output the three **(copy below)** blocks per ticket-card-info **without** running `git ts`.
 - **Never** use `git-ts` — only **`git ts`** (space-separated Git subcommand via alias).
 - Prefer `git push -u origin "$(git branch --show-current)"` over `HEAD` if hooks require explicit branch names ([integrations.md](../../docs/workflows/integrations.md)).

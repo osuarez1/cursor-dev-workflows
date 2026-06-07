@@ -51,6 +51,8 @@ Prepare and open a pull request for the active OpenSpec change after readiness a
 
    If `git log staging..HEAD` spans multiple themes or a large catch-up vs `staging`, state that explicitly in **Overview** (cumulative staging catch-up, not a single-ticket diff).
 
+   **Mandatory clipboard output (always):** after the summary header, emit **exactly two** fenced blocks — **Title (copy below)** then **Body (copy below)**. Put **all** title and body content **only** inside those blocks; do not repeat title or body as prose, bullets, or un-fenced markdown elsewhere in the response.
+
 7. **Push (only if user confirms)**
 
    Ask: "Push branch and create Bitbucket PR to `staging` with the above title and body?"
@@ -71,23 +73,65 @@ Prepare and open a pull request for the active OpenSpec change after readiness a
 
 **Output**
 
+Emit in this order:
+
+1. Summary header (metadata only — no title/body prose here):
+
 ```
 ## PR: <slug>
 
 **Target:** staging (default)
-**URL:** <bitbucket pr url or "not created — awaiting confirmation">
+**URL:** <PR create URL or "not created — awaiting confirmation">
 
 **Readiness:** Ready
 **Review:** Approve
 
 **CI:** pytest coverage ✓/✗
+```
 
+2. **Title (copy below)** — single line, `text` fence only:
+
+````markdown
+**Title (copy below):**
+
+```text
+<type>(<scope>): <imperative description>
+```
+````
+
+3. **Body (copy below)** — full PR description, `markdown` fence only:
+
+````markdown
+**Body (copy below):**
+
+```markdown
+## Overview
+...
+
+## Changes
+- ...
+
+## Potential risks
+- ...
+
+## Testing
+1. ...
+
+## Related
+- ...
+```
+````
+
+4. Footer (after both blocks):
+
+```
 After merge: `/lsi:merge-desc` for extended merge description — **do not** sync or archive.
 Next: staging QA → `/lsi:promote` → after main merge → `/lsi:close` on **main**.
 ```
 
 **Guardrails**
 
+- **Always** emit separate **Title (copy below)** and **Body (copy below)** fenced blocks — never title/body as inline prose only.
 - Do **not** run `gh pr create` or any GitHub CLI PR commands.
 - Do **not** auto-push without user confirmation.
 - Default PR target is **`staging`**, not `main`.

@@ -60,7 +60,13 @@ Use when `/opsx:propose` or early implementation happened on a branch **before**
 
 4. **Draft and redact ticket-card fields (required before card API)**
 
-   Output exactly per [ticket-card-info.md](../../docs/workflows/ticket-card-info.md) — three separate fenced blocks:
+   Output exactly per [ticket-card-info.md](../../docs/workflows/ticket-card-info.md) — **mandatory clipboard blocks** in order:
+
+   1. **Task type (copy below)** — `text` fence only
+   2. **Task title (copy below)** — `text` fence only
+   3. **Task description (copy below)** — `markdown` fence only
+
+   Do **not** put type, title, or description values outside those three labeled blocks.
 
    | Field | Rules |
    |-------|------|
@@ -73,7 +79,7 @@ Use when `/opsx:propose` or early implementation happened on a branch **before**
    - Remove secrets, tokens, `.env`, credentials paths, `MAINTAINER.md` org-specific slugs
    - Replace absolute home paths with placeholders; keep repo-relative paths
    - Omit ad-hoc agent prose not grounded in OpenSpec files
-   - Show redacted draft to user in the three blocks before API call
+   - Show redacted draft in the three **(copy below)** blocks before API call
 
    **Rename target after link:**
 
