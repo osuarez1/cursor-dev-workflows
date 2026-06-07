@@ -66,3 +66,8 @@ Docs consumed only by bundle maintainers (`docs/adopt-new-repo.md`, `patches/REA
 
 - **WHEN** an adopter opens `.lsi/workflows/adopt-and-update.md`
 - **THEN** every relative link targets a file that exists in the adopter repo after adopt (including optional copied CI snippet paths under `.lsi/workflows/` if the design copies them)
+
+#### Scenario: Future docs use adopter-docs when layouts diverge
+
+- **WHEN** a bundle doc copied into adopters cannot be authored in the maintainer tree without tier 2 hrefs or fragile rewrites
+- **THEN** maintainers add an adopter-shaped copy under `overlays/lsi/adopter-docs/` (mirroring install path) and wire `adopt.py` — rather than extending `LINK_REWRITES`

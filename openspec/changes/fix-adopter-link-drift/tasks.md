@@ -3,7 +3,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 ## 1. Adopter-shaped source docs
 
 - [ ] 1.1 Create `overlays/lsi/adopter-docs/adopt-and-update.md` per three-tier policy: tier 1 relative links only within adopt output; tier 2 for `patches/`, `MAINTAINER.md`, `adopt-new-repo.md` (GitHub `v{{BUNDLE_VERSION}}` or prose); tier 3 links to `ci/*.yml`
-- [ ] 1.2 Add `overlays/lsi/adopter-docs/README.md` — document three-tier link policy, authoring checklist, and that `LINK_REWRITES` are transition aid only (source-first; pattern rules + tests enforce)
+- [ ] 1.2 Add `overlays/lsi/adopter-docs/README.md` — document three-tier link policy, authoring checklist, `LINK_REWRITES` as transition aid only, and **long-term expansion rule**: add adopter-shaped copies under `adopter-docs/` for any doc where maintainer layout diverges from post-adopt layout (this change seeds `adopt-and-update.md` only)
 - [ ] 1.3 Update `copy_core_bundle()` in `snippets/adopt.py` to copy adopter doc instead of `docs/adopt-and-update.md`
 - [ ] 1.4 Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` during every adopt (tier 3; no per-patch conditionals)
 - [ ] 1.5 Add cross-reference in `docs/adopt-and-update.md` pointing maintainers at `overlays/lsi/adopter-docs/adopt-and-update.md` and `adopter-docs/README.md`
@@ -42,3 +42,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 Adopter parity on registered repos is the **real acceptance test** — temp-dir regression (§4) is necessary but not sufficient. **Do not announce** the release (team chat, adopter ping, `/lsi:update` broadcast) until 6.1 completes.
 
 - [ ] 6.1 Re-sync registered adopters via maintainer adopt loop; confirm `verify-adopters.py` passes on each — **required before announcing this release**
+
+## 7. Long-term (follow-on — not apply deliverables)
+
+- [ ] 7.1 When a copied doc cannot be authored cleanly in the maintainer tree, add an adopter-shaped source under `overlays/lsi/adopter-docs/` (mirroring install path) and wire `adopt.py` — expand beyond `adopt-and-update.md` per design **Long-term direction**

@@ -18,6 +18,7 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 - Fix root cause in bundle sources so maintainers edit links once
 - **Bundle adopt-link regression test** (`test_adopt_links.py`) — highest-value deliverable for long-term maintenance; required gate before `VERSION` bump (local + CI when present)
 - Minimal adopter churn — re-sync only, no hand-edits under `.lsi/workflows/`
+- Seed **`overlays/lsi/adopter-docs/`** for docs where maintainer layout diverges from adopter layout (this change: `adopt-and-update.md` only; expand long-term — see below)
 
 **Non-Goals:**
 
@@ -28,6 +29,7 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 - GitHub URLs for **tier 1** cross-spec links (installed workflow docs stay relative in-repo)
 - Copying maintainer-only bundle docs into adopters just to satisfy link verify
 - Expanding `LINK_REWRITES` as the primary link-fix strategy (regex whack-a-mole)
+- Completing the full `adopter-docs/` tree in this change — seed `adopt-and-update.md` only; long-term expansion is follow-on work
 
 ## Three-tier link policy
 
@@ -64,7 +66,9 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 
 **Choice:** Add `overlays/lsi/adopter-docs/adopt-and-update.md` written for `.lsi/workflows/` layout following the **three-tier link policy**; `copy_core_bundle()` copies this file instead of `docs/adopt-and-update.md`. Keep `docs/adopt-and-update.md` as the maintainer-facing superset (may link to bundle paths freely). Add `overlays/lsi/adopter-docs/README.md` documenting the three tiers for future authors.
 
-**Rationale:** `adopt-and-update.md` has the most tier 2 violations today. A dedicated adopter copy avoids regex whack-a-mole and is the first step toward a full adopter-shaped source tree.
+**Rationale:** `adopt-and-update.md` has the most tier 2 violations today. A dedicated adopter copy avoids regex whack-a-mole and is the **first** step toward a full adopter-shaped source tree (see **Long-term direction** below).
+
+**Long-term (not this change):** Expand `overlays/lsi/adopter-docs/` for **any** doc where the bundle maintainer layout diverges from post-adopt adopter layout. When a file copied into adopters cannot be authored correctly in the maintainer tree without tier 2 hrefs or fragile rewrites, add an adopter-shaped copy under `adopter-docs/` (mirroring install path) and point `adopt.py` at it. Prefer in-place tier 1 fixes in `docs/workflows/` and `overlays/lsi/docs/workflows/` when maintainer and adopter layouts already align (decision 2). `adopter-docs/README.md` documents the expansion criterion for future maintainers.
 
 **Alternatives considered:**
 
@@ -156,6 +160,18 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 | CI snippet copy duplicates bundle | Small tier 3 files; versioned with bundle; acceptable |
 | Tier 2 GitHub URLs stale after adopter lag on re-sync | Pin to `v{{BUNDLE_VERSION}}` in source; adopter `PROJECT.md` updated on re-sync |
 | Authors confuse tier 1 vs tier 2 | `adopter-docs/README.md` + pattern rules + source grep + `test_adopt_links.py` |
+
+## Long-term direction
+
+**Expand `overlays/lsi/adopter-docs/`** for any doc where maintainer bundle layout diverges from adopter install layout.
+
+| Situation | Approach |
+|-----------|----------|
+| Same tree after adopt; links wrong (e.g. `../../overlays/lsi/…`) | Fix hrefs at source in `docs/workflows/` or `overlays/lsi/docs/workflows/` (decision 2) |
+| Maintainer doc mixes adopter-facing content with bundle-only paths (`patches/`, `MAINTAINER.md`, `docs/adopt-new-repo.md`) | Adopter-shaped copy under `adopter-docs/`; maintainer superset stays in bundle layout |
+| Small artifact adopters need but bundle does not install by default | Tier 3 copy in `adopt.py`, then tier 1 relative link (CI snippets) |
+
+**This change** seeds the pattern with `adopt-and-update.md` only. Future docs enter `adopter-docs/` when link verify or authoring review shows maintainer layout cannot produce clean adopt output without rewrites. Do not grow `LINK_REWRITES` instead.
 
 ## Migration Plan
 
