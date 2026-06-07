@@ -153,6 +153,24 @@ description: Interactive LSI workflow help — stay in menu until Exit
 ---
 ```
 
+### Help session guardrails (required at top of `lsi-help.md`)
+
+Place **immediately after** the one-line intro and canonical source links — **before** **Input** / **Steps**:
+
+```markdown
+**Help session — agent guardrails**
+
+You are in a **`/lsi:help` session** until the user selects **Exit** from the section menu.
+
+- **Stay in session:** treat follow-up turns as help navigation until Exit; do not end after one section.
+- **Read-only:** no `git commit`, `git ts`, `git tb`, Trello API, `adopt.py`, or running other `/lsi:*` / `/opsx:*` from within help.
+- **Suggest, don't run:** the `next` section names one command + rationale only — never auto-invoke it.
+- **One section per turn:** full overview once at session start; then section content + menu only.
+- **No dump:** never emit all sections, full lifecycle, command table, and SDLC diagram in one response.
+- **Fresh session:** a new `/lsi:help` invocation starts over; prior session state does not carry over.
+- **Menu fallback:** prefer AskQuestion; if unavailable, numbered list + reply with id (same menu ids; do not refuse).
+```
+
 ### Agent steps
 
 1. Read `PROJECT.md` → `{ref}` from `BUNDLE_VERSION`.
@@ -282,4 +300,4 @@ Example link:
 
 - **AskQuestion preferred** — when unavailable, use numbered menu + “reply with id”; never refuse and never dump all sections at once.
 - **GitHub-only links** — adopters on private forks must use their fork URL manually until a `DOCS_WEB_BASE` token exists (out of scope).
-- **Session state** — agent must track “in help session” across turns; new `/lsi:help` starts fresh session.
+- **Session state** — agent must track “in help session” across turns; **`lsi-help.md` opens with the help-session guardrail block** (see command outline); new `/lsi:help` starts fresh session.
