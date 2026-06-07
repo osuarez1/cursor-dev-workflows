@@ -27,6 +27,7 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 - Retrofitting Profile A/B layouts
 - GitHub URLs for **tier 1** cross-spec links (installed workflow docs stay relative in-repo)
 - Copying maintainer-only bundle docs into adopters just to satisfy link verify
+- Expanding `LINK_REWRITES` as the primary link-fix strategy (regex whack-a-mole)
 
 ## Three-tier link policy
 
@@ -45,6 +46,7 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 3. **Ask:** Is it a small file adopters must copy-paste (CI snippet)? → tier **3** (copy in `adopt.py`, link relatively from `.lsi/workflows/`).
 4. **Do not** use GitHub URLs for tier 1 — adopted specs are local canon (`CANONICAL_DOCS_PATH=.lsi/workflows/`); relative links work offline and in IDE `@` navigation. `/lsi:help` chat output may use GitHub URLs (different consumer).
 5. **Source layout:** Author tier 1 content under **`overlays/lsi/adopter-docs/`** when the bundle maintainer layout differs from the adopter layout (start with `adopt-and-update.md`; expand over time toward a full adopter-shaped tree).
+6. **`LINK_REWRITES` are a transition aid, not primary authoring.** Fix links at source (decisions 1–2). Rewrites catch accidental bundle-layout hrefs during copy only. Pattern rules (decision 5) and regression tests (decision 4) enforce that maintainers cannot rely on rewrites as the main strategy.
 
 ### Verify gate alignment
 
@@ -92,9 +94,9 @@ All content that `adopt.py` installs into adopters MUST follow this policy. Main
 
 Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow_lsi()` — fix the overlay file as primary.
 
-### 3. Extend `LINK_REWRITES` as safety net (tier 1 fallback)
+### 3. Extend `LINK_REWRITES` as safety net (transition aid — not primary authoring)
 
-**Choice:** Add catch-all rewrites in `adopt.py` for tier 1 paths that may reappear when maintainers accidentally author bundle layout hrefs:
+**Choice:** Add catch-all rewrites in `adopt.py` for tier 1 paths that may reappear when maintainers accidentally author bundle layout hrefs. **Do not** treat new rewrites as the default fix — extend the table only for known accidental patterns during transition, not as a substitute for source edits.
 
 ```python
 (r"\]\(\.\./\.\./overlays/lsi/docs/workflows/", "](",),
@@ -103,7 +105,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 (r"\]\(\.\./\.\./\.\./docs/adopt-and-update\.md\)", "](adopt-and-update.md)"),
 ```
 
-**Rationale:** Belt-and-suspenders if a maintainer path slips into a shared doc. Rewrites run on every copied file.
+**Rationale:** Belt-and-suspenders while sources are corrected (decisions 1–2). **Pattern rules + tests enforce the boundary:** adopted output must not contain smuggled tier 2 path substrings; verify fails even if a rewrite would paper over a bad href. Rewrites run on every copied file but must not become the primary authoring strategy.
 
 ### 4. Bundle regression: `test_adopt_links.py`
 
@@ -124,7 +126,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 **Choice:** Add pattern violations for `](overlays/lsi/` and `](agent-stack/` inside canonical tree (same severity as doubled `docs/workflows/` prefix). These catch **tier 2 paths written as tier 1 relative links**.
 
-**Rationale:** Clearer failure message than "file not found"; encodes tier 1 vs tier 2 boundary in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md).
+**Rationale:** Clearer failure message than "file not found"; encodes tier 1 vs tier 2 boundary in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md). Together with `test_adopt_links.py` substring checks (decision 4), ensures rewrites remain a transition aid — authors must fix sources, not add regex to `LINK_REWRITES`.
 
 ## Risks / Trade-offs
 
@@ -132,7 +134,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 |------|------------|
 | Dual `adopt-and-update.md` copies diverge | Adopter copy is short; maintainer doc links to it; test asserts adopter copy links |
 | `.cursor/commands/` missing during verify if adopt partial | Regression test runs full adopt install including agent stack |
-| Rewrites mask bad source links silently | Pattern rule + substring assertion in test |
+| Rewrites mask bad source links silently | Pattern rules fail on smuggled tier 2 paths; substring assertion in test; source fixes are primary (§2) |
 | CI snippet copy duplicates bundle | Small tier 3 files; versioned with bundle; acceptable |
 | Tier 2 GitHub URLs stale after adopter lag on re-sync | Pin to `v{{BUNDLE_VERSION}}` in source; adopter `PROJECT.md` updated on re-sync |
 | Authors confuse tier 1 vs tier 2 | `adopter-docs/README.md` + pattern rules + `test_adopt_links.py` |
