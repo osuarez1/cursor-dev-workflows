@@ -8,11 +8,13 @@ Portable **Cursor agent workflows** for any language or framework: ticket cards,
 
 **Agents:** start at [AGENTS.md](AGENTS.md).
 
-1. Copy this entire folder into a new git repository (or use it as the repo root).
-2. Replace placeholders in the table below for your project.
-3. Read [docs/adoption-layout.md](docs/adoption-layout.md) — choose Profile A (default) or B.
-4. Follow [adoption-checklist.md](adoption-checklist.md).
-5. Copy [snippets/cursor-rules/](snippets/cursor-rules/) into your target repo’s `.cursor/rules/` and adjust paths to your canonical docs.
+**LSI adopters** (video-encoder, web, ai-agent):
+
+1. Maintain `patches/<repo>.yaml` in this bundle.
+2. Run [docs/adopt-and-update.md](docs/adopt-and-update.md) — `snippets/adopt.py` installs `.lsi/workflows/` and agent stack.
+3. Do **not** hand-edit `.lsi/workflows/` in application repos.
+
+**Bundle maintainers:** read [MAINTAINER.md.example](MAINTAINER.md.example) and [docs/adoption-layout.md](docs/adoption-layout.md).
 
 ## Placeholder registry
 
