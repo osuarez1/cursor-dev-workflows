@@ -22,6 +22,8 @@ project:
   PR_MAX_COMMITS: "12"
   PR_MAX_PRIMARY_CONCERNS: "1"
   PR_MAX_SCOPES: "3"
+overlay_files:
+  versioning-and-releases.md: patches/files/ai-agent/versioning-and-releases.md
 preserve:
   - bitbucket-pipelines.yml
   - .cursor/rules/*.mdc
