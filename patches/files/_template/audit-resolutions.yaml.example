@@ -1,0 +1,8 @@
+# Copy to patches/files/<repo>/audit-resolutions.yaml after --audit-only review.
+- id: claude_symlink
+  choice: symlink_to_agents
+  note: "Merge CLAUDE.md domain into AGENTS.md before symlink"
+- id: pr_target
+  choice: staging_first
+- id: openspec_archive_timing
+  choice: lsi_close_on_main

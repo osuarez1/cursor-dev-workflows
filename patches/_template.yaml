@@ -1,19 +1,64 @@
+# Copy to patches/<repo>.yaml and fill in. See docs/adopt-new-repo.md.
 repo: my-repo
 overlay: lsi
 layout: lsi
 canonical: .lsi/workflows
+sync_opsx: false  # true only to overwrite root .cursor/commands/opsx-* from bundle
+
 project:
   REPO_NAME: my-repo
   TITLE_PREFIX: "My Repo | "
   BASE_BRANCH: main
   PR_TARGET_BRANCH: staging
-  PROTECTED_BRANCHES: "main, staging"
+  PROTECTED_BRANCHES: "main, staging"  # e.g. web adds master; ai-agent adds test
   SOURCE_ROOT: "src/"
+  TEST_ROOT: tests/
   TEST_COMMAND: "npm test"
+  PR_HOST: Bitbucket
+  BITBUCKET_REMOTE: org/my-repo
+  VERSION_FILE: version.txt  # or VERSION for monorepos
+  PR_WARN_FILES: "15"
+  PR_WARN_LINES: "250"
+  PR_MAX_FILES: "25"
+  PR_MAX_LINES: "400"
+  PR_MAX_COMMITS: "12"
+  PR_MAX_PRIMARY_CONCERNS: "1"
+  PR_MAX_SCOPES: "3"
+
+# scope_exclude_globs:  # optional — PR size limits
+#   - package-lock.json
+
 preserve:
   - bitbucket-pipelines.yml
+  # - docs/workflows/my-runbook.md
+  # - .cursor/rules/my-domain.mdc
+
+overlay_files:
+  ticket-card-info.md: patches/files/my-repo/ticket-card-info.md
+  test-requirements.md: patches/files/my-repo/test-requirements.md
+  versioning-and-releases.md: patches/files/my-repo/versioning-and-releases.md
+
+# remove_after_adopt:
+#   - docs/workflows/legacy-workflow.md
+#   - .cursor/rules/legacy-rule.mdc
+
 agents_claude:
   canonical: AGENTS.md
   claude_symlink: true
+  reconcile_sources:
+    - CLAUDE.md
+  # stub_after_merge: docs/agents/coding-agents.md
+
+merge:
+  AGENTS.md:
+    markers: [lsi:workflows, lsi:domain]
+  cursorrules:
+    marker_block: lsi:workflows
+
 bootstrap:
   version.txt: "0.1.0"
+  # VERSION: "0.1.0"
+  # VERSION_FILE: VERSION
+
+ci_hook:
+  add_check_version: true  # documents snippet only; adopt does not edit pipelines
