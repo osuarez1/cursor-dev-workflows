@@ -1,8 +1,23 @@
 # Adoption checklist
 
-Bootstrap **cursor-dev-workflows** into a target project repository.
+## LSI adopters (recommended)
 
-**Layout rules (read first):** [docs/adoption-layout.md](docs/adoption-layout.md) — choose Profile A or B, copy map, link verification.
+Use **`snippets/adopt.py`** — do not hand-copy bundle files. Full guide: [docs/adopt-new-repo.md](docs/adopt-new-repo.md).
+
+- [ ] Create `patches/<repo>.yaml` from [patches/_template.yaml](patches/_template.yaml)
+- [ ] `adopt.py --audit-only` → resolve → adopt → `verify-adopters.py`
+- [ ] Wire `check_version.py` in CI ([docs/ci/](docs/ci/))
+- [ ] App-repo PR with audit summary
+
+Registered repos: [patches/README.md](patches/README.md). Layout: [docs/adoption-layout.md](docs/adoption-layout.md) (`.lsi/workflows/` only).
+
+---
+
+## Legacy manual bootstrap (deprecated)
+
+The steps below are **superseded** for LSI repos by `adopt.py`. Kept for reference only.
+
+**Layout rules:** [docs/adoption-layout.md](docs/adoption-layout.md) — Profile A/B retired for LSI; use `.lsi/workflows/`.
 
 ## 1. Copy the bundle
 

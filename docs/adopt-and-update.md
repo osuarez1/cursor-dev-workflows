@@ -67,4 +67,11 @@ See [MAINTAINER.md.example](../MAINTAINER.md.example) — re-run `adopt.py` on e
 
 ## New repo
 
-Copy `patches/_template.yaml` → `patches/<repo>.yaml`, add overlay files under `patches/files/<repo>/`, run adopt.
+Full checklist: **[adopt-new-repo.md](adopt-new-repo.md)**.
+
+Summary:
+
+1. Copy `patches/_template.yaml` → `patches/<repo>.yaml` and `patches/files/_template/` → `patches/files/<repo>/`
+2. Register in [patches/README.md](../patches/README.md)
+3. `--audit-only` → `audit-resolutions.yaml` if needed → adopt → `verify-adopters.py`
+4. Add to local `MAINTAINER.md` adopt loop
