@@ -13,6 +13,7 @@ AUDIT = BUNDLE_ROOT / "snippets" / "audit-agent-docs.py"
 VERIFY = BUNDLE_ROOT / "snippets" / "adoption-verify-links.py"
 
 LSI_COMMANDS = [
+    "lsi-help",
     "lsi-card",
     "lsi-card-link",
     "lsi-trello-list",

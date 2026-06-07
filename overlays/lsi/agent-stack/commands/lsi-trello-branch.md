@@ -52,7 +52,7 @@ Create and checkout a ticket branch from an **existing** Trello card using **`gi
 
    Read `openspec/changes/<slug>/proposal.md`, `tasks.md`, `design.md` (if present).
 
-   Draft per [ticket-card-info.md](../../docs/workflows/ticket-card-info.md):
+   Draft per [ticket-card-info.md](../../docs/workflows/ticket-card-info.md) — **mandatory clipboard blocks** in order: **Task type (copy below)**, **Task title (copy below)**, **Task description (copy below)**. Do **not** put field values outside those blocks.
 
    - **Context/Goal** ← proposal **Why**
    - **Acceptance Criteria** ← `tasks.md` `- [ ]` items

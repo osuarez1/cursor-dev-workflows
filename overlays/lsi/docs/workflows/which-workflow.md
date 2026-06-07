@@ -10,12 +10,13 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 |----------------------|-----|---------|------------------|
 | explore idea, think through change | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:explore` | Discussion; docs-only on protected branches |
 | propose OpenSpec change | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:propose` | proposal, design, tasks |
+| which command, workflow help, lost, LSI onboarding, what should I run next (discovery) | [lsi-help.md](../../agent-stack/commands/lsi-help.md) | `/lsi:help` | Overview + topic list; `/lsi:help <topic>` for section — read-only one-shot |
 | sync delta specs | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:sync` | Main specs updated |
 | create Trello card and branch, `/lsi:card` | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card` | Card + branch via `git ts` from `main`/`staging` |
 | link Trello card to existing branch, `/lsi:card-link` | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card-link` | Requires open OpenSpec; card body redacted from artifacts |
 | list Trello To Do cards, `/lsi:trello-list` | [git-trello.md](../sdlc/git-trello.md) | `/lsi:trello-list` | Picker → confirm; requires OpenSpec to branch |
 | branch from existing Trello card, `/lsi:trello-branch` | [git-trello.md](../sdlc/git-trello.md) | `/lsi:trello-branch` | Requires open OpenSpec; sync card then `git tb` |
-| draft ticket card, task type/title/description (no CLI) | [ticket-card-info.md](ticket-card-info.md) | — | Three copy-paste blocks; use `/lsi:card` for card + branch |
+| draft ticket card, task type/title/description (no CLI) | [ticket-card-info.md](ticket-card-info.md) | — | Three labeled copy-paste blocks (type, title, description); use `/lsi:card` for card + branch |
 | create branch, wrong branch, on main | [branch-workflow.md](branch-workflow.md) | `/lsi:branch` | Refuse or redirect to ticket branch |
 | draft PR title, PR description, PR copy | [pull-requests.md](pull-requests.md) | `/lsi:pr` | Title + markdown body |
 | production promotion PR (staging → main) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:promote` | Promotion PR to `main` |
@@ -38,6 +39,7 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 4. **`/lsi:card` vs `/lsi:card-link` vs trello commands vs `git ts`** — `/lsi:card` runs `git ts` (new branch). `/lsi:card-link` and trello flows require OpenSpec and redact card copy before Trello API. `/lsi:trello-list` is interactive picker → confirm → optional `git tb`. Never run raw `git ts` when linking an existing card.
 5. **Commit plan vs commit execution** — Always show a plan before the first commit on a branch when multiple logical changes exist. Run `git commit` only when the user explicitly asks.
 6. **`tasks.md` vs production close** — `/opsx:apply` completes `tasks.md` deliverables only. Do **not** add `/opsx:sync`, `/opsx:archive`, or `/lsi:close` as tasks; run `/lsi:close` on **`main`** after promotion.
+7. **`/lsi:help` vs implementation commands** — `/lsi:help` is read-only reference output (one response per invocation); it may suggest the next command but does **not** run `/lsi:*`, `/opsx:*`, `git ts`/`git tb`, Trello API, `adopt.py`, or commits. When the user wants to **do** work (card, apply, PR, close), use the implementation command. Session detail: [lsi-help.md](../../agent-stack/commands/lsi-help.md).
 
 ## Flowchart
 

@@ -2,19 +2,19 @@
 
 Paste-ready blocks for [ticket-card-info.md](../docs/workflows/ticket-card-info.md).
 
-### 1. Task type
+**Task type (copy below):**
 
 ```text
 feature
 ```
 
-### 2. Task title
+**Task title (copy below):**
 
 ```text
 MyApp | Add webhook signature verification
 ```
 
-### 3. Task description
+**Task description (copy below):**
 
 ```markdown
 **Context/Goal**

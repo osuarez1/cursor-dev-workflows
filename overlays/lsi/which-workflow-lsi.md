@@ -6,6 +6,7 @@ Merge these rows into the decision table when adopting with `--overlay lsi`.
 |----------------------|-----|---------|------------------|
 | explore idea, think through change | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:explore` | Discussion; docs-only on protected branches |
 | propose OpenSpec change | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:propose` | proposal, design, tasks |
+| which command, workflow help, lost, LSI onboarding, what should I run next (discovery) | [lsi-help.md](agent-stack/commands/lsi-help.md) | `/lsi:help` | Overview + topic list; `/lsi:help <topic>` for section — read-only one-shot |
 | sync delta specs | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:sync` | Main specs updated |
 | create Trello card and branch, `/lsi:card` | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card` | Card + branch via `git ts` from `main`/`staging` |
 | link Trello card to existing branch | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:card-link` | OpenSpec required; redacted card + rename branch |

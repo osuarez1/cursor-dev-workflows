@@ -6,7 +6,7 @@ Use this routing guide when the user’s request could match more than one docum
 
 | User says (examples) | Use | Output / verdict |
 |----------------------|-----|------------------|
-| draft ticket card, `git ts`, task type/title/description | [ticket-card-info.md](docs/workflows/ticket-card-info.md) | Three copy-paste blocks |
+| draft ticket card, `git ts`, task type/title/description | [ticket-card-info.md](docs/workflows/ticket-card-info.md) | Three labeled copy-paste blocks (type, title, description) |
 | create branch, wrong branch, on main | [branch-workflow.md](docs/workflows/branch-workflow.md) | Refuse or redirect to ticket branch |
 | draft PR title, PR description, PR copy | [pull-requests.md](docs/workflows/pull-requests.md) | Title + markdown body (Overview, Changes, Potential risks, Testing, Related) |
 | PR merge info, merge commit, extended description | [pull-requests.md](docs/workflows/pull-requests.md) | Default `Merge pull request #…` subject + extended description (Summary, Changes, Commits merged, Post-merge) |
@@ -16,7 +16,7 @@ Use this routing guide when the user’s request could match more than one docum
 | commit plan, logical commits, commit message | [commits-logical-order.md](docs/workflows/commits-logical-order.md) | Ordered commit plan; **commit only if asked** |
 | when are tests required | [test-requirements.md](docs/workflows/test-requirements.md) | Policy + exemption wording |
 | log review to PR host or ticket tool | [integrations.md](docs/workflows/integrations.md) | Optional adapters |
-| LSI OpenSpec + Trello slash commands | [overlays/lsi/docs/workflows/openspec-git-integration.md](overlays/lsi/docs/workflows/openspec-git-integration.md) | `/lsi:card`, `/lsi:card-link`, `/lsi:trello-*`, full lifecycle |
+| LSI OpenSpec + Trello slash commands | [overlays/lsi/docs/workflows/openspec-git-integration.md](overlays/lsi/docs/workflows/openspec-git-integration.md) | `/lsi:card`, `/lsi:card-link`, `/lsi:trello-*`, full lifecycle; Discovery: `/lsi:help` (overlay) |
 | what did the agent do wrong | [common-mistakes.md](docs/workflows/common-mistakes.md) | Anti-patterns |
 
 ## Overlap rules

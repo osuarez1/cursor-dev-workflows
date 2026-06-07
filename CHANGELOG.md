@@ -4,7 +4,21 @@ All notable changes to **cursor-dev-workflows** are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning policy: [docs/versioning.md](docs/versioning.md).
 
+
 ## [Unreleased]
+
+## [1.4.1] - 2026-06-07
+
+### Added
+
+- **`/lsi:help`** — LSI workflow discovery: overview + topic list (no arg) or `/lsi:help <topic>` for one section per invocation; SDLC diagram section, GitHub bundle spec links, branch → phase → command heuristics for `status` / `next`
+- **Routing** — discovery decision-table row and overlap rule **#7** in overlay `which-workflow.md`; `/lsi:help` in openspec-git-integration quick reference
+
+### Changed
+
+- **`/lsi:help`** — one response per invocation; removed sticky session, AskQuestion loop, and Exit option (topic arg required for section content)
+
+## [1.4.0] - 2026-06-07
 
 ### Added
 
