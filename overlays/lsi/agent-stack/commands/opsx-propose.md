@@ -109,4 +109,4 @@ After completing all artifacts, summarize:
 **Protected branches (video-encoder)**
 
 - Proposing on `main`/`staging` is allowed (OpenSpec artifacts only).
-- After propose, suggest **`/lsi:card`** from **`main`** before `/opsx:apply`. See [docs/workflows/openspec-git-integration.md](../../docs/workflows/openspec-git-integration.md).
+- After propose, suggest **`/lsi:card`** from **`main`** or **`staging`**, or **`/lsi:card-link`** if already on a feature branch without Trello id, before `/opsx:apply`. See [docs/workflows/openspec-git-integration.md](../../docs/workflows/openspec-git-integration.md).

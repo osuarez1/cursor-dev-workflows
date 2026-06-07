@@ -1,71 +1,24 @@
 # Maintainer playbook (local only)
 
-Copy this file to **`MAINTAINER.md`** in the bundle root. `MAINTAINER.md` is gitignored — do not commit org names, internal repo slugs, or machine-specific paths.
+Copy this file to **`MAINTAINER.md`** in the bundle root. **`MAINTAINER.md` is gitignored** — do not commit org names, internal repo slugs, or machine-specific paths.
 
-## Local setup
+**Full maintainer playbook** (local Cursor bootstrap, adopt loop, verify, release checklists) lives in **`MAINTAINER.md` only**. Copy from a teammate’s `MAINTAINER.md` or ask a bundle maintainer for the standard sections.
+
+## Local setup (fill in after copy)
 
 | Field | Your value |
 |-------|------------|
 | `WORKFLOWS_BUNDLE_PATH` | e.g. `~/Repos/lsi/current/cursor-dev-workflows` |
-| Adopter repos | `video-encoder`, `web`, `agents/ai-agent` |
+| Adopter repos | e.g. `video-encoder`, `web` |
 | Layout | **LSI only** — `.lsi/workflows/` (see [docs/adoption-layout.md](docs/adoption-layout.md)) |
 
-## Adopt / re-sync loop
+## Sections to add in gitignored MAINTAINER.md
 
-After every bundle release (`VERSION` + tag):
+- **`maintainer-adopters.local.yaml`** — org-specific adopter clone paths for `update-workflows.py` / `/lsi:update` / `verify-all-adopters.sh` (never commit; not documented in tracked slash commands)
+- Local Cursor install (`bootstrap-maintainer-local.sh`, `/lsi:update --local-only`)
+- Adopt / re-sync loop (`adopt.py`, `update-workflows.py`, `/lsi:update`)
+- Verify all adopters
+- Register new adopter
+- Pre-release and release checklists
 
-```bash
-cd "$WORKFLOWS_BUNDLE_PATH"
-
-for target config; do
-  # video-encoder
-  python3 snippets/adopt.py --target ../video-encoder --config patches/video-encoder.yaml --accept-policy-defaults
-  # web
-  python3 snippets/adopt.py --target ../web --config patches/web.yaml --accept-policy-defaults
-  # ai-agent monorepo
-  python3 snippets/adopt.py --target ../agents/ai-agent --config patches/ai-agent.yaml --accept-policy-defaults
-done
-```
-
-First adopt on a repo with drift: run `--audit-only` first, commit `patches/files/<repo>/audit-resolutions.yaml`, then adopt.
-
-## Verify all adopters
-
-```bash
-./snippets/verify-all-adopters.sh
-```
-
-Or per repo: `python3 snippets/verify-adopters.py --repo-root ../web`
-
-## Register a new adopter
-
-Follow [docs/adopt-new-repo.md](docs/adopt-new-repo.md) — add `patches/<repo>.yaml`, update [patches/README.md](patches/README.md), then add the adopt line to the loop above.
-
-Individual checks:
-
-```bash
-python3 snippets/adoption-verify-links.py --repo-root ../web --canonical .lsi/workflows
-python3 snippets/audit-agent-docs.py --repo-root ../web --fail-on error
-```
-
-## CI: `check_version.py`
-
-Adopt copies `scripts/check_version.py` — **pipelines are not auto-edited**. Snippets:
-
-| Repo | File | Version file |
-|------|------|----------------|
-| video-encoder | `bitbucket-pipelines.yml` (existing) | `version.txt` |
-| web | [docs/ci/check_version-web.yml](docs/ci/check_version-web.yml) | `version.txt` |
-| ai-agent | [docs/ci/check_version-ai-agent.yml](docs/ci/check_version-ai-agent.yml) | `VERSION` (`VERSION_FILE=VERSION`) |
-
-## Pre-release checklist (bundle)
-
-- [ ] Update `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md)
-- [ ] Run `python3 snippets/verify-adopters.py` on each adopter after adopt dry-run
-- [ ] Classify bump per [docs/versioning.md](docs/versioning.md)
-
-## Release checklist (bundle)
-
-- [ ] `## [X.Y.Z] - YYYY-MM-DD` in CHANGELOG; set [VERSION](VERSION)
-- [ ] Tag `vX.Y.Z` on `main`
-- [ ] Re-sync all adopters; open app-repo PRs with `BUNDLE_VERSION` bump in `PROJECT.md`
+Public adopter docs: [docs/adopt-and-update.md](docs/adopt-and-update.md). Patch registry: [patches/README.md](patches/README.md).

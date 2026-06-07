@@ -6,6 +6,26 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+
+- **LSI slash commands** — `/lsi:card-link` (Trello card + rename existing branch), `/lsi:trello-list` (interactive To Do picker), `/lsi:trello-branch` (`git tb` from existing card), `/lsi:update` (re-sync adopt or maintainer bootstrap)
+- **OpenSpec-gated card copy** — card-link, trello-branch, and trello-list (confirm path) require an in-progress OpenSpec change; Trello title/body drafted from `proposal.md` / `tasks.md` / `design.md` and redacted before API calls
+
+### Changed
+
+- **`/lsi:card`** — allowed from **`staging`** as well as **`main`**; contrast docs for card-link vs trello flows
+- **`/lsi:trello-list`** — interactive AskQuestion picker with confirm/exit before `git tb`
+- **`snippets/adopt.py`** — inject `BUNDLE_VERSION` from bundle `VERSION` into overlay token substitution; simplify stdlib YAML fallback parser; fix list-key parsing without PyYAML
+- **Overlay** — `openspec-git-integration.md` uses `v{{BUNDLE_VERSION}}` placeholder; workflow docs updated for Trello card routing ([integrations.md](docs/workflows/integrations.md), [git-trello.md](overlays/lsi/docs/sdlc/git-trello.md), [which-workflow-lsi.md](overlays/lsi/which-workflow-lsi.md))
+- **`snippets/verify-adopters.py`** / **`snippets/audit-agent-docs.py`** — parity lists include new slash commands (18× `/lsi:*` in agent stack)
+- **`.gitignore`** — gitignore local `.cursor/` maintainer install (canonical rules in `snippets/cursor-rules/`; install playbook in gitignored `MAINTAINER.md`)
+- **`snippets/bootstrap-maintainer-local.sh`**, **`snippets/update-workflows.py`**, **`/lsi:update`** — maintainer/adopter re-sync helpers; org-specific adopter paths in gitignored `maintainer-adopters.local.yaml` (see gitignored `MAINTAINER.md`)
+
+### Fixed
+
+- **`PROJECT.md`** dogfood — `BUNDLE_VERSION` synced with `VERSION`
+- **`snippets/adopt.py`** stdlib YAML fallback — parse `key:` + indented list items in patch configs when PyYAML is unavailable
+
 ## [1.3.0] - 2026-06-06
 
 ### Added

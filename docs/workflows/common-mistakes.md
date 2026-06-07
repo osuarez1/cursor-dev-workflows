@@ -45,6 +45,7 @@ Anti-patterns to avoid when using [cursor-dev-workflows](../../README.md) in a t
 | Wrong task type (not in team’s allowed set) | Use team list; default: feature, bugfix, hotfix, chore, release |
 | Title without `TITLE_PREFIX` or over 60 chars | `TITLE_PREFIX` + imperative title |
 | Running `git ts` without user ask | Output copy-paste blocks only |
+| Running `git-ts`, `which git-ts`, or probing for a hyphenated binary | Run **`git ts`** — local Git alias to `.git-trello/bin/git-trello`; verify with `git config --local --get alias.ts` |
 
 ## Pull requests
 

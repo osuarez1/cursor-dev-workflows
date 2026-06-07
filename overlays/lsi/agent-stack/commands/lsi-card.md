@@ -9,7 +9,9 @@ Create a Trello card and ticket-linked branch for the active OpenSpec change usi
 
 **Canonical source:** [ticket-card-info.md](../../docs/workflows/ticket-card-info.md) · [git-trello.md](../../docs/sdlc/git-trello.md) · [`docs/workflows/openspec-git-integration.md`](../../docs/workflows/openspec-git-integration.md) (when present)
 
-**Protected-branch exception:** This is the **only** `/lsi:*` command allowed on a protected branch — and **only on `main`**, never on `staging`. Card + branch creation only; no `src/` edits.
+**Contrast with `/lsi:card-link`:** Use **`/lsi:card-link`** when work already exists on a branch without a Trello id (e.g. after `/opsx:propose` on a manual branch). **`/lsi:card`** always creates a **new** branch via `git ts`.
+
+**Protected-branch exception:** Card-setup commands **`/lsi:card`**, **`/lsi:trello-list`**, and **`/lsi:trello-branch`** are allowed on **`main`** or **`staging`** only (no `src/` edits). For existing feature branches without a Trello id, use **`/lsi:card-link`** instead.
 
 **Input:** Optionally specify change slug after `/lsi:card`. Invoking this command counts as explicit consent to run `git ts`.
 
@@ -28,9 +30,11 @@ Create a Trello card and ticket-linked branch for the active OpenSpec change usi
 
 2. **Verify starting point**
 
-   - **`git ts` MUST run from `main` only** — `git pull origin main` first.
-   - **Refuse on `staging`** — checkout `main` before continuing.
-   - If on a feature branch without a card, checkout `main` first unless user confirms re-card from current context.
+   - **`git ts` MUST run from a protected integration branch** — `main` or `staging` only:
+     - On **`main`**: `git pull origin main` first.
+     - On **`staging`**: `git pull origin staging` first.
+   - **Refuse on other protected branches** (e.g. `master`, `test`) — checkout `main` or `staging` before continuing.
+   - If on a feature branch without a card, checkout `main` or `staging` first unless user confirms re-card from current context.
    - **Do not** edit `src/` or implement tasks — card + branch creation only.
 
 3. **Read OpenSpec context**
@@ -51,7 +55,7 @@ Create a Trello card and ticket-linked branch for the active OpenSpec change usi
    |-------|-------|
    | **Task type** | `feature`, `bugfix`, `hotfix`, `chore`, or `release` — use **`chore`** for docs/process/OpenSpec-only changes; **`feature`** for worker/runtime work |
    | **Task title** | `TITLE_PREFIX` + imperative title (≤ ~60 chars total) |
-   | **Task description** | Context/Goal, Acceptance Criteria (`- [ ]`), Technical Notes — source from OpenSpec artifacts; link `openspec/changes/<slug>/`; note Trello + OpenSpec dual ticketing |
+   | **Task description** | Context/Goal, Acceptance Criteria (`- [ ]`), Technical Notes — **only** from OpenSpec artifacts; **redact** secrets and org-only paths before Trello; link `openspec/changes/<slug>/`; note dual ticketing |
 
    **Branch slug for `git ts`:** when prompted for short description, use **`<change-slug>` exactly** (kebab-case OpenSpec folder name) so the branch becomes:
 
@@ -71,6 +75,7 @@ Create a Trello card and ticket-linked branch for the active OpenSpec change usi
    git ts
    ```
 
+   - **`git ts` is a local Git alias** (`.git-trello/bin/git-trello start`) — run it exactly as shown. **Do not** run `git-ts`, `which git-ts`, or search for a hyphenated binary ([git-trello.md](../../docs/sdlc/git-trello.md)).
    - Feed the prepared type, title, and description when `git ts` prompts interactively.
    - If `git ts` fails (missing `~/.trello_secrets`, hook error), stop and point to [git-trello.md](../../docs/sdlc/git-trello.md) install steps — do not fall back to manual `git checkout -b`.
 
@@ -100,9 +105,9 @@ Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists a
 
 **Guardrails**
 
-- **Only** `/lsi:*` command permitted on **`main`**; all others refuse until on ticket branch.
-- **Never** run `/lsi:card` on **`staging`**.
+- **Card-setup commands only** on **`main`** or **`staging`** — `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch`; all other `/lsi:*` commands refuse until on ticket branch.
 - **Never** use `git checkout -b feature/<slug>` without Trello id — breaks git-trello hooks and Bitbucket pipelines.
 - **Never** invent a change slug — use OpenSpec folder name or ask the user.
 - For "draft card only" requests (no `/lsi:card`), output blocks per ticket-card-info **without** running `git ts`.
+- **Never** use `git-ts` — only **`git ts`** (space-separated Git subcommand via alias).
 - Prefer `git push -u origin "$(git branch --show-current)"` over `HEAD` if hooks require explicit branch names ([integrations.md](../../docs/workflows/integrations.md)).

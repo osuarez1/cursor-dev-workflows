@@ -31,7 +31,7 @@ All normative workflow specs live here. This repo dogfoods `CANONICAL_DOCS_PATH 
 
 ## Commit and PR conventions (always on)
 
-Enforced by [.cursor/rules/commit-pr-conventions.mdc](.cursor/rules/commit-pr-conventions.mdc).
+Enforced by [snippets/cursor-rules/commit-pr-conventions.mdc](snippets/cursor-rules/commit-pr-conventions.mdc) (bundle maintainer: install locally per gitignored [MAINTAINER.md](MAINTAINER.md) when present).
 
 - **Commits:** Conventional Commits — `type(scope): imperative subject`, ≤ ~72 chars, no trailing period; one logical change per commit; show a commit plan before the first commit when multiple concerns exist
 - **Only run `git commit` when the user explicitly asks**

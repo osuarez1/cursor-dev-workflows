@@ -6,10 +6,10 @@ Resolved values for **this repository**. Application repos adopting the bundle s
 |-------|-------------------|
 | `REPO_NAME` | `cursor-dev-workflows` |
 | `CANONICAL_DOCS_PATH` | `docs/workflows/` |
-| `BUNDLE_VERSION` | `1.2.0` (matches [VERSION](VERSION); adopters use tag or SHA) |
+| `BUNDLE_VERSION` | `1.3.0` (matches [VERSION](VERSION); adopters use tag or SHA) |
 | `BASE_BRANCH` | `main` |
 | `PR_HOST` | `GitHub` |
 
 Other tokens (`TITLE_PREFIX`, `TEST_COMMAND`, `SOURCE_ROOT`, `PROTECTED_BRANCHES`, etc.) are meaningful only in adopted application repos. Workflow docs retain placeholder tokens for portability.
 
-Referenced from [AGENTS.md](AGENTS.md) and [.cursor/rules/commit-pr-conventions.mdc](.cursor/rules/commit-pr-conventions.mdc).
+Referenced from [AGENTS.md](AGENTS.md) and [snippets/cursor-rules/commit-pr-conventions.mdc](snippets/cursor-rules/commit-pr-conventions.mdc) (local install: `.cursor/rules/`).

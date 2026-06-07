@@ -20,16 +20,19 @@ In **Agent, Plan, Ask, and Debug** modes — if the current branch is protected:
 1. **Stop** — do not edit application source (`{{SOURCE_ROOT}}`), run migrations, or make feature commits.
 2. Show the stop image and **🛑**.
 3. Tell the user to create or check out a ticket-linked branch:
-   - **`git ts`** — new card + branch (preferred)
-   - **`git tl`** — list cards
-   - **`git tb`** — checkout ticket branch
+   - **`/lsi:card`** — from `main`/`staging` via `git ts` (new card + branch)
+   - **`/lsi:card-link`** — on existing feature branch without Trello id (OpenSpec required)
+   - **`/lsi:trello-list`** → **`/lsi:trello-branch`** — pick existing To Do card (OpenSpec required to branch)
+   - **`git tl`** / **`git tb`** — low-level; prefer slash commands above
 4. Point to [ticket-card-info.md](../../.lsi/workflows/ticket-card-info.md) for card fields.
 
 ## Exceptions (allowed on protected branches)
 
 | Action | Branch | Notes |
 |--------|--------|-------|
-| `/lsi:card` | **`main` only** | Card + branch via `git ts`; no source edits |
+| `/lsi:card` | **`main`** or **`staging`** | New card + branch via `git ts`; no source edits |
+| `/lsi:trello-list` (confirm) | **`main`** or **`staging`** | Pick To Do card → sync + `git tb`; no source edits |
+| `/lsi:trello-branch` | **`main`** or **`staging`** | Existing card → sync + `git tb`; no source edits |
 | `/lsi:promote` | **`staging`** | Promotion PR to `main` — not feature implementation |
 
 **Never** treat `staging` as a feature branch. **Never** require a new `feature/{id}-*` branch to merge `staging` → `main`.

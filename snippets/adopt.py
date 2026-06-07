@@ -61,31 +61,36 @@ def _load_simple_yaml(text: str) -> dict:
             while stack and indent <= stack[-1][0]:
                 stack.pop()
             parent = stack[-1][1]
-            if not isinstance(parent, list):
-                # find list key on parent dict — last inserted list key
-                if isinstance(parent, dict):
-                    last_key = next(
-                        (k for k, v in reversed(list(parent.items())) if v is ...),
-                        None,
-                    )
-                # append to most recent list value in parent dict
-                if isinstance(parent, dict):
-                    for k, v in reversed(list(parent.items())):
-                        if isinstance(v, list):
-                            v.append(item.strip("'\""))
-                            break
-                    else:
-                        # create list on synthetic key — find dict key with empty list placeholder
-                        for k, v in parent.items():
-                            if isinstance(v, dict) and not v:
-                                lst: list = []
-                                parent[k] = lst
-                                lst.append(item.strip("'\""))
-                                stack.append((indent, lst))
-                                break
+            value = item.strip("'\"")
+            if isinstance(parent, list):
+                parent.append(value)
+                stack.append((indent, parent))
                 continue
-            parent.append(item.strip("'\""))
-            stack.append((indent, parent))
+            if isinstance(parent, dict):
+                if not parent and len(stack) >= 2:
+                    # `key:` with no value — list items replace empty placeholder with a list.
+                    grandparent = stack[-2][1]
+                    if isinstance(grandparent, dict):
+                        for key, placeholder in grandparent.items():
+                            if placeholder is parent:
+                                lst: list = [value]
+                                grandparent[key] = lst
+                                stack[-1] = (indent, lst)
+                                break
+                    continue
+                # Patch YAML uses one list key per indented block; append to the most recent list value.
+                for v in reversed(list(parent.values())):
+                    if isinstance(v, list):
+                        v.append(value)
+                        break
+                else:
+                    for k, v in parent.items():
+                        if isinstance(v, dict) and not v:
+                            lst: list = [value]
+                            parent[k] = lst
+                            stack.append((indent, lst))
+                            break
+            continue
     return root
 
 BUNDLE_ROOT = Path(__file__).resolve().parents[1]
@@ -559,8 +564,8 @@ def adopt(
     accept_resolutions: Path | None = None,
 ) -> int:
     config = load_config(config_path)
-    tokens = build_tokens(config)
     bundle_version = (BUNDLE_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    tokens = {**build_tokens(config), "BUNDLE_VERSION": bundle_version}
     resolutions = resolve_audit_resolutions(config, config_path, accept_resolutions)
 
     if not skip_audit and AUDIT_SCRIPT.is_file():

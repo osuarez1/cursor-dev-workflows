@@ -98,7 +98,7 @@ Thin wrappers over release scripts plus git steps (user confirms tag push):
 ## Lifecycle placement
 
 ```text
-Feature: explore → propose → /lsi:card → apply → commit → readiness → review → PR → merge (staging)
+Feature: explore → propose → card setup (`/lsi:card`, `/lsi:card-link`, or `/lsi:trello-list` + branch) → apply → commit → readiness → review → PR → merge (staging)
 Promotion: /lsi:promote → merge (main) → /lsi:close on main
 Release (optional, on main): /lsi:version → /lsi:changelog → /lsi:release
 ```

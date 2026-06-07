@@ -5,7 +5,7 @@ category: Workflow
 description: Branch checklist and verify ticket-linked branch for active change
 ---
 
-Run the video-encoder branch checklist and verify the ticket-linked branch for the active OpenSpec change.
+Run the branch checklist and verify the ticket-linked branch for the active OpenSpec change.
 
 **Canonical source:** [`docs/workflows/openspec-git-integration.md` § Branch checklist](../../docs/workflows/openspec-git-integration.md#branch-checklist) · [branch-workflow.md](../../docs/workflows/branch-workflow.md) · [git-trello.md](../../docs/sdlc/git-trello.md)
 
@@ -41,8 +41,9 @@ Run the video-encoder branch checklist and verify the ticket-linked branch for t
    If on `main` or `staging`, or branch lacks a 24-char Trello id, or suffix ≠ change slug:
 
    - **Stop** — do not run `git checkout -b feature/<slug>` or any branch without Trello id.
-   - Suggest **`/lsi:card`** from **`main`** (never from `staging`) to create card + branch via `git ts`.
-   - If card already exists, suggest `git tb <card_id>` per [git-trello.md](../../docs/sdlc/git-trello.md).
+   - Suggest **`/lsi:card`** from **`main`** or **`staging`** to create card + branch via `git ts`.
+   - If on a feature branch **without** a 24-char Trello id but with an active OpenSpec change, suggest **`/lsi:card-link`** (card + rename in place).
+   - If card already exists and you need a **new** branch for that card, suggest **`/lsi:trello-list`** then **`/lsi:trello-branch <card-id>`** (or `git tb <card_id>`) per [git-trello.md](../../docs/sdlc/git-trello.md).
 
 4. **Switch or sync existing ticket branch (when user confirms)**
 
@@ -72,6 +73,6 @@ Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists a
 **Guardrails**
 
 - **Never** implement features on `main` or `staging`.
-- **Never** create branches without Trello id — use **`/lsi:card`** + `git ts` only.
+- **Never** create branches without Trello id — use **`/lsi:card`**, **`/lsi:card-link`**, **`/lsi:trello-list`**, or **`/lsi:trello-branch`** per [git-trello.md](../../docs/sdlc/git-trello.md); do not use raw `git checkout -b`.
 - Branch suffix must match active change slug exactly.
 - Do not auto-run full lifecycle — branch verification only unless user confirms broader scope.

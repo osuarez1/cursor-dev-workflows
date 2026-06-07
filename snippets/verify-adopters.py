@@ -14,6 +14,9 @@ VERIFY = BUNDLE_ROOT / "snippets" / "adoption-verify-links.py"
 
 LSI_COMMANDS = [
     "lsi-card",
+    "lsi-card-link",
+    "lsi-trello-list",
+    "lsi-trello-branch",
     "lsi-branch",
     "lsi-senior",
     "lsi-commit",
@@ -27,6 +30,7 @@ LSI_COMMANDS = [
     "lsi-changelog",
     "lsi-release",
     "lsi-bootstrap-release",
+    "lsi-update",
 ]
 ALWAYS_ON_RULES = (
     "branch-workflow.mdc",
