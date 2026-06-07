@@ -278,6 +278,8 @@ def copy_overlay(target: Path, tokens: dict[str, str], config: dict) -> None:
     release_dst = target / "scripts" / "release"
     release_dst.mkdir(parents=True, exist_ok=True)
     for py in (OVERLAY_ROOT / "snippets" / "release").glob("*.py"):
+        if py.name == "check_version.py":
+            continue
         shutil.copy2(py, release_dst / py.name)
 
     check_src = OVERLAY_ROOT / "snippets" / "release" / "check_version.py"
