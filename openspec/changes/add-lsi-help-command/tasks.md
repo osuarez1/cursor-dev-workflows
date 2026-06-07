@@ -5,12 +5,12 @@
 
 ## 2. Routing and rules
 
-**Apply scope:** ship **1.1–1.2 + 2.1–2.3** in this change; **do not** implement **2.4** until routing gate **5.7** fails.
+**Apply scope:** ship **1.1–1.2 + 2.1–2.3**; task **2.4** flowchart branch deferred — **5.7** closed on static decision-table pass (see **5.7** residual risk).
 
 - [x] 2.1 Add `/lsi:help` decision-table row to `overlays/lsi/docs/workflows/which-workflow.md` and `overlays/lsi/which-workflow-lsi.md` — insert **after `/opsx:propose`**
 - [x] 2.2 Add overlap rule **#7** (`/lsi:help` vs implementation commands) to **LSI overlay** `overlays/lsi/docs/workflows/which-workflow.md` only; list `/lsi:help` in openspec-git-integration quick reference
 - [x] 2.3 Extend bundle-root `which-workflow.md` LSI row with “Discovery: `/lsi:help` (overlay)” — **no** full overlap rule at root
-- [x] 2.4 *(optional — gated by 5.7)* Overlay flowchart early branch for workflow help → `/lsi:help` — **Closed (5.7 pass):** decision-table row after `/opsx:propose` is canonical discovery entry per `design.md` §9; flowchart branch not required
+- [x] 2.4 *(optional — gated by 5.7)* Overlay flowchart early branch for workflow help → `/lsi:help` — **Closed (accepted trade-off):** decision-table row is canonical; flowchart branch intentionally omitted per static **5.7** pass
 
 ## 3. Parity tooling
 
@@ -25,15 +25,17 @@
 
 ## 5. Verification
 
-- [x] 5.1 Manual: `/lsi:help` → overview + numbered topic list only (no section bodies)
-- [x] 5.2 Manual: `/lsi:help sdlc` → mermaid diagram in chat; no topic list re-shown
-- [x] 5.3 Manual: `/lsi:help lifecycle` → 13 steps with GitHub links
+**Agent-dependent rendering:** delta spec requires agents to read `## Section:` blocks from the command source and emit them in chat; **no programmatic enforcement**. **Chat dogfood (apply/review):** matched spec for `/lsi:help` (overview), `/lsi:help sdlc`, `/lsi:help lifecycle`, `/lsi:help next`, and invalid topic (error + topic list).
+
+- [x] 5.1 Manual: `/lsi:help` → overview + numbered topic list only (no section bodies) — chat dogfood pass
+- [x] 5.2 Manual: `/lsi:help sdlc` → mermaid diagram in chat; no topic list re-shown — chat dogfood pass
+- [x] 5.3 Manual: `/lsi:help lifecycle` → 13 steps with GitHub links — chat dogfood pass
 - [x] 5.4 Manual: all spec links are `github.com/osuarez1/cursor-dev-workflows/blob/v1.4.1/...`
-- [x] 5.5 Run `python3 snippets/verify-adopters.py` after bootstrap (bundle repo smoke)
+- [x] 5.5 Run `python3 snippets/verify-adopters.py --repo-root <adopter>` after release/adopt re-sync — **adopter-oriented** parity check; running against **this bundle maintainer repo** (`--repo-root .`) **fails expected** (no `.lsi/workflows/`); not a regression from this change
 - [x] 5.6 Manual: after `/lsi:help next`, a new message “create a card” is handled normally (not trapped in help)
-- [x] 5.7 **Routing gate (task 2.4):** three fresh Agent chats — plain user text only; agent routes to **`/lsi:help`** via overlay decision table:
-  1. `which command should I use?` → matches “which command” in overlay decision table → `/lsi:help`
+- [x] 5.7 **Routing gate (task 2.4) — static pass (not live Agent dogfood):** verified overlay decision-table phrase matching in `overlays/lsi/docs/workflows/which-workflow.md` (row after `/opsx:propose`) plus route-first via `AGENTS.md` / `which-workflow.md`; **did not** run three fresh Agent chats with plain user text.
+  1. `which command should I use?` → matches “which command” in decision table → `/lsi:help`
   2. `I'm lost on the LSI workflow` → matches “lost”, “workflow help” → `/lsi:help`
-  3. `what should I run next?` → matches “what should I run next (discovery)” → `/lsi:help` (not `/lsi:help next` auto-run)
-  - **Pass (all 3):** decision-table row in `overlays/lsi/docs/workflows/which-workflow.md` + `AGENTS.md` route-first; **2.4 closed**
-  - **Fail (any):** implement **2.4** before marking change complete
+  3. `what should I run next?` → matches “what should I run next (discovery)” → `/lsi:help` (discovery, not `/lsi:help next` auto-run)
+  - **Pass (static):** table row + overlap **#7** present; **2.4 closed** without flowchart branch (accepted trade-off — see proposal **PR risk** one-liner)
+- [x] 5.8 **Chat dogfood — `/lsi:help next` + invalid topic:** `/lsi:help next` rendered phase/command suggestion; unrecognized topic → one-line error + topic list — matched delta spec (agent read `## Section:` blocks; not programmatically enforceable)

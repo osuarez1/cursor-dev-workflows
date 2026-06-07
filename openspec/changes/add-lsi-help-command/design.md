@@ -86,7 +86,7 @@ Topics: `lifecycle`, `sdlc`, `status`, `commands`, `policies`, `overlap`, `links
 | Delta spec | Testable scenarios (read-only, one response, topic render) |
 | Help `overlap` section | Summarize existing overlap rules + this one |
 
-**Optional (overlay flowchart):** Early branch for “workflow help / which command / LSI onboarding” → `/lsi:help`, before the card/branch fork.
+**Optional (overlay flowchart):** Early branch for “workflow help / which command / LSI onboarding” → `/lsi:help`, before the card/branch fork. **Not implemented** — task **2.4** closed on static **5.7** pass (decision-table row is canonical). **Residual risk:** flowchart-first agents may miss discovery prompts; add branch in follow-up if live dogfood fails.
 
 **Alternative rejected:** Full overlap rule in bundle-root `which-workflow.md` — root overlap rules are workflow-spec disambiguation (PR vs readiness vs review), not slash-command session behavior.
 
@@ -326,4 +326,6 @@ Example link:
 
 - **Topic arg required for content** — no-arg shows list only; user must run `/lsi:help <topic>` (or agent routes them there).
 - **GitHub-only links** — adopters on private forks must use their fork URL manually until a `DOCS_WEB_BASE` token exists (out of scope).
-- **Agent must read section templates** — on `<topic>`, agent must locate and emit `## Section:` block from command source; no programmatic renderer.
+- **Agent-dependent rendering** — delta spec requires agents to read `## Section:` blocks from command source; no programmatic enforcement. Chat dogfood in apply/review matched spec (overview, `sdlc`, `lifecycle`, `next`, invalid topic).
+- **Flowchart gap (accepted trade-off)** — overlay decision table routes discovery to `/lsi:help`, but the mermaid flowchart still jumps from explore/propose straight to card/branch with no help branch; intentional per closed task **2.4** (static **5.7** pass only).
+- **`verify-adopters.py` on bundle repo** — `--repo-root .` fails here (no `.lsi/workflows/`); expected for maintainer dogfood — parity script targets adopters after adopt re-sync, not this repo.

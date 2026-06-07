@@ -27,3 +27,22 @@ LSI adopters have many slash commands and workflow specs under `.lsi/workflows/`
 - Overlay routing docs — decision-table row; overlap rule **#7**
 - `VERSION`, `PROJECT.md`, `CHANGELOG.md` — release **v1.4.1**
 - Adopters: receive `/lsi:help` after bundle release and `adopt.py` / `/lsi:update` re-sync
+
+## PR scope (staging → this branch)
+
+**Do not treat this PR as a single-feature diff.** The ticket is `add-lsi-help-command`, but `staging...HEAD` bundles additional staging-integration work:
+
+1. **Production-close `fix-review-nits`** — archive under `openspec/changes/archive/2026-06-07-fix-review-nits/`; delta specs synced to normative **`openspec/specs/`** (`adopt-bundle-version-token`, `maintainer-cursor-gitignore`, `trello-card-slash-commands`)
+2. **Release train** — **`v1.4.0`** bump (CHANGELOG/VERSION/PROJECT) on staging integration path; **`v1.4.1`** for `/lsi:help` (including one-turn model refactor)
+3. **Prior promotion merge** — `chore(release): promote bundle v1.3.0 and review fixes to main` (cumulative staging→main integration commit on this branch)
+4. **`add-lsi-help-command`** (primary) — `/lsi:help` one-turn slash command, overlay routing, parity scripts, OpenSpec change artifacts
+
+Reviewers: judge **`/lsi:help`** and **v1.4.1** against this change’s proposal/design/spec; treat archive/sync and **v1.4.0** promotion as bundled staging hygiene, not as lsi-help feature scope.
+
+**Routing verification note:** task **5.7** is a **static** pass (decision-table phrase matching), not live Agent dogfood.
+
+**PR risk (one line):** Flowchart gap (accepted trade-off) — overlay decision table routes discovery to `/lsi:help`, but the mermaid flowchart still jumps from explore/propose straight to card/branch with no help branch; intentional per closed task **2.4**.
+
+**PR testing note:** `python3 snippets/verify-adopters.py --repo-root .` fails on the bundle maintainer repo (no `.lsi/workflows/`) — expected; task **5.5** is adopter parity after adopt re-sync, not bundle maintainer smoke.
+
+**PR risk (agent rendering):** Section output is agent-dependent — delta spec requires reading `## Section:` blocks from command source; no programmatic enforcement. Chat dogfood matched spec (overview, `sdlc`, `lifecycle`, `next`, invalid topic).
