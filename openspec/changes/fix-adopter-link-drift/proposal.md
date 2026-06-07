@@ -7,7 +7,7 @@ Recent LSI overlay updates (card-link, Trello list/branch flows, `/lsi:update`, 
 - Fix **source** workflow docs and adopt transforms so every link inside adopted `.lsi/workflows/**/*.md` resolves within the adopter repo root.
 - Replace or rewrite maintainer-only targets (`../MAINTAINER.md.example`, `../patches/README.md`, `../../overlays/lsi/docs/…`, `../../agent-stack/commands/…`, `ci/check_version-*.yml` without a copied target).
 - Introduce an **adopter-shaped source subtree** (or equivalent) for docs that must read correctly at `.lsi/workflows/` without fragile regex rewrites — starting with `adopt-and-update.md` and overlay `which-workflow.md`.
-- Add **bundle-side regression tests** that run adopt (or link rewrite) against a temp tree and assert `adoption-verify-links.py` passes — catching drift before adopter re-sync.
+- Add **bundle-side regression tests** (`test_adopt_links.py`) — **highest-value deliverable** for long-term maintenance; catches adopt link drift before adopter re-sync and before every `VERSION` bump
 - Optionally extend link-verify **pattern rules** to flag bundle-maintainer path prefixes inside `CANONICAL_DOCS_PATH` (fail fast on future drift).
 - Codify a **three-tier link policy** for adopt output: tier 1 relative in-repo, tier 2 GitHub/prose for maintainer-only, tier 3 copy-then-link for small extras.
 - Update `docs/adoption-verify-architecture.md` and maintainer notes if scan rules or source layout change.
@@ -26,6 +26,6 @@ Recent LSI overlay updates (card-link, Trello list/branch flows, `/lsi:update`, 
 
 - **Source docs:** `docs/adopt-and-update.md`, `docs/workflows/integrations.md`, `docs/workflows/ticket-card-info.md`, `docs/workflows/branch-workflow.md`, `overlays/lsi/docs/workflows/which-workflow.md`, possibly `which-workflow.md` (bundle router row)
 - **Adopt authoring:** `overlays/lsi/adopter-docs/` (three-tier link policy README + adopter-facing docs)
-- **Verification:** `snippets/adoption-verify-links.py`, `snippets/verify-adopters.py`, new `snippets/test_adopt_links.py` (or extend existing tests)
+- **Verification:** `snippets/adoption-verify-links.py`, `snippets/verify-adopters.py`, new `snippets/test_adopt_links.py` — **required local/CI gate before `VERSION` bump**
 - **Fixtures:** `snippets/fixtures/adoption-verify/` — add post-adopt drift cases
 - **Adopters:** require re-sync (`/lsi:update` or maintainer adopt loop) after bundle release; no application code changes

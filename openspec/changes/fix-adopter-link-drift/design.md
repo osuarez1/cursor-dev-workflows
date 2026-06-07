@@ -16,7 +16,7 @@ Current rewrites do not cover overlay paths, agent-stack paths, or `docs/adopt-a
 
 - Zero broken relative links in `.lsi/workflows/**/*.md` after adopt
 - Fix root cause in bundle sources so maintainers edit links once
-- Bundle-side regression test (adopt → verify) before adopter re-sync
+- **Bundle adopt-link regression test** (`test_adopt_links.py`) — highest-value deliverable for long-term maintenance; required gate before `VERSION` bump (local + CI when present)
 - Minimal adopter churn — re-sync only, no hand-edits under `.lsi/workflows/`
 
 **Non-Goals:**
@@ -107,20 +107,23 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 **Rationale:** Belt-and-suspenders while sources are corrected (decisions 1–2). **Pattern rules + tests enforce the boundary:** adopted output must not contain smuggled tier 2 path substrings; verify fails even if a rewrite would paper over a bad href. Rewrites run on every copied file but must not become the primary authoring strategy.
 
-### 4. Bundle regression: `test_adopt_links.py`
+### 4. Bundle regression: `test_adopt_links.py` (highest-value deliverable)
 
-**Choice:** New unittest that:
+**Choice:** New unittest that exercises **full adopt → verify** end-to-end. This is the **highest-value deliverable** for long-term maintenance — it catches link drift in bundle sources and transforms before adopter re-sync or release.
+
+**Release gate:** `python3 snippets/test_adopt_links.py` and `python3 snippets/test_adoption_verify_links.py` **MUST pass** before any `VERSION` / `CHANGELOG.md` bump on the bundle repo. Document in [adoption-verify-architecture.md](../../docs/adoption-verify-architecture.md), [README.md](../../README.md), and maintainer pre-release checklist; wire into bundle CI when a pipeline exists.
 
 1. Creates temp dir with minimal adopter skeleton (`PROJECT.md`, patch config from `_template.yaml`)
 2. Runs `adopt.py --target <tmp> --config patches/_template.yaml --accept-policy-defaults` (or invokes `copy_core_bundle` + `copy_overlay` helpers if full adopt is heavy)
 3. Runs `adoption-verify-links.verify()` on `.lsi/workflows/` and asserts `broken == []`
 4. Runs the same `verify(..., extra_dirs=[Path("docs/ai")])` and asserts `broken == []` — catches regressions in `docs/ai/openspec.md` cross-tree links to `../../.lsi/workflows/openspec-git-integration.md` (bundle test only; `verify-adopters.py` default unchanged per task 5.2)
-5. Optionally asserts no `overlays/lsi/` or `agent-stack/` substrings in `.lsi/workflows/**/*.md`
+5. Asserts no `overlays/lsi/` or `agent-stack/` substrings in `.lsi/workflows/**/*.md`
 
 **Alternatives considered:**
 
 - *Fixture-only static files* — does not catch transform regressions in `adopt.py`
 - *Run verify-adopters on real adopters in CI* — out of bundle repo scope; keep as maintainer post-release step
+- *Manual smoke only before release* — insufficient; automated gate prevents drift from shipping in tagged releases
 
 ### 5. Pattern rule in `adoption-verify-links.py` (enforce tier boundaries)
 
@@ -142,9 +145,10 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 ## Migration Plan
 
 1. Implement bundle fixes on feature branch (`chore/bundle-fix-adopter-link-drift` or similar — **not on `main`**).
-2. Bump `VERSION` / `CHANGELOG.md` with adopter re-sync note.
-3. Maintainer adopt loop: re-sync each registered adopter; `verify-adopters.py --repo-root <adopter>` must pass.
-4. Rollback: revert bundle release; adopters keep previous `.lsi/workflows/` until re-sync.
+2. **Run adopt-link regression gate** — `python3 snippets/test_adopt_links.py` and `python3 snippets/test_adoption_verify_links.py` must pass.
+3. Bump `VERSION` / `CHANGELOG.md` with adopter re-sync note (only after step 2).
+4. Maintainer adopt loop: re-sync each registered adopter; `verify-adopters.py --repo-root <adopter>` must pass.
+5. Rollback: revert bundle release; adopters keep previous `.lsi/workflows/` until re-sync.
 
 ## Resolved decisions
 
@@ -157,3 +161,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 ### CI snippet copy (task 1.3)
 
 **Choice:** Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` on every adopt. Cheap, avoids per-patch conditionals, matches adopter doc linking both snippets.
+
+### Release gate (task 4.4, 5.3)
+
+**Choice:** `test_adopt_links.py` + `test_adoption_verify_links.py` are **required** before any bundle `VERSION` bump — local maintainer gate and CI step when a pipeline exists. Do not tag or bump `VERSION` on failing adopt-link regression.

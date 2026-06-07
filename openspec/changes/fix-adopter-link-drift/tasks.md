@@ -22,17 +22,18 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 3.2 Add pattern rules in `snippets/adoption-verify-links.py` for `overlays/lsi/` and `agent-stack/` inside canonical tree (tier 2 smuggled as relative)
 - [ ] 3.3 Add fixture + test case for maintainer-path pattern violation under `snippets/fixtures/adoption-verify/`
 
-## 4. Bundle regression tests
+## 4. Bundle regression tests (highest-value deliverable)
 
 - [ ] 4.1 Add `snippets/test_adopt_links.py` — temp adopt + `adoption-verify-links.verify()` asserts zero broken links under `.lsi/workflows/`; same test calls `verify(..., extra_dirs=[Path("docs/ai")])` to cover `docs/ai/openspec.md` cross-tree links to `../../.lsi/workflows/openspec-git-integration.md` (bundle regression only — does not change `verify-adopters.py` default per 5.2)
 - [ ] 4.2 Assert adopted `.lsi/workflows/**/*.md` contains no `overlays/lsi/` or `../../agent-stack/` substrings (tier 2 paths in tier 1 tree)
-- [ ] 4.3 Run `python3 snippets/test_adoption_verify_links.py` and new adopt link tests locally
+- [ ] 4.3 Run `python3 snippets/test_adoption_verify_links.py` and `python3 snippets/test_adopt_links.py` locally — both must pass before §5 release tasks
+- [ ] 4.4 Document **required release gate**: adopt-link regression tests (`test_adopt_links.py`, `test_adoption_verify_links.py`) must pass before `VERSION` bump — update `docs/adoption-verify-architecture.md`, bundle `README.md`, and maintainer pre-release checklist; add CI step when bundle pipeline exists
 
 ## 5. Docs and release
 
-- [ ] 5.1 Update `docs/adoption-verify-architecture.md` — three-tier link policy, pattern rules, `overlays/lsi/adopter-docs/` source path, tier 3 CI copy
+- [ ] 5.1 Update `docs/adoption-verify-architecture.md` — three-tier link policy, pattern rules, `overlays/lsi/adopter-docs/` source path, tier 3 CI copy, **pre-`VERSION` regression gate**
 - [ ] 5.2 Fix `overlays/lsi/docs/ai/openspec.md` at source (tier 1 cross-tree): `../workflows/openspec-git-integration.md` → `../../.lsi/workflows/openspec-git-integration.md` (both occurrences); do **not** add `--extra-dirs docs/ai` to `verify-adopters.py`
-- [ ] 5.3 Bump `VERSION` and `CHANGELOG.md` — note adopter re-sync required (`/lsi:update`) and three-tier link policy
+- [ ] 5.3 Bump `VERSION` and `CHANGELOG.md` — **only after §4 tests pass**; note adopter re-sync required (`/lsi:update`) and three-tier link policy
 - [ ] 5.4 Manual smoke: `adopt.py` against temp repo + `verify-adopters.py --repo-root <tmp>` passes
 
 ## 6. Post-merge (maintainer — not apply deliverables)

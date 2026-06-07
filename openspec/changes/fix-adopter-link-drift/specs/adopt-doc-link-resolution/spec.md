@@ -35,6 +35,12 @@ The bundle repository SHALL include automated tests that exercise adopt link out
 - **WHEN** `adoption-verify-links.py` scans `.lsi/workflows/` containing `](overlays/lsi/` or `](../../agent-stack/`
 - **THEN** the script reports a pattern violation (in addition to or instead of broken-link detection, per design)
 
+#### Scenario: Bundle release blocked without adopt-link regression pass
+
+- **WHEN** a maintainer prepares a bundle `VERSION` / `CHANGELOG.md` bump
+- **AND** `python3 snippets/test_adopt_links.py` or `python3 snippets/test_adoption_verify_links.py` fails
+- **THEN** the release MUST NOT proceed until both tests pass (local gate and CI when present)
+
 ### Requirement: Maintainer and adopter source docs stay distinguishable
 
 Docs consumed only by bundle maintainers (`docs/adopt-new-repo.md`, `patches/README.md`, `MAINTAINER.md.example`) SHALL NOT be linked from adopted `.lsi/workflows/` with relative paths that assume the bundle repo layout. Adopter-facing guidance SHALL live in or be copied to `.lsi/workflows/` (e.g. `adopt-and-update.md`) with self-contained links.
