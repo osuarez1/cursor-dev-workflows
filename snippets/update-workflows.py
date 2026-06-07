@@ -20,13 +20,49 @@ BUNDLE_ROOT = Path(__file__).resolve().parents[1]
 ADOPT = BUNDLE_ROOT / "snippets" / "adopt.py"
 BOOTSTRAP = BUNDLE_ROOT / "snippets" / "bootstrap-maintainer-local.sh"
 VERIFY = BUNDLE_ROOT / "snippets" / "verify-adopters.py"
+MAINTAINER_ADOPTERS_LOCAL = "maintainer-adopters.local.yaml"
 
-# Relative to bundle root — keep in sync with snippets/verify-all-adopters.sh
-MAINTAINER_ADOPTER_TARGETS: list[tuple[str, str]] = [
-    ("../video-encoder", "patches/video-encoder.yaml"),
-    ("../web", "patches/web.yaml"),
-    ("../agents/ai-agent", "patches/ai-agent.yaml"),
-]
+
+def _load_adopt_yaml(path: Path) -> dict:
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("adopt", ADOPT)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Cannot load {ADOPT}")
+    adopt = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(adopt)
+    data = adopt._load_yaml_text(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"expected mapping: {path}")
+    return data
+
+
+def load_maintainer_adopter_targets(bundle: Path) -> list[tuple[str, str]]:
+    """Org-specific adopter paths — gitignored maintainer-adopters.local.yaml only."""
+    path = bundle / MAINTAINER_ADOPTERS_LOCAL
+    if not path.is_file():
+        return []
+    try:
+        data = _load_adopt_yaml(path)
+    except (OSError, ValueError) as exc:
+        print(f"Invalid {MAINTAINER_ADOPTERS_LOCAL}: {exc}", file=sys.stderr)
+        return []
+    adopters = data.get("adopters")
+    if not isinstance(adopters, list):
+        print(
+            f"Invalid {MAINTAINER_ADOPTERS_LOCAL}: expected adopters list",
+            file=sys.stderr,
+        )
+        return []
+    out: list[tuple[str, str]] = []
+    for item in adopters:
+        if not isinstance(item, dict):
+            continue
+        target = item.get("target")
+        config = item.get("config")
+        if isinstance(target, str) and isinstance(config, str):
+            out.append((target, config))
+    return out
 
 
 def repo_root() -> Path:
@@ -129,8 +165,16 @@ def verify_adopter(target: Path, *, dry_run: bool = False) -> int:
 
 
 def sync_maintainer_adopters(bundle: Path, *, dry_run: bool = False) -> int:
+    targets = load_maintainer_adopter_targets(bundle)
+    if not targets:
+        print(
+            f"SKIP: no adopter targets — create {MAINTAINER_ADOPTERS_LOCAL} "
+            "(see gitignored MAINTAINER.md)",
+            file=sys.stderr,
+        )
+        return 0
     code = 0
-    for rel_target, rel_config in MAINTAINER_ADOPTER_TARGETS:
+    for rel_target, rel_config in targets:
         target = (bundle / rel_target).resolve()
         config = bundle / rel_config
         print(f"\n=== adopter: {target.name} ===")
@@ -138,6 +182,27 @@ def sync_maintainer_adopters(bundle: Path, *, dry_run: bool = False) -> int:
             code = 1
             continue
         if not dry_run and verify_adopter(target) != 0:
+            code = 1
+    return code
+
+
+def verify_maintainer_adopters(bundle: Path, *, dry_run: bool = False) -> int:
+    targets = load_maintainer_adopter_targets(bundle)
+    if not targets:
+        print(
+            f"SKIP: no adopter targets — create {MAINTAINER_ADOPTERS_LOCAL} "
+            "(see gitignored MAINTAINER.md)",
+            file=sys.stderr,
+        )
+        return 0
+    code = 0
+    for rel_target, _rel_config in targets:
+        target = (bundle / rel_target).resolve()
+        print(f"\n=== verify: {target.name} ===")
+        if not target.is_dir():
+            print(f"SKIP: adopter not found — {target}", file=sys.stderr)
+            continue
+        if verify_adopter(target, dry_run=dry_run) != 0:
             code = 1
     return code
 
@@ -194,6 +259,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Bundle maintainer: bootstrap only, skip adopter adopt loop",
     )
+    parser.add_argument(
+        "--verify-adopters-only",
+        action="store_true",
+        help="Bundle maintainer: verify registered adopters only (no bootstrap/adopt)",
+    )
     args = parser.parse_args(argv)
 
     cwd = repo_root()
@@ -203,6 +273,11 @@ def main(argv: list[str] | None = None) -> int:
         print("Detected: bundle maintainer (cursor-dev-workflows)")
         bundle = cwd
         code = 0
+        if args.verify_adopters_only:
+            code = verify_maintainer_adopters(bundle, dry_run=args.dry_run)
+            if code == 0 and not args.dry_run:
+                print("\nOK: adopter verify complete")
+            return code
         if not args.adopters_only:
             if bootstrap_maintainer(dry_run=args.dry_run) != 0:
                 code = 1

@@ -39,6 +39,20 @@ class UpdateWorkflowsTests(unittest.TestCase):
         name = mod.read_project_repo_name(BUNDLE)
         self.assertEqual(name, "cursor-dev-workflows")
 
+    def test_load_maintainer_adopter_targets_missing_file(self) -> None:
+        targets = mod.load_maintainer_adopter_targets(BUNDLE / "nonexistent-bundle")
+        self.assertEqual(targets, [])
+
+    def test_load_maintainer_adopter_targets_from_local_yaml(self) -> None:
+        local = BUNDLE / mod.MAINTAINER_ADOPTERS_LOCAL
+        if not local.is_file():
+            self.skipTest(f"{mod.MAINTAINER_ADOPTERS_LOCAL} not present")
+        targets = mod.load_maintainer_adopter_targets(BUNDLE)
+        self.assertGreater(len(targets), 0)
+        for target, config in targets:
+            self.assertTrue(target.startswith("../"))
+            self.assertTrue(config.startswith("patches/"))
+
 
 if __name__ == "__main__":
     unittest.main()
