@@ -33,6 +33,7 @@
 
 - [x] 7.1 Add `.cursor/` to `.gitignore` and remove tracked rules from git index
 - [x] 7.2 Update `AGENTS.md`, `PROJECT.md`, `README.md` to reference `snippets/cursor-rules/commit-pr-conventions.mdc`
+- [x] 7.3 Add `bootstrap-maintainer-local.sh` to sync `.cursor/commands/` from overlay (install docs in gitignored `MAINTAINER.md`)
 
 ## 8. Regression tests
 
