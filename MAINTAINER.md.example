@@ -32,10 +32,14 @@ First adopt on a repo with drift: run `--audit-only` first, commit `patches/file
 ## Verify all adopters
 
 ```bash
-for repo in ../video-encoder ../web ../agents/ai-agent; do
-  python3 snippets/verify-adopters.py --repo-root "$repo"
-done
+./snippets/verify-all-adopters.sh
 ```
+
+Or per repo: `python3 snippets/verify-adopters.py --repo-root ../web`
+
+## Register a new adopter
+
+Follow [docs/adopt-new-repo.md](docs/adopt-new-repo.md) — add `patches/<repo>.yaml`, update [patches/README.md](patches/README.md), then add the adopt line to the loop above.
 
 Individual checks:
 
