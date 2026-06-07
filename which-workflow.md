@@ -16,7 +16,7 @@ Use this routing guide when the user’s request could match more than one docum
 | commit plan, logical commits, commit message | [commits-logical-order.md](docs/workflows/commits-logical-order.md) | Ordered commit plan; **commit only if asked** |
 | when are tests required | [test-requirements.md](docs/workflows/test-requirements.md) | Policy + exemption wording |
 | log review to PR host or ticket tool | [integrations.md](docs/workflows/integrations.md) | Optional adapters |
-| LSI OpenSpec + Trello slash commands | [overlays/lsi/docs/workflows/openspec-git-integration.md](overlays/lsi/docs/workflows/openspec-git-integration.md) | `/lsi:card`, `/lsi:card-link`, `/lsi:trello-*`, full lifecycle |
+| LSI OpenSpec + Trello slash commands | [overlays/lsi/docs/workflows/openspec-git-integration.md](overlays/lsi/docs/workflows/openspec-git-integration.md) | `/lsi:card`, `/lsi:card-link`, `/lsi:trello-*`, full lifecycle; Discovery: `/lsi:help` (overlay) |
 | what did the agent do wrong | [common-mistakes.md](docs/workflows/common-mistakes.md) | Anti-patterns |
 
 ## Overlap rules
