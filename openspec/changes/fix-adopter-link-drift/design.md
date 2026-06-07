@@ -154,7 +154,7 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 
 | Risk | Mitigation |
 |------|------------|
-| Dual `adopt-and-update.md` copies diverge | Adopter copy is short; maintainer doc links to it; test asserts adopter copy links |
+| Dual `adopt-and-update.md` copies diverge | Maintainer checklist in `docs/adopt-and-update.md` (task 1.5); `adopter-docs/README.md`; `test_adopt_links.py` on adopter copy; future heading lint (task 7.2) when dual-doc set grows |
 | `.cursor/commands/` missing during verify if adopt partial | Regression test runs full adopt install including agent stack |
 | Rewrites mask bad source links silently | Pattern rules fail on smuggled tier 2 paths; substring assertion in test; source fixes are primary (§2) |
 | CI snippet copy duplicates bundle | Small tier 3 files; versioned with bundle; acceptable |
@@ -203,3 +203,13 @@ Overlay `which-workflow.md` **overwrites** core router via `merge_which_workflow
 ### Adopter parity before announce (task 6.1)
 
 **Choice:** After the first (and every) bundle release that changes adopt output, run the **maintainer adopt loop** on all registered adopters and confirm `verify-adopters.py` passes **before announcing** the release. Temp-dir regression (`test_adopt_links.py`) gates the VERSION bump; **adopter parity on real repos is the real acceptance test** for ship confidence.
+
+### Dual-copy drift (tasks 1.5, 7.2)
+
+**Choice:** **Both, phased.**
+
+1. **Now (this change):** Maintainer checklist in `docs/adopt-and-update.md` — banner at top: when editing adopter-facing content, update `overlays/lsi/adopter-docs/adopt-and-update.md`; canonical process in `adopter-docs/README.md`. Cheap, visible at edit time; pairs with task 1.5 cross-reference.
+
+2. **Later (task 7.2):** Optional bundle lint comparing **adopter-relevant** section headings between maintainer superset and `adopter-docs/` copy — **not** naive full `##` parity, because structures intentionally diverge (maintainer keeps `patches/`, `MAINTAINER.md`, `adopt-new-repo.md` sections; adopter copy uses tier 2 GitHub/prose). Lint should warn when maintainer adds or renames shared-topic headings (e.g. Bundle update, Verify after adopt, CI) absent from adopter copy. Defer until 2+ dual docs exist; wire to CI alongside adopt-link regression.
+
+**Rationale:** Checklist catches human process immediately; link regression catches broken hrefs but not missing sections; heading lint closes the structural gap once the dual-doc pattern is proven and scope is clear enough to avoid false positives.

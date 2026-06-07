@@ -6,7 +6,7 @@ Implementation follows the **three-tier link policy** in `design.md` (tier 1 = r
 - [ ] 1.2 Add `overlays/lsi/adopter-docs/README.md` — document three-tier link policy, authoring checklist, `LINK_REWRITES` as transition aid only, and **long-term expansion rule**: add adopter-shaped copies under `adopter-docs/` for any doc where maintainer layout diverges from post-adopt layout (this change seeds `adopt-and-update.md` only)
 - [ ] 1.3 Update `copy_core_bundle()` in `snippets/adopt.py` to copy adopter doc instead of `docs/adopt-and-update.md`
 - [ ] 1.4 Copy **both** `docs/ci/check_version-web.yml` and `docs/ci/check_version-ai-agent.yml` unconditionally into `.lsi/workflows/ci/` during every adopt (tier 3; no per-patch conditionals)
-- [ ] 1.5 Add cross-reference in `docs/adopt-and-update.md` pointing maintainers at `overlays/lsi/adopter-docs/adopt-and-update.md` and `adopter-docs/README.md`
+- [ ] 1.5 Add maintainer **dual-copy checklist** in `docs/adopt-and-update.md` (banner at top): when editing adopter-facing sections, update `overlays/lsi/adopter-docs/adopt-and-update.md`; link to `adopter-docs/README.md`
 
 ## 2. Fix workflow cross-links at source (tier 1)
 
@@ -46,3 +46,4 @@ Adopter parity on registered repos is the **real acceptance test** — temp-dir 
 ## 7. Long-term (follow-on — not apply deliverables)
 
 - [ ] 7.1 When a copied doc cannot be authored cleanly in the maintainer tree, add an adopter-shaped source under `overlays/lsi/adopter-docs/` (mirroring install path) and wire `adopt.py` — expand beyond `adopt-and-update.md` per design **Long-term direction**
+- [ ] 7.2 Consider bundle lint that diffs **adopter-relevant** `##` headings between maintainer doc and `adopter-docs/` copy (not naive full heading parity — structures intentionally diverge); wire to CI when 2+ dual docs exist
