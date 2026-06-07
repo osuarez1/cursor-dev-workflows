@@ -1,0 +1,11 @@
+## Workflows (LSI — adopt-managed)
+
+**Router:** [`.lsi/workflows/which-workflow.md`](.lsi/workflows/which-workflow.md)
+
+- **Branch policy:** `.cursor/rules/branch-workflow.mdc` (always on)
+- **OpenSpec + Git:** `.cursor/rules/openspec-git-integration.mdc`
+- **Commits / PRs:** `CONVENTION.md` + `.cursor/rules/commit-pr-conventions.mdc`
+
+**Staging-first:** feature PRs target `staging`; promotion to `main` via `/lsi:promote`; close on `main` via `/lsi:close`.
+
+Do not edit files under `.lsi/workflows/` by hand — re-run adopt from `cursor-dev-workflows`.

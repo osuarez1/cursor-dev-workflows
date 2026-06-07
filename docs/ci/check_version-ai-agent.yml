@@ -1,0 +1,10 @@
+# Copy into bitbucket-pipelines.yml (ai-agent) — VERSION file gate
+#
+# Requires: scripts/check_version.py, root VERSION, CHANGELOG.md
+
+# Dedicated PR step (runs on all PRs):
+#   - step:
+#       name: Version and changelog gate
+#       image: python:3.14-bookworm
+#       script:
+#         - VERSION_FILE=VERSION python3 scripts/check_version.py

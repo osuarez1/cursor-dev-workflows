@@ -8,11 +8,15 @@ Portable **Cursor agent workflows** for any language or framework: ticket cards,
 
 **Agents:** start at [AGENTS.md](AGENTS.md).
 
-1. Copy this entire folder into a new git repository (or use it as the repo root).
-2. Replace placeholders in the table below for your project.
-3. Read [docs/adoption-layout.md](docs/adoption-layout.md) — choose Profile A (default) or B.
-4. Follow [adoption-checklist.md](adoption-checklist.md).
-5. Copy [snippets/cursor-rules/](snippets/cursor-rules/) into your target repo’s `.cursor/rules/` and adjust paths to your canonical docs.
+**LSI adopters** ([registered repos](patches/README.md)):
+
+1. Maintain `patches/<repo>.yaml` in this bundle.
+2. Run [docs/adopt-and-update.md](docs/adopt-and-update.md) — `snippets/adopt.py` installs `.lsi/workflows/` and agent stack.
+3. Do **not** hand-edit `.lsi/workflows/` in application repos.
+
+**New repo:** [docs/adopt-new-repo.md](docs/adopt-new-repo.md).
+
+**Bundle maintainers:** [MAINTAINER.md.example](MAINTAINER.md.example) · verify all: `./snippets/verify-all-adopters.sh`
 
 ## Placeholder registry
 
@@ -32,8 +36,9 @@ Set these once per target repository. Search/replace tokens in docs after copyin
 | `TICKET_ID_PATTERN` | `24-char hex` / `PROJ-123` | Required id in branch names, if enforced |
 | `BRANCH_PATTERN` | `feature/<id>-slug` | Branch naming convention |
 | `PR_HOST` | `GitHub` / `GitLab` / `Bitbucket` | Where pull requests live |
-| `CANONICAL_DOCS_PATH` | `docs/workflows/` | Where adopted copies of these specs live in the target repo (use in rules and agent docs) |
-| `ADOPTION_PROFILE` | `A` | Layout profile: **A** mirror bundle (default) or **B** flatten — see [docs/adoption-layout.md](docs/adoption-layout.md) |
+| `CANONICAL_DOCS_PATH` | `.lsi/workflows/` | Adopt-managed specs in LSI repos ([docs/adoption-layout.md](docs/adoption-layout.md)) |
+| `ADOPTION_LAYOUT` | `lsi` | Single layout for all LSI adopters |
+| `VERSION_FILE` | `version.txt` or `VERSION` | App semver file for `check_version.py` |
 | `BUNDLE_VERSION` | `v1.0.0` or commit SHA | Version of this bundle recorded in adopted `PROJECT.md` when copying or re-syncing |
 | `WORKFLOWS_BUNDLE_PATH` | `~/src/cursor-dev-workflows` | Optional: where you cloned this bundle locally; for maintainer notes only — do not commit machine-specific paths |
 
@@ -64,21 +69,15 @@ Not sure which doc to use? See [which-workflow.md](which-workflow.md).
 
 **Branch policy applies in every mode:** do not implement task work on `PROTECTED_BRANCHES`. See [branch-workflow.md](docs/workflows/branch-workflow.md).
 
-## Adoption recipe (target repo)
+## Adoption (LSI layout)
 
-**Default (Profile A — mirror bundle):**
+Registered LSI repos adopt via **`snippets/adopt.py`** — do not hand-copy specs into application repos. Full guide: [docs/adopt-and-update.md](docs/adopt-and-update.md).
 
-For submodule or subtree installs ([adoption-checklist.md §1](adoption-checklist.md)), copy specs into `CANONICAL_DOCS_PATH` in the **application** repo; still use Profile A for router, `templates/`, and `examples/` at the app repo root.
+1. Add or maintain `patches/<repo>.yaml` in this bundle ([patches/README.md](patches/README.md)).
+2. Audit, adopt, and verify per [adoption-checklist.md](adoption-checklist.md) (`--audit-only` → adopt → `verify-adopters.py`).
+3. Set `CANONICAL_DOCS_PATH=.lsi/workflows/` in the app repo's `PROJECT.md`.
 
-1. Copy normative specs from [`docs/workflows/`](docs/workflows/) into `CANONICAL_DOCS_PATH`.
-2. Copy [`which-workflow.md`](which-workflow.md), [`templates/`](templates/), and [`examples/`](examples/) to the **app repo root** (do not nest under `CANONICAL_DOCS_PATH`).
-3. Install thin rules from [snippets/cursor-rules/](snippets/cursor-rules/) → `.cursor/rules/`.
-4. Add pointers in `AGENTS.md`, `CLAUDE.md`, or `.cursorrules`.
-5. Run link verification and agent smoke tests ([adoption-checklist.md §9](adoption-checklist.md)).
-6. Paste [snippets/user-rule-only-commit-when-asked.md](snippets/user-rule-only-commit-when-asked.md) into Cursor **Settings → Rules** (optional but recommended).
-7. Append [snippets/gitignore-local-artifacts.txt](snippets/gitignore-local-artifacts.txt) to `.gitignore`.
-
-Layout profiles, copy map, and link rules: [docs/adoption-layout.md](docs/adoption-layout.md). Full checklist: [adoption-checklist.md](adoption-checklist.md).
+Layout spec: [docs/adoption-layout.md](docs/adoption-layout.md). New repo: [docs/adopt-new-repo.md](docs/adopt-new-repo.md).
 
 ## Versioning
 
@@ -117,19 +116,25 @@ adoption-checklist.md
 MAINTAINER.md.example        # Copy → MAINTAINER.md (gitignored)
 AGENTS-LOCAL.md.example      # Copy → AGENTS-LOCAL.md (gitignored)
 docs/
-  adoption-layout.md         # Layout profiles, copy map, link verification
+  adoption-layout.md         # LSI layout (.lsi/workflows/), link verification
   adoption-verify-architecture.md  # Verification gate design reference
   versioning.md              # Semver policy
-  workflows/                 # CANONICAL_DOCS_PATH — normative specs
+  workflows/                 # Bundle source specs (copied by adopt.py)
+overlays/lsi/                # LSI overlay (docs, agent stack, release scripts)
+patches/                     # Per-repo adopt YAML + file overlays
 templates/
 examples/
 snippets/
   maintainer-local/          # Kit templates (MAINTAINER, openspec scaffold, rules)
   bootstrap-maintainer-local.sh
   verify-maintainer-local.sh
-  adoption-verify-links.py
-  test_adoption_verify_links.py
-  fixtures/adoption-verify/
+  adopt.py                   # LSI adopt entry point
+  adoption-verify-links.py   # Post-adoption link verification (.lsi/workflows/)
+  audit-agent-docs.py        # Pre/post adopt contradiction scan
+  verify-adopters.py         # Parity checklist + audit gate
+  verify-all-adopters.sh     # Verify all registered adopters
+  test_adoption_verify_links.py  # Regression tests (python3 snippets/test_adoption_verify_links.py)
+  fixtures/adoption-verify/  # Test fixture trees
   cursor-rules/
   gitignore-local-artifacts.txt
 openspec/                         # tracked OpenSpec (config, changes, specs)

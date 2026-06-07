@@ -105,8 +105,6 @@ Completed changes under `openspec/changes/archive/` (updated by `/lsi:close` on 
 
 ## Adoption into application repos
 
-1. Read [docs/adoption-layout.md](docs/adoption-layout.md) — choose Profile A (default) or B; copy map and link rules.
-2. Follow [adoption-checklist.md](adoption-checklist.md).
-3. In the app repo, symlink `CLAUDE.md` → `AGENTS.md` or merge a Workflows section per [adoption-layout.md](docs/adoption-layout.md#agent-entry-points).
+**LSI adopters:** use **`snippets/adopt.py`** — [docs/adopt-and-update.md](docs/adopt-and-update.md), [adoption-checklist.md](adoption-checklist.md), layout [docs/adoption-layout.md](docs/adoption-layout.md) (`.lsi/workflows/` only).
 
 Human-oriented overview and placeholder registry: [README.md](README.md).

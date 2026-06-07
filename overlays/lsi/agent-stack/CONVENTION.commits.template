@@ -1,0 +1,11 @@
+<!-- lsi:commits:start -->
+## Commit conventions (LSI)
+
+Follow **Conventional Commits**: `type(scope): imperative subject` — ≤ ~72 chars, no trailing period.
+
+- **One logical change per commit** — do not mix unrelated feature, refactor, and fix.
+- **Commit plan first** when multiple logical changes exist (see `.lsi/workflows/commits-logical-order.md`).
+- **Only run `git commit` when the user explicitly asks.**
+
+Full spec: `.lsi/workflows/commits-logical-order.md`
+<!-- lsi:commits:end -->

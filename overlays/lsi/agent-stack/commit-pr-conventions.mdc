@@ -1,0 +1,13 @@
+---
+description: Commits and PR conventions — pointer to canonical docs
+alwaysApply: true
+---
+
+# Commit and PR conventions
+
+- **Commits:** follow [`CONVENTION.md`](../../CONVENTION.md) — types, scope, body, examples.
+- **Commit plans:** [`.lsi/workflows/commits-logical-order.md`](../../.lsi/workflows/commits-logical-order.md) — plan first; **commit only when the user explicitly asks**.
+- **PRs:** [`.lsi/workflows/pull-requests.md`](../../.lsi/workflows/pull-requests.md) — title and body sections.
+- **Examples:** `.lsi/workflows/examples/`
+
+Do not amend, squash, or use `--no-verify` unless the user explicitly requests.
