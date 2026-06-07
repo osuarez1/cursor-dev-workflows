@@ -1,0 +1,41 @@
+---
+description: Protected branches — refuse feature work on PROTECTED_BRANCHES
+alwaysApply: true
+---
+
+# Protected branches
+
+![Stop](https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Stop_sign_MUTCD.svg/240px-Stop_sign_MUTCD.svg.png)
+
+**🛑 Never implement features on protected branches.**
+
+Protected branches for this repo: **{{PROTECTED_BRANCHES}}**
+
+Canonical spec: [`.lsi/workflows/branch-workflow.md`](../../.lsi/workflows/branch-workflow.md)
+
+## Refuse feature work
+
+In **Agent, Plan, Ask, and Debug** modes — if the current branch is protected:
+
+1. **Stop** — do not edit application source (`{{SOURCE_ROOT}}`), run migrations, or make feature commits.
+2. Show the stop image and **🛑**.
+3. Tell the user to create or check out a ticket-linked branch:
+   - **`git ts`** — new card + branch (preferred)
+   - **`git tl`** — list cards
+   - **`git tb`** — checkout ticket branch
+4. Point to [ticket-card-info.md](../../.lsi/workflows/ticket-card-info.md) for card fields.
+
+## Exceptions (allowed on protected branches)
+
+| Action | Branch | Notes |
+|--------|--------|-------|
+| `/lsi:card` | **`main` only** | Card + branch via `git ts`; no source edits |
+| `/lsi:promote` | **`staging`** | Promotion PR to `main` — not feature implementation |
+
+**Never** treat `staging` as a feature branch. **Never** require a new `feature/{id}-*` branch to merge `staging` → `main`.
+
+## Verify branch
+
+```bash
+git branch --show-current
+```
