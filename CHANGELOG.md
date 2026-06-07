@@ -13,10 +13,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 - **`/lsi:help`** — LSI workflow discovery: overview + topic list (no arg) or `/lsi:help <topic>` for one section per invocation; SDLC diagram section, GitHub bundle spec links, branch → phase → command heuristics for `status` / `next`
 - **Routing** — discovery decision-table row and overlap rule **#7** in overlay `which-workflow.md`; `/lsi:help` in openspec-git-integration quick reference
+- **OpenSpec** — normative `openspec/specs/lsi-help-slash-command/` after production close
 
 ### Changed
 
 - **`/lsi:help`** — one response per invocation; removed sticky session, AskQuestion loop, and Exit option (topic arg required for section content)
+- **Slash command output** — labeled **Title (copy below)** / **Body (copy below)** / **Extended description (copy below)** blocks in `/lsi:card*`, `/lsi:pr`, `/lsi:merge-desc`; normative updates in `pull-requests.md` and `ticket-card-info.md`
 
 ## [1.4.0] - 2026-06-07
 
