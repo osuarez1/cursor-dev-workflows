@@ -11,7 +11,7 @@ After **`snippets/adopt.py`** installs workflow docs under **`.lsi/workflows/`**
 | Operator guide | [adoption-layout.md](adoption-layout.md) — LSI layout, CLI examples |
 | Checklist gate | [adoption-checklist.md](../adoption-checklist.md) — required verify step |
 | Implementation | [snippets/adoption-verify-links.py](../snippets/adoption-verify-links.py) |
-| Adopt link regression | [snippets/test_adopt_links.py](../snippets/test_adopt_links.py) — temp adopt + verify (bundle gate) |
+| Adopt link regression | [snippets/test_adopt_links.py](../snippets/test_adopt_links.py) — temp adopt + verify (bundle gate); one test calls ``adopt(..., skip_audit=True)`` for the built-in post-adopt verify hook; others call helpers + ``verify()`` directly for ``extra_dirs`` scopes |
 | Fixture regression | [snippets/test_adoption_verify_links.py](../snippets/test_adoption_verify_links.py) |
 | Source grep (manual pre-PR) | [snippets/check-workflow-link-sources.py](../snippets/check-workflow-link-sources.py) |
 | Adopter-shaped sources | [overlays/lsi/adopter-docs/](../overlays/lsi/adopter-docs/) — when maintainer layout diverges |
@@ -136,6 +136,8 @@ python3 snippets/test_adoption_verify_links.py
 python3 snippets/test_adopt_links.py
 python3 snippets/check-workflow-link-sources.py   # manual pre-PR until CI
 ```
+
+``test_adopt_links.py`` uses helper calls plus direct ``verify()`` for most cases so bundle-only ``--extra-dirs`` scans stay explicit. One integration test calls ``adopt(..., skip_audit=True)`` to exercise the full adopt entry point and its post-adopt verify subprocess.
 
 **When bundle CI lands:** run all three in the same job on every PR; block merge on failure.
 

@@ -1,4 +1,14 @@
-"""End-to-end adopt → verify link regression tests."""
+"""End-to-end adopt → verify link regression tests.
+
+Most cases call adopt helpers directly, then invoke ``verify()`` with optional
+``extra_dirs`` (e.g. ``docs/ai`` cross-tree links). That keeps bundle-only scan
+scopes explicit and avoids subprocess overhead on every test method.
+
+``test_adopt_entry_point_runs_post_adopt_verify`` calls ``adopt(...,
+skip_audit=True)`` once to exercise the full adopt pipeline and the built-in
+post-adopt ``adoption-verify-links.py`` hook (pre-adopt audit is skipped on
+minimal temp fixtures; post-adopt audit INFO findings are non-blocking).
+"""
 
 from __future__ import annotations
 
@@ -85,6 +95,7 @@ class AdoptLinksRegressionTests(unittest.TestCase):
         self._tmpdir.cleanup()
 
     def run_adopt(self) -> None:
+        """Core adopt transforms only — link assertions call ``verify()`` directly."""
         config = adopt.load_config(self.config_path)
         bundle_version = (BUNDLE_ROOT / "VERSION").read_text(encoding="utf-8").strip()
         tokens = {**adopt.build_tokens(config), "BUNDLE_VERSION": bundle_version}
@@ -97,6 +108,10 @@ class AdoptLinksRegressionTests(unittest.TestCase):
         adopt.merge_agents_markers(self.target)
         adopt.update_project_md(self.target, config, bundle_version)
         adopt.bootstrap_files(self.target, config)
+
+    def test_adopt_entry_point_runs_post_adopt_verify(self) -> None:
+        code = adopt.adopt(self.target, self.config_path, skip_audit=True)
+        self.assertEqual(code, 0)
 
     def test_adopted_workflows_have_no_broken_links(self) -> None:
         self.run_adopt()
