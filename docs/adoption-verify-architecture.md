@@ -13,7 +13,7 @@ After **`snippets/adopt.py`** installs workflow docs under **`.lsi/workflows/`**
 | Implementation | [snippets/adoption-verify-links.py](../snippets/adoption-verify-links.py) |
 | Adopt link regression | [snippets/test_adopt_links.py](../snippets/test_adopt_links.py) — temp adopt + verify (bundle gate); one test calls ``adopt(..., skip_audit=True)`` for the built-in post-adopt verify hook; others call helpers + ``verify()`` directly for ``extra_dirs`` scopes |
 | Fixture regression | [snippets/test_adoption_verify_links.py](../snippets/test_adoption_verify_links.py) |
-| Source grep (manual pre-PR) | [snippets/check-workflow-link-sources.py](../snippets/check-workflow-link-sources.py) |
+| Source grep (manual pre-PR) | [snippets/check-workflow-link-sources.py](../snippets/check-workflow-link-sources.py) · [snippets/test_check_workflow_link_sources.py](../snippets/test_check_workflow_link_sources.py) |
 | Adopter-shaped sources | [overlays/lsi/adopter-docs/](../overlays/lsi/adopter-docs/) — when maintainer layout diverges |
 
 Legacy Profile A/B scan modes were **retired in v1.3.0** — the script targets the LSI layout only.
@@ -134,8 +134,11 @@ Run (required before any bundle `VERSION` bump):
 ```bash
 python3 snippets/test_adoption_verify_links.py
 python3 snippets/test_adopt_links.py
+python3 snippets/test_check_workflow_link_sources.py
 python3 snippets/check-workflow-link-sources.py   # manual pre-PR until CI
 ```
+
+Source-grep fixtures: [snippets/fixtures/check-workflow-link-sources/](../snippets/fixtures/check-workflow-link-sources/) (`clean/`, `violations/`).
 
 ``test_adopt_links.py`` uses helper calls plus direct ``verify()`` for most cases so bundle-only ``--extra-dirs`` scans stay explicit. One integration test calls ``adopt(..., skip_audit=True)`` to exercise the full adopt entry point and its post-adopt verify subprocess.
 
