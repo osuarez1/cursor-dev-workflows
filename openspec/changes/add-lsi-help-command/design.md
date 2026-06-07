@@ -351,7 +351,7 @@ End of every section turn: `Pick another section or Exit.` then AskQuestion.
 | `common-mistakes.md` | `docs/workflows/common-mistakes.md` |
 | `test-requirements.md` | `docs/workflows/test-requirements.md` |
 | `integrations.md` | `docs/workflows/integrations.md` |
-| `CONVENTION.md` | `overlays/lsi/agent-stack/CONVENTION.commits.template` |
+| `CONVENTION.commits.template` | `overlays/lsi/agent-stack/CONVENTION.commits.template` (adopted into repo-root `CONVENTION.md`) |
 
 Example link:
 
