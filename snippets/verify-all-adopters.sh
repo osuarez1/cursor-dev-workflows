@@ -5,4 +5,6 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
+
+python3 snippets/test_supported_agents_only.py
 exec python3 snippets/update-workflows.py --verify-adopters-only "$@"

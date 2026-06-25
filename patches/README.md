@@ -38,6 +38,10 @@ Paths for this workspace:
 | web | `../web` |
 | ai-agent | `../agents/ai-agent` |
 
+## Supported agents
+
+This bundle emits artifacts for **Cursor** (`.cursor/commands/`, `.cursor/rules/`) and **Claude** (`.claude/commands/`) only. OpenCode, Junie, JetBrains AI, and workflow shell wrappers (`bin/lsi-*`, `bin/opsx-*`) are not supported. Legacy keys `agents_opencode`, `agents_junie`, `agents_jetbrains`, and `bin` cause adopt to exit with an error.
+
 ## Patch YAML keys
 
 | Key | Purpose |
@@ -45,10 +49,11 @@ Paths for this workspace:
 | `project` | Tokens written to `PROJECT.md` |
 | `preserve` | Globs/paths adopt never deletes |
 | `overlay_files` | Replace specific `.lsi/workflows/*.md` from `patches/files/<repo>/` |
-| `remove_after_adopt` | Delete legacy paths after adopt |
+| `rule_overlays` | Install repo-specific `.cursor/rules/*.mdc` from `patches/files/<repo>/cursor-rules/` |
+| `remove_after_adopt` | Delete pre-listed legacy paths after adopt (no interactive prompt) |
 | `agents_claude` | `AGENTS.md` canonical + `CLAUDE.md` symlink |
 | `bootstrap` | Create `version.txt` / `VERSION` if missing |
-| `sync_opsx` | Overwrite root `opsx-*.md` commands (default `false`) |
+| `sync_opsx` | Install all `opsx-*.md` commands to `.cursor/commands/` (default `false`) |
 | `ci_hook.add_check_version` | Document only — see `docs/ci/` |
 
 Full token list: [docs/token-registry.md](../docs/token-registry.md).

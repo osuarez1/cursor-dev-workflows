@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -12,32 +13,13 @@ BUNDLE_ROOT = Path(__file__).resolve().parents[1]
 AUDIT = BUNDLE_ROOT / "snippets" / "audit-agent-docs.py"
 VERIFY = BUNDLE_ROOT / "snippets" / "adoption-verify-links.py"
 
-LSI_COMMANDS = [
-    "lsi-help",
-    "lsi-card",
-    "lsi-card-link",
-    "lsi-trello-list",
-    "lsi-trello-branch",
-    "lsi-branch",
-    "lsi-senior",
-    "lsi-commit",
-    "lsi-readiness",
-    "lsi-review",
-    "lsi-pr",
-    "lsi-promote",
-    "lsi-merge-desc",
-    "lsi-close",
-    "lsi-version",
-    "lsi-changelog",
-    "lsi-release",
-    "lsi-bootstrap-release",
-    "lsi-update",
-]
-ALWAYS_ON_RULES = (
-    "branch-workflow.mdc",
-    "commit-pr-conventions.mdc",
-    "openspec-git-integration.mdc",
+# Import expected agent stack from single source of truth.
+_eas_spec = importlib.util.spec_from_file_location(
+    "expected_agent_stack",
+    BUNDLE_ROOT / "snippets" / "expected_agent_stack.py",
 )
+_eas = importlib.util.module_from_spec(_eas_spec)  # type: ignore[arg-type]
+_eas_spec.loader.exec_module(_eas)  # type: ignore[union-attr]
 
 
 def check(repo: Path) -> list[str]:
@@ -49,12 +31,12 @@ def check(repo: Path) -> list[str]:
     if not router.is_file():
         errors.append("missing .lsi/workflows/which-workflow.md")
 
-    for name in ALWAYS_ON_RULES:
+    for name in _eas.ALWAYS_ON_RULES:
         if not (repo / ".cursor" / "rules" / name).is_file():
             errors.append(f"missing .cursor/rules/{name}")
 
     cmds = repo / ".cursor" / "commands"
-    for name in LSI_COMMANDS:
+    for name in _eas.LSI_COMMANDS:
         if not (cmds / f"{name}.md").is_file():
             errors.append(f"missing .cursor/commands/{name}.md")
 
@@ -107,7 +89,7 @@ def main(argv: list[str] | None = None) -> int:
         VERIFY, "--repo-root", str(repo), "--canonical", ".lsi/workflows"
     )
     audit_code = run_script(
-        AUDIT, "--repo-root", str(repo), "--fail-on", "error"
+        AUDIT, "--repo-root", str(repo), "--check-parity", "--fail-on", "error"
     )
 
     failed = errors or link_code != 0 or audit_code != 0
