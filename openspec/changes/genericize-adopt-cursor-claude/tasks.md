@@ -12,11 +12,11 @@
 - [x] 2.2 Generic LSI `openspec-git-integration.md` + `which-workflow.md` baselines
 - [x] 2.3 Add `snippets/test_commands_generic.py` + denylist
 
-## 3. OPSX commands
+## 3. OpenSpec commands delegated to OpenSpec
 
-- [x] 3.1 Add `opsx-new`, `opsx-ff`, `opsx-continue`, `opsx-onboard`, `opsx-verify`, `opsx-bulk-archive` (generic)
-- [x] 3.2 Centralize expected command list in `snippets/expected_agent_stack.py`; update `verify-adopters` + `audit-agent-docs` to import it
-- [x] 3.3 Regenerate `.claude/commands/` only
+- [x] 3.1 Remove all `opsx-*` command sources from the bundle (`overlays/lsi/agent-stack/commands/`, `.claude/commands/opsx/`)
+- [x] 3.2 Centralize expected command list (`lsi-*` only) in `snippets/expected_agent_stack.py`; `adopt.py` installs `lsi-*` only; `audit-agent-docs`/`verify-adopters` ignore the `opsx-*` namespace
+- [x] 3.3 Regenerate `.claude/commands/lsi/` only (no `opsx-*`)
 
 ## 3b. Adopt command/rule parity gate (runs on every `/lsi:update`)
 
@@ -30,10 +30,10 @@
 ## 4. Per-repo patches + adopt.py
 
 - [x] 4.1 `rule_overlays` in `adopt.py` + `patches/README.md`
-- [x] 4.2 `patches/files/web/openspec-git-integration.md` + `cursor-rules/*`
+- [x] 4.2 `patches/files/web/openspec-git-integration.md` (web keeps existing `.cursor/rules/*` via `preserve`; no `rule_overlays` required)
 - [x] 4.3 `patches/files/ai-agent/openspec-git-integration.md`; remove `command_overlays` `lsi-review`
 - [x] 4.4 `patches/files/video-encoder/openspec-git-integration.md`
-- [x] 4.5 Update `web.yaml`, `ai-agent.yaml`, `video-encoder.yaml` (`overlay_files`, `rule_overlays`, `remove_after_adopt`, `sync_opsx`)
+- [x] 4.5 Update `web.yaml`, `ai-agent.yaml`, `video-encoder.yaml` (`overlay_files`, `rule_overlays`, `remove_after_adopt`)
 
 ## 5. Release
 

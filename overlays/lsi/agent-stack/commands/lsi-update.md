@@ -93,10 +93,10 @@ Re-sync the **cursor-dev-workflows** bundle after a release or overlay command e
 ```
 ## Workflow update — bundle maintainer
 
-**Bootstrap:** 30 commands → .cursor/commands/
+**Bootstrap:** 19 LSI commands → .cursor/commands/ (OpenSpec `opsx-*` commands managed by `openspec init`, not the bundle)
 **Adopters synced:** <from maintainer-adopters.local.yaml; skipped if missing>
 **Parity:** <clean | N surplus items listed — adopter confirmed removal>
-**Bundle version:** 1.4.x
+**Bundle version:** 1.5.x
 
 Review adopter repo diffs and commit when asked.
 ```

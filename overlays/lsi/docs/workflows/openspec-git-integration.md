@@ -45,11 +45,11 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 | Tag + Bitbucket | [versioning-and-releases.md](versioning-and-releases.md) | `/lsi:release` |
 | Optional baseline tag | [versioning-and-releases.md](versioning-and-releases.md) | `/lsi:bootstrap-release` |
 
-**OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive`
+**OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive` — provided by OpenSpec (`openspec init` / config profile); this bundle does not install or manage OpenSpec slash commands.
 
 **LSI (git):** `/lsi:help`, `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`, `/lsi:update`
 
-**Release scripts:** `{{TEST_COMMAND}}`, `scripts/check_version.py`
+**Release scripts:** `scripts/check_version.py` (version bump, changelog, and tag via `/lsi:version`, `/lsi:changelog`, `/lsi:release`)
 
 ---
 
