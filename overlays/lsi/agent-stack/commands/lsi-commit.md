@@ -44,21 +44,7 @@ Create logical commits from the active OpenSpec change's `tasks.md` sections usi
    2. `type(scope): imperative description` — files: ...
    ```
 
-   Map sections per integration doc worker scope table:
-
-   | Area | Typical scope / type |
-   |------|----------------------|
-   | Worker listener / `main.py` | `feat(worker):` / `fix(worker):` |
-   | FFmpeg / HLS pipeline | `feat(ffmpeg):` / `fix(ffmpeg):` |
-   | S3 / AWS CLI upload | `feat(s3):` / `fix(s3):` |
-   | Webhook / HTTP client | `feat(webhook):` / `fix(webhook):` |
-   | Job payload / contracts | `feat(contracts):` / `fix(contracts):` |
-   | Tests under `tests/` | `test(<scope>):` |
-   | OpenSpec / workflow docs | `docs(openspec):` / `chore(docs):` |
-   | CI / Bitbucket pipelines | `ci:` / `chore(ci):` |
-   | Release / version | `chore(release):` |
-
-   One logical change per commit.
+   Derive commit scopes from [`docs/workflows/openspec-git-integration.md` § Commit mapping](../../docs/workflows/openspec-git-integration.md#commit-mapping). One logical change per commit.
 
 5. **Execute commits (one at a time)**
 
@@ -95,6 +81,6 @@ Next: `/lsi:readiness` before opening a PR.
 **Guardrails**
 
 - Run `git commit` **only when the user explicitly asks** (invoking this command counts as asking).
-- Never commit secrets (`.env`, credentials, `key.bin`, `tmp/`).
+- Never commit secrets (`.env`, credentials, key files, `tmp/`).
 - If pre-commit hook fails, fix and create a **new** commit — do not amend.
 - Refuse on `main` or `staging`.

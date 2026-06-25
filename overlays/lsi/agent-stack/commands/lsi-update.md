@@ -63,7 +63,17 @@ Re-sync the **cursor-dev-workflows** bundle after a release or overlay command e
 
    Matches `REPO_NAME` in [PROJECT.md](../../PROJECT.md) to `patches/<repo>.yaml`, runs adopt, then verify.
 
-5. **Dry-run (optional)**
+5. **Parity check (runs automatically after adopt)**
+
+   After adopt, `update-workflows.py` runs `check_agent_stack_parity` against the adopter's `.cursor/commands/` and `.cursor/rules/`:
+
+   - **Missing expected files** → warn (re-run adopt to install)
+   - **Surplus files not in expected set** → error; lists each path and asks adopter which to remove
+   - **Legacy alias pairs both present** (e.g., `code_review.mdc` + `code-review.mdc`) → error; asks adopter to confirm removal
+
+   **Adopter decides**: only confirmed paths are deleted. Decline = surplus stays; add to `preserve_agent_stack` in patch YAML to allowlist intentional extras without being asked again.
+
+6. **Dry-run (optional)**
 
    ```bash
    python3 snippets/update-workflows.py --dry-run
@@ -71,7 +81,7 @@ Re-sync the **cursor-dev-workflows** bundle after a release or overlay command e
 
    Shows adopt/bootstrap commands without writing files.
 
-6. **Report**
+7. **Report**
 
    - Bundle version adopted (from bundle `VERSION`)
    - Files changed summary (`git status --short` in target repo)
@@ -83,9 +93,10 @@ Re-sync the **cursor-dev-workflows** bundle after a release or overlay command e
 ```
 ## Workflow update — bundle maintainer
 
-**Bootstrap:** 22 commands → .cursor/commands/
+**Bootstrap:** 30 commands → .cursor/commands/
 **Adopters synced:** <from maintainer-adopters.local.yaml; skipped if missing>
-**Bundle version:** 1.3.0
+**Parity:** <clean | N surplus items listed — adopter confirmed removal>
+**Bundle version:** 1.4.x
 
 Review adopter repo diffs and commit when asked.
 ```

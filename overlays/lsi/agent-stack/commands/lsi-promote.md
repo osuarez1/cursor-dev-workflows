@@ -35,7 +35,7 @@ Prepare and open a **production promotion** pull request after staging QA passes
 4. **Run `/lsi:readiness`** in **promotion mode** (`git diff main...HEAD`, PR target **`main`**)
 
    - Block if verdict is not `Ready` unless user documents explicit exemption.
-   - `uv run pytest --cov=src --cov=dev --cov-fail-under=100` must pass locally when `src/` or `dev/` touched.
+   - Test suite must pass locally (see integration doc § PR production readiness) when source changed.
 
 5. **Run `/lsi:review`** in **promotion mode** (`git diff main...HEAD`)
 
@@ -94,7 +94,7 @@ Prepare and open a **production promotion** pull request after staging QA passes
 **Readiness:** Ready
 **Review:** Approve
 
-**CI:** pytest coverage ✓/✗
+**CI:** Test suite ✓/✗
 
 After merge: `/lsi:merge-desc` (target main).
 Next: checkout **main**, pull, then `/lsi:close`.

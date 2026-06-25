@@ -34,16 +34,9 @@ Run code review for the active OpenSpec change after readiness passes and before
    - `docs/contracts/` when payload or wire format touched
    - Feature: `git diff staging...HEAD` · Promotion: `git diff main...HEAD`
 
-4. **Review focus areas (video-encoder worker)**
+4. **Review focus areas**
 
-   | Area | When to check |
-   |------|---------------|
-   | FFmpeg / HLS | `ffmpeg_pipeline.py`, segment naming, encryption key consumption (no key generation) |
-   | Redis queue | BLPOP/BRPOP, job payload parsing, error handling |
-   | S3 / AWS CLI | `s3_manager.py` — `aws s3 sync` subprocess only; no boto3 bulk upload |
-   | Contracts | Payload shape vs `docs/contracts/`; webhook callbacks |
-   | Security | No secrets in repo; `tmp/` cleanup after job success/failure |
-   | Version scope | No V2/V3 modules (`workflow_executor`, multi-queue) during V1 tasks |
+   Refer to [`docs/workflows/openspec-git-integration.md` § Code review](../../docs/workflows/openspec-git-integration.md#code-review) for this repo's specific focus areas (domain components, security, version scope, etc.).
 
 5. **Structured findings**
 

@@ -25,7 +25,7 @@ Run senior analysis tier selection for the active OpenSpec change after `design.
 
    | Tier | When |
    |------|------|
-   | **Deep** | Worker runtime, FFmpeg pipeline, contracts, S3 upload, or multi-capability change |
+   | **Deep** | Runtime-critical, integration-heavy, or multi-capability change — see integration doc for this repo's tier signals |
    | **Light** | ≤ ~3 `tasks.md` sections |
    | **Skip** | Docs/openspec-only; point to `/lsi:review` instead |
 
@@ -35,7 +35,7 @@ Run senior analysis tier selection for the active OpenSpec change after `design.
 
    - Logical units **LC-1, LC-2, …** align with numbered `tasks.md` sections.
    - Inputs: Why / What Changes, `design.md` decisions, capabilities from `proposal.md`.
-   - Cover: architecture fit, risks, test strategy (`uv run pytest --cov=src --cov=dev --cov-fail-under=100`), rollback if BREAKING.
+   - Cover: architecture fit, risks, test strategy (run the test command from [PROJECT.md](../../PROJECT.md)), rollback if BREAKING.
    - **Do not** post full analysis to Bitbucket unless user explicitly asks.
 
 6. **Save locally (only if user asks)**
