@@ -277,7 +277,7 @@ See [versioning-and-releases.md](versioning-and-releases.md). Forward-only from 
 
 ## Command syntax
 
-Cursor stores slash commands as files under `.cursor/commands/` with **hyphen** names (e.g. `lsi-card.md`, `opsx-apply.md`). In chat, invoke with **colon** syntax: `/lsi:card`, `/opsx:apply`. The mapping is one-to-one: `/lsi:card` → `lsi-card.md`.
+Cursor stores slash commands as files under `.cursor/commands/` with **hyphen** names (e.g. `lsi-card.md`, `lsi-commit.md`). In chat, invoke with **colon** syntax: `/lsi:card`, `/lsi:commit`. The mapping is one-to-one: `/lsi:card` → `lsi-card.md`. OpenSpec commands (`opsx-*`) follow the same pattern but are provided by OpenSpec, not this bundle.
 
 ---
 
