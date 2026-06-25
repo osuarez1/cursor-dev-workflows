@@ -2,7 +2,7 @@ repo: video-encoder
 overlay: lsi
 layout: lsi
 canonical: .lsi/workflows
-sync_opsx: false
+sync_opsx: true
 project:
   REPO_NAME: video-encoder
   TITLE_PREFIX: "VE | "
@@ -21,6 +21,8 @@ project:
   PR_MAX_COMMITS: "12"
   PR_MAX_PRIMARY_CONCERNS: "1"
   PR_MAX_SCOPES: "3"
+overlay_files:
+  openspec-git-integration.md: patches/files/video-encoder/openspec-git-integration.md
 preserve:
   - bitbucket-pipelines.yml
   - .cursor/rules/ffmpeg.mdc
