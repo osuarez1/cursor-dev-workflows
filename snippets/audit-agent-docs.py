@@ -37,34 +37,15 @@ OPSX_ARCHIVE_AFTER_MERGE = re.compile(
     re.IGNORECASE,
 )
 PROTECTED_TOKEN = re.compile(r"PROTECTED_BRANCHES\s*[=:]\s*([^\n]+)", re.IGNORECASE)
-LSI_COMMANDS = [
-    "lsi-help",
-    "lsi-card",
-    "lsi-card-link",
-    "lsi-trello-list",
-    "lsi-trello-branch",
-    "lsi-branch",
-    "lsi-senior",
-    "lsi-commit",
-    "lsi-readiness",
-    "lsi-review",
-    "lsi-pr",
-    "lsi-promote",
-    "lsi-merge-desc",
-    "lsi-close",
-    "lsi-version",
-    "lsi-changelog",
-    "lsi-release",
-    "lsi-bootstrap-release",
-    "lsi-update",
-]
-OPSX_COMMANDS = [
-    "opsx-explore",
-    "opsx-propose",
-    "opsx-apply",
-    "opsx-sync",
-    "opsx-archive",
-]
+
+# Import expected agent stack from single source of truth.
+import importlib.util as _ilu
+_eas_path = Path(__file__).resolve().parent / "expected_agent_stack.py"
+_eas_spec = _ilu.spec_from_file_location("expected_agent_stack", _eas_path)
+_eas = _ilu.module_from_spec(_eas_spec)  # type: ignore[arg-type]
+_eas_spec.loader.exec_module(_eas)  # type: ignore[union-attr]
+
+LSI_COMMANDS = _eas.LSI_COMMANDS
 
 
 @dataclass
@@ -225,7 +206,7 @@ def check_commands(repo_root: Path) -> list[Finding]:
             )
         ]
     present = {p.stem for p in cmd_dir.glob("*.md")}
-    for name in LSI_COMMANDS + OPSX_COMMANDS:
+    for name in LSI_COMMANDS:
         if name not in present:
             findings.append(
                 Finding(
@@ -235,6 +216,115 @@ def check_commands(repo_root: Path) -> list[Finding]:
                     f".cursor/commands/{name}.md",
                 )
             )
+    return findings
+
+
+def check_agent_stack_parity(
+    repo_root: Path,
+    *,
+    extra_rules: list[str] | None = None,
+    preserve_globs: list[str] | None = None,
+) -> list[Finding]:
+    """Compare adopter .cursor/commands/ and .cursor/rules/ against expected set.
+
+    - Missing expected files: WARN
+    - Surplus files not in expected set and not allowlisted: ERROR
+    - Legacy alias pairs both present: ERROR
+
+    Commands in an unmanaged namespace (e.g. `opsx-*`, owned by OpenSpec) are
+    ignored entirely: never expected, never flagged surplus, never removed.
+    """
+    findings: list[Finding] = []
+    cmd_dir = repo_root / ".cursor" / "commands"
+    rules_dir = repo_root / ".cursor" / "rules"
+
+    exp_cmds = _eas.expected_commands()
+    exp_rules = _eas.expected_rules(extra_rules)
+    alias_pairs = _eas.legacy_rule_aliases()
+
+    # Resolve preserve globs against the repo root
+    preserved_cmds: set[str] = set()
+    preserved_rules: set[str] = set()
+    if preserve_globs:
+        for glob in preserve_globs:
+            for p in repo_root.glob(glob):
+                rel = p.relative_to(repo_root)
+                parts = rel.parts
+                if len(parts) >= 2 and parts[0] == ".cursor" and parts[1] == "commands":
+                    preserved_cmds.add(p.stem)
+                elif len(parts) >= 2 and parts[0] == ".cursor" and parts[1] == "rules":
+                    preserved_rules.add(p.name)
+
+    # --- Commands ---
+    if cmd_dir.is_dir():
+        present_cmds = {p.stem for p in cmd_dir.glob("*.md")}
+        for name in exp_cmds:
+            if name not in present_cmds:
+                findings.append(
+                    Finding(
+                        SEVERITY_WARN,
+                        "command_drift",
+                        f"Missing expected command {name}.md",
+                        f".cursor/commands/{name}.md",
+                        f"Run /lsi:update to install",
+                    )
+                )
+        for name in sorted(present_cmds - exp_cmds):
+            if name in preserved_cmds or _eas.is_unmanaged_command(name):
+                continue
+            findings.append(
+                Finding(
+                    SEVERITY_ERROR,
+                    "agent_stack_parity",
+                    f"Surplus command {name}.md not in expected set",
+                    f".cursor/commands/{name}.md",
+                    "Confirm removal with adopter or add to preserve_agent_stack in patch",
+                )
+            )
+    else:
+        findings.append(
+            Finding(SEVERITY_WARN, "command_drift", ".cursor/commands/ missing", str(cmd_dir))
+        )
+
+    # --- Rules ---
+    if rules_dir.is_dir():
+        present_rules = {p.name for p in rules_dir.glob("*.mdc")}
+        for name in exp_rules:
+            if name not in present_rules:
+                findings.append(
+                    Finding(
+                        SEVERITY_WARN,
+                        "rule_drift",
+                        f"Missing expected rule {name}",
+                        f".cursor/rules/{name}",
+                        "Run /lsi:update to install",
+                    )
+                )
+        for name in sorted(present_rules - exp_rules):
+            if name in preserved_rules:
+                continue
+            findings.append(
+                Finding(
+                    SEVERITY_ERROR,
+                    "agent_stack_parity",
+                    f"Surplus rule {name} not in expected set",
+                    f".cursor/rules/{name}",
+                    "Confirm removal with adopter or add to preserve_agent_stack in patch",
+                )
+            )
+        # Legacy alias pairs
+        for canonical, alias in alias_pairs:
+            if canonical in present_rules and alias in present_rules:
+                findings.append(
+                    Finding(
+                        SEVERITY_ERROR,
+                        "agent_stack_parity",
+                        f"Legacy alias pair both present: {canonical} and {alias}",
+                        f".cursor/rules/",
+                        f"Remove {alias} (legacy alias for {canonical})",
+                    )
+                )
+
     return findings
 
 
@@ -318,13 +408,28 @@ def apply_resolutions(
     return unresolved, suppressed
 
 
-def audit(repo_root: Path, extra_paths: list[Path] | None = None) -> list[Finding]:
+def audit(
+    repo_root: Path,
+    extra_paths: list[Path] | None = None,
+    *,
+    check_parity: bool = False,
+    extra_rules: list[str] | None = None,
+    preserve_globs: list[str] | None = None,
+) -> list[Finding]:
     repo_root = repo_root.resolve()
     tokens = project_tokens(repo_root)
     findings: list[Finding] = []
     findings.extend(check_symlink(repo_root))
     findings.extend(check_protected_branches(repo_root, tokens))
     findings.extend(check_commands(repo_root))
+    if check_parity:
+        findings.extend(
+            check_agent_stack_parity(
+                repo_root,
+                extra_rules=extra_rules,
+                preserve_globs=preserve_globs,
+            )
+        )
 
     scan = default_scan_paths(repo_root)
     if extra_paths:
@@ -384,9 +489,26 @@ def main(argv: list[str] | None = None) -> int:
         help="Accept confirmed LSI policy resolutions (staging-first, symlink, /lsi:close)",
     )
     parser.add_argument("--report-file", type=Path, default=None)
+    parser.add_argument(
+        "--check-parity",
+        action="store_true",
+        help="Also run agent-stack parity check (surplus/missing commands and rules)",
+    )
+    parser.add_argument(
+        "--preserve",
+        action="append",
+        default=None,
+        metavar="GLOB",
+        help="Glob (relative to repo root) for adopter-owned files the parity check must "
+        "not flag as surplus (e.g. patch `preserve` entries). Repeatable.",
+    )
     args = parser.parse_args(argv)
 
-    raw_findings = audit(args.repo_root.resolve())
+    raw_findings = audit(
+        args.repo_root.resolve(),
+        check_parity=args.check_parity,
+        preserve_globs=args.preserve,
+    )
     accepted_map = load_resolutions(
         args.accept_resolutions.resolve() if args.accept_resolutions else None
     )

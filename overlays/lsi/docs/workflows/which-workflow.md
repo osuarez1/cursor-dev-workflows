@@ -70,7 +70,7 @@ flowchart TD
 
 1. `/opsx:explore` (optional) — clarify problem  
 2. `/opsx:propose <slug>` — proposal, design, tasks  
-3. `/lsi:senior` — when design is large (FFmpeg, contracts, multi-module)  
+3. `/lsi:senior` — when design is large (runtime-critical, integration-heavy, multi-module)  
 4. `/lsi:card` from **`main`** or **`staging`** — Trello card + ticket branch  
 5. `/opsx:apply` — implement `tasks.md`  
 6. [test-requirements.md](test-requirements.md) — while coding  

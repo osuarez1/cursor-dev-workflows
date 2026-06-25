@@ -20,6 +20,7 @@ BUNDLE_ROOT = Path(__file__).resolve().parents[1]
 ADOPT = BUNDLE_ROOT / "snippets" / "adopt.py"
 BOOTSTRAP = BUNDLE_ROOT / "snippets" / "bootstrap-maintainer-local.sh"
 VERIFY = BUNDLE_ROOT / "snippets" / "verify-adopters.py"
+AUDIT = BUNDLE_ROOT / "snippets" / "audit-agent-docs.py"
 MAINTAINER_ADOPTERS_LOCAL = "maintainer-adopters.local.yaml"
 
 
@@ -122,6 +123,111 @@ def bootstrap_maintainer(*, dry_run: bool = False) -> int:
     return run([str(BOOTSTRAP)], dry_run=dry_run)
 
 
+def run_parity_check(
+    target: Path,
+    config_path: Path,
+    *,
+    dry_run: bool = False,
+    interactive: bool = True,
+) -> int:
+    """Run agent-stack parity check after adopt; ask adopter about surplus files.
+
+    Returns 0 if clean or adopter resolved surplus, 1 if unresolved surplus remains.
+    """
+    if dry_run:
+        print(f"→ parity check: {target.name} (dry-run)")
+        return 0
+
+    import importlib.util
+
+    # Load audit module
+    spec = importlib.util.spec_from_file_location("audit_agent_docs", AUDIT)
+    if spec is None or spec.loader is None:
+        print(f"Cannot load {AUDIT}", file=sys.stderr)
+        return 1
+    audit_mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(audit_mod)
+
+    # Load adopt module to read config
+    adopt_spec = importlib.util.spec_from_file_location("adopt_mod", ADOPT)
+    if adopt_spec is None or adopt_spec.loader is None:
+        print(f"Cannot load {ADOPT}", file=sys.stderr)
+        return 1
+    adopt_mod = importlib.util.module_from_spec(adopt_spec)
+    adopt_spec.loader.exec_module(adopt_mod)
+
+    try:
+        config = adopt_mod.load_config(config_path)
+    except SystemExit as e:
+        print(f"Config error: {e}", file=sys.stderr)
+        return 1
+
+    preserve_globs = list(config.get("preserve") or [])
+
+    findings = audit_mod.check_agent_stack_parity(
+        target,
+        preserve_globs=preserve_globs,
+    )
+
+    surplus = [
+        f for f in findings
+        if f.category == "agent_stack_parity" and f.severity == audit_mod.SEVERITY_ERROR
+    ]
+
+    if not surplus:
+        return 0
+
+    print(f"\nParity check found {len(surplus)} unresolved surplus/alias item(s) in {target.name}:")
+    for f in surplus:
+        print(f"  {f.location}: {f.message}")
+        if f.suggestion:
+            print(f"    → {f.suggestion}")
+
+    if not interactive:
+        print("\nNon-interactive mode: surplus unresolved. Add to preserve_agent_stack or remove manually.")
+        return 1
+
+    print("\nWhich paths do you want to remove? Enter one path per line (blank line to finish, 'none' to skip all):")
+    confirmed: list[str] = []
+    while True:
+        try:
+            line = input("  remove> ").strip()
+        except EOFError:
+            break
+        if not line or line.lower() == "none":
+            break
+        confirmed.append(line)
+
+    if not confirmed:
+        print("No paths confirmed for removal — surplus remains. Add to preserve_agent_stack in patch YAML to suppress.")
+        return 1
+
+    for rel in confirmed:
+        path = target / rel
+        if path.is_file():
+            path.unlink()
+            print(f"  Removed: {rel}")
+        elif path.exists():
+            print(f"  SKIP (not a file): {rel}")
+        else:
+            print(f"  SKIP (not found): {rel}")
+
+    # Re-run parity after cleanup
+    findings_after = audit_mod.check_agent_stack_parity(
+        target, preserve_globs=preserve_globs
+    )
+    surplus_after = [
+        f for f in findings_after
+        if f.category == "agent_stack_parity" and f.severity == audit_mod.SEVERITY_ERROR
+    ]
+    if surplus_after:
+        print(f"\nStill {len(surplus_after)} unresolved surplus item(s). Add to preserve_agent_stack to allowlist.")
+        return 1
+
+    print("Parity: OK after cleanup")
+    return 0
+
+
 def adopt_target(
     bundle: Path,
     target: Path,
@@ -181,6 +287,10 @@ def sync_maintainer_adopters(bundle: Path, *, dry_run: bool = False) -> int:
         if adopt_target(bundle, target, config, dry_run=dry_run) != 0:
             code = 1
             continue
+        if not dry_run:
+            parity_code = run_parity_check(target, config, dry_run=dry_run, interactive=True)
+            if parity_code != 0:
+                code = 1
         if not dry_run and verify_adopter(target) != 0:
             code = 1
     return code

@@ -20,7 +20,7 @@ Prepare and open a pull request for the active OpenSpec change after readiness a
 3. **Run `/lsi:readiness`**
 
    - Block if verdict is not `Ready` unless user documents explicit exemption.
-   - `uv run pytest --cov=src --cov=dev --cov-fail-under=100` must pass locally.
+   - Test suite must pass locally (see integration doc § PR production readiness).
 
 4. **Run `/lsi:review`**
 
@@ -34,7 +34,7 @@ Prepare and open a pull request for the active OpenSpec change after readiness a
    | **Overview** | `proposal.md` → Why |
    | **Changes** | What Changes + `design.md` |
    | **Potential risks** | BREAKING in proposal + design risks + review |
-   | **Testing** | tasks.md test tasks + pytest results from readiness |
+   | **Testing** | tasks.md test tasks + test results from readiness |
    | **Related** | `openspec/changes/<slug>/proposal.md` + Trello card id/URL |
 
 6. **Draft PR**
@@ -86,7 +86,7 @@ Emit in this order:
 **Readiness:** Ready
 **Review:** Approve
 
-**CI:** pytest coverage ✓/✗
+**CI:** Test suite ✓/✗
 ```
 
 2. **Title (copy below)** — single line, `text` fence only:

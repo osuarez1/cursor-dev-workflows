@@ -2,7 +2,7 @@
 name: /lsi-readiness
 id: lsi-readiness
 category: Workflow
-description: PR production readiness with pytest coverage gate
+description: PR production readiness with test gate
 ---
 
 Run PR production readiness checks for the active OpenSpec change before opening or merging a PR.
@@ -31,17 +31,14 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
    | Branch | Ticket pattern; not `main` or `staging` | Ticket branch or **`staging`**; not `main` |
    | Ticket | Suffix matches `openspec/changes/<slug>/` | Same when on ticket branch; N/A on `staging` |
    | Trello id | 24-char id in branch name | Same when on ticket branch; N/A on `staging` |
-   | Secrets | No `.env`, credentials, `key.bin`, or keys in diff | Same |
+   | Secrets | No `.env`, credentials, or key material in diff | Same |
 
 3. **Run CI gates locally (required)**
 
-   ```bash
-   uv run pytest --cov=src --cov=dev --cov-fail-under=100
-   ```
+   Run the test command per [`docs/workflows/openspec-git-integration.md` § PR production readiness](../../docs/workflows/openspec-git-integration.md#pr-production-readiness) (also in `PROJECT.md` as `TEST_COMMAND`).
 
    - Fix failures before reporting `Ready`.
-   - Docs-only changes: still run pytest if `src/` changed; document exemption in output only if user explicitly confirms and CI would not apply.
-   - Release script tests (`tests/test_release_*.py`, `tests/test_check_version.py`) run separately — outside the 100% `COVERAGE_ROOTS` (`src/`, `dev/`) gate.
+   - Docs-only changes: run tests if source changed; document exemption explicitly if CI would not apply.
 
 4. **Review diff scope**
 
@@ -84,7 +81,7 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 | Branch | ✓/✗ |
 | Ticket match | ✓/✗ |
 | Trello id in branch | ✓/✗ |
-| uv run pytest --cov=src --cov=dev --cov-fail-under=100 | ✓/✗ |
+| Test suite (see integration doc) | ✓/✗ |
 | Secrets scan | ✓/✗ |
 
 ### Issues (if any)
@@ -98,7 +95,7 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 
 **Guardrails**
 
-- Do not report `Ready` if pytest coverage gate failed locally.
+- Do not report `Ready` if test gate failed locally.
 - Never post readiness report to Bitbucket unless user asks.
 - Feature mode: refuse on `main` or `staging`.
 - Promotion mode: refuse on `main` only; **`staging`** branch is allowed.

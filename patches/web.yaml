@@ -3,7 +3,6 @@ overlay: lsi
 layout: lsi
 canonical: .lsi/workflows
 audit_resolutions: patches/files/web/audit-resolutions.yaml
-sync_opsx: false
 project:
   REPO_NAME: web
   TITLE_PREFIX: "Web | "
@@ -33,6 +32,7 @@ preserve:
   - PROJECT.md
   - bitbucket-pipelines.yml
 overlay_files:
+  openspec-git-integration.md: patches/files/web/openspec-git-integration.md
   test-requirements.md: patches/files/web/test-requirements.md
   versioning-and-releases.md: patches/files/web/versioning-and-releases.md
   ticket-card-info.md: patches/files/web/ticket-card-info.md

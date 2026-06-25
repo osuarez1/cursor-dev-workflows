@@ -7,6 +7,12 @@ maintainer-adopters.local.yaml
 # Local Cursor install (see gitignored MAINTAINER.md)
 .cursor/
 
+# Unsupported agent tool dirs (Cursor + Claude only)
+.opencode/
+.aiassistant/
+.junie/
+bin/
+
 # Test / smoke artifacts
 .coverage
 .tmp-adopt-smoke-*/

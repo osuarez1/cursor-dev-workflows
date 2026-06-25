@@ -1,9 +1,14 @@
 # Copy to patches/<repo>.yaml and fill in. See docs/adopt-new-repo.md.
+# Supported agents: Cursor (.cursor/commands/, .cursor/rules/) + Claude (.claude/commands/).
+# Legacy keys agents_opencode, agents_junie, agents_jetbrains, bin are NOT supported and will
+# cause adopt to exit with an error.
+# Scope: this bundle installs LSI (lsi-*) commands only. OpenSpec (opsx-*) slash
+# commands are owned by OpenSpec (openspec init / config profile) — adopt never
+# installs or removes them, and the parity gate ignores the opsx-* namespace.
 repo: my-repo
 overlay: lsi
 layout: lsi
 canonical: .lsi/workflows
-sync_opsx: false  # true only to overwrite root .cursor/commands/opsx-* from bundle
 
 project:
   REPO_NAME: my-repo

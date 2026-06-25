@@ -140,10 +140,20 @@ LINK_REWRITES = [
 ]
 
 
+_LEGACY_KEYS = ("agents_opencode", "agents_junie", "agents_jetbrains", "bin")
+
+
 def load_config(path: Path) -> dict:
     data = _load_yaml_text(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
         raise SystemExit(f"Invalid config (expected mapping): {path}")
+    legacy = [k for k in _LEGACY_KEYS if k in data]
+    if legacy:
+        raise SystemExit(
+            f"Patch config {path} contains unsupported keys: {legacy}. "
+            "This bundle supports Cursor + Claude only. "
+            "Remove these keys and re-run adopt."
+        )
     return data
 
 
@@ -335,12 +345,10 @@ def install_agent_stack(target: Path, tokens: dict[str, str], config: dict) -> N
             content = substitute_tokens(src.read_text(encoding="utf-8"), tokens)
             (rules_dir / mdc).write_text(content, encoding="utf-8")
 
-    sync_opsx = config.get("sync_opsx", False)
-    for cmd in sorted((OVERLAY_ROOT / "agent-stack" / "commands").glob("*.md")):
-        if cmd.name.startswith("opsx-") and not sync_opsx:
-            dst = cmds_dir / cmd.name
-            if dst.exists():
-                continue
+    # Install LSI commands only. OpenSpec (`opsx-*`) slash commands are owned by
+    # OpenSpec (`openspec init` / config profile); the bundle never installs or
+    # removes them.
+    for cmd in sorted((OVERLAY_ROOT / "agent-stack" / "commands").glob("lsi-*.md")):
         content = substitute_tokens(cmd.read_text(encoding="utf-8"), tokens)
         content = content.replace("docs/workflows/", ".lsi/workflows/")
         content = content.replace("../../docs/sdlc/", "../../.lsi/workflows/sdlc/")
@@ -360,6 +368,26 @@ def install_agent_stack(target: Path, tokens: dict[str, str], config: dict) -> N
             )
             content = content.replace("CANONICAL_DOCS_PATH", ".lsi/workflows")
             (rules_dir / mdc.name).write_text(content, encoding="utf-8")
+
+    # rule_overlays: install repo-specific .cursor/rules/*.mdc from patch
+    # Applied after generic rules so domain-specific content overrides/extends baseline.
+    _install_rule_overlays(target, tokens, config)
+
+
+def _install_rule_overlays(target: Path, tokens: dict[str, str], config: dict) -> None:
+    """Install repo-specific .cursor/rules/*.mdc from rule_overlays in patch config."""
+    rule_overlays = config.get("rule_overlays") or {}
+    if not rule_overlays:
+        return
+    rules_dir = target / ".cursor" / "rules"
+    rules_dir.mkdir(parents=True, exist_ok=True)
+    for dest_name, src_rel in rule_overlays.items():
+        src = BUNDLE_ROOT / src_rel
+        if not src.is_file():
+            print(f"WARNING: rule_overlays source not found: {src}", file=sys.stderr)
+            continue
+        content = rewrite_links(substitute_tokens(src.read_text(encoding="utf-8"), tokens))
+        (rules_dir / dest_name).write_text(content, encoding="utf-8")
 
 
 def merge_convention(target: Path) -> None:
@@ -516,6 +544,8 @@ def bootstrap_files(target: Path, config: dict) -> None:
 
 
 def remove_after_adopt(target: Path, config: dict) -> None:
+    # Only removes paths explicitly pre-listed in patch YAML remove_after_adopt.
+    # Never auto-prunes surplus files — adopter decides via interactive /lsi:update flow.
     for rel in config.get("remove_after_adopt") or []:
         path = target / rel
         if path.is_file():

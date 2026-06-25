@@ -74,7 +74,7 @@ Generate the mandatory extended merge description for Bitbucket's merge-commit d
 
    Testing
    -------
-   - uv run pytest --cov=src --cov=dev --cov-fail-under=100 — passed locally
+   - Test suite (see `PROJECT.md` `TEST_COMMAND`) — passed locally
    - <other verification steps>
 
    Related
