@@ -1,4 +1,4 @@
-# OpenSpec + Git workflow (video-encoder)
+# OpenSpec + Git workflow
 
 **LSI overlay** for [cursor-dev-workflows](https://github.com/osuarez1/cursor-dev-workflows) v{{BUNDLE_VERSION}}. Generic commit/PR/branch/review rules live in [docs/workflows/which-workflow.md](which-workflow.md); this doc maps them to **OpenSpec + Trello + Bitbucket**.
 
@@ -15,12 +15,12 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 
 ## Quick reference
 
-| Concept | video-encoder |
-|---------|---------------|
+| Concept | Value |
+|---------|-------|
 | Scope ticket | OpenSpec change slug |
 | Delivery ticket | Trello card (24-char id in branch) |
 | Branch | `feature\|bugfix\|hotfix\|chore/{id}-<change-slug>` via **`/lsi:card`**, **`/lsi:card-link`**, or **`/lsi:trello-list`** / **`/lsi:trello-branch`** |
-| Protected branches | **`main`**, **`staging`** — no task work (except card-setup: `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch` on `main` or `staging`) |
+| Protected branches | **`{{PROTECTED_BRANCHES}}`** — no task work (except card-setup: `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch` on protected branches) |
 | Implement | `/opsx:apply` on ticket branch |
 | Close ticket | After **`main`** promotion: **`/lsi:close`** (or `/opsx:sync` → `/opsx:archive` on `main`) |
 | Normative specs | [`openspec/specs/`](../../openspec/specs/) after production close on `main` |
@@ -49,7 +49,7 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 
 **LSI (git):** `/lsi:help`, `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`, `/lsi:update`
 
-**Release scripts:** `uv run python scripts/release/infer_version.py`, `generate_changelog.py`, `scripts/check_version.py`
+**Release scripts:** `{{TEST_COMMAND}}`, `scripts/check_version.py`
 
 ---
 
@@ -138,17 +138,15 @@ Any change merged to **`main`** (including hotfixes) MUST be back-merged to **`s
 
 Map [commits-logical-order.md](commits-logical-order.md) to **`tasks.md` sections**.
 
-| Area | Typical scope |
-|------|---------------|
-| Worker / `main.py` | `worker` |
-| FFmpeg / HLS | `ffmpeg` |
-| S3 / AWS CLI | `s3` |
-| Webhook / HTTP | `webhook` |
-| Contracts / payload | `contracts` |
-| Tests | `test(<scope>)` |
-| OpenSpec / workflow | `docs(openspec)` / `chore(docs)` |
-| CI / pipelines | `ci` / `chore(ci)` |
-| Release | `chore(release)` |
+Repo-specific commit scopes and area mapping are documented in the `openspec-git-integration.md` overlay for this repo (from `patches/files/<repo>/openspec-git-integration.md`).
+
+| Area | Typical type |
+|------|--------------|
+| Source code | `feat(<scope>):` / `fix(<scope>):` |
+| Tests | `test(<scope>):` |
+| OpenSpec / workflow docs | `docs(openspec):` / `chore(docs):` |
+| CI / pipelines | `ci:` / `chore(ci):` |
+| Release / version | `chore(release):` |
 
 Optional footer: `Refs: openspec/changes/<change-slug>`
 
@@ -174,8 +172,8 @@ In **promotion mode**, substitute `main` for `staging` in diff/log commands. On 
 | Branch | Ticket pattern; not `main`/`staging` | Ticket branch or **`staging`**; not `main` |
 | Ticket match | Suffix matches `openspec/changes/<slug>/` | Same on ticket branch; N/A on **`staging`** |
 | Trello id | 24-char id in branch name | Same on ticket branch; N/A on **`staging`** |
-| Tests | `uv run pytest --cov=src --cov=dev --cov-fail-under=100` when `src/` or `dev/` touched | Same |
-| Version | `uv run python scripts/check_version.py` when `version.txt` bumped | Same |
+| Tests | `{{TEST_COMMAND}}` when `{{SOURCE_ROOT}}` touched | Same |
+| Version | `scripts/check_version.py` when version file bumped | Same |
 | Secrets | None in diff | Same |
 
 **Verdict:** `Ready` | `Needs fixes` | `Blocked`
@@ -184,7 +182,7 @@ In **promotion mode**, substitute `main` for `staging` in diff/log commands. On 
 
 Command: `/lsi:review`. Same **feature** vs **promotion** modes as readiness — feature diffs `staging...HEAD`; promotion diffs `main...HEAD` and allows ticket branch or **`staging`**.
 
-Follow [code-review.md](code-review.md). Worker focus: contracts, FFmpeg scope, tmp cleanup, no boto3 upload paths.
+Follow [code-review.md](code-review.md). Repo-specific focus areas (critical components, security constraints, version scope) are documented in the per-repo `openspec-git-integration.md` overlay.
 
 Save locally when asked: `.reviews/`, `.senior-analyses/` (gitignored).
 
@@ -197,7 +195,7 @@ Save locally when asked: `.reviews/`, `.senior-analyses/` (gitignored).
 | Overview | `proposal.md` → Why |
 | Changes | What Changes + `design.md` |
 | Potential risks | `design.md` + review |
-| Testing | `tasks.md` + `TEST_COMMAND` from [PROJECT.md](../../PROJECT.md) |
+| Testing | `tasks.md` + `{{TEST_COMMAND}}` from [PROJECT.md](../../PROJECT.md) |
 | Related | `openspec/changes/<slug>/` + Trello id |
 
 ---
@@ -286,6 +284,6 @@ Cursor stores slash commands as files under `.cursor/commands/` with **hyphen** 
 ## What we do not do
 
 - Manual branches without Trello id.
-- Task work on `main` or `staging` (except card-setup: `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch` on `main` or `staging`).
+- Task work on `main` or `staging` (except card-setup: `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch` on protected branches).
 - `gh pr create` or GitHub releases.
 - Auto-commit or auto-open PRs without explicit request.
