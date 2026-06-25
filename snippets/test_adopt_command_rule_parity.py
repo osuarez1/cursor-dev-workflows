@@ -14,6 +14,7 @@ from types import ModuleType
 BUNDLE_ROOT = Path(__file__).resolve().parents[1]
 ADOPT_SCRIPT = BUNDLE_ROOT / "snippets" / "adopt.py"
 AUDIT_SCRIPT = BUNDLE_ROOT / "snippets" / "audit-agent-docs.py"
+VERIFY_ADOPTERS_SCRIPT = BUNDLE_ROOT / "snippets" / "verify-adopters.py"
 
 
 def load_module(path: Path, name: str) -> ModuleType:
@@ -28,6 +29,7 @@ def load_module(path: Path, name: str) -> ModuleType:
 
 adopt = load_module(ADOPT_SCRIPT, "adopt_parity")
 audit = load_module(AUDIT_SCRIPT, "audit_parity")
+verify_adopters = load_module(VERIFY_ADOPTERS_SCRIPT, "verify_adopters_parity")
 
 
 MINIMAL_CONFIG = """\
@@ -142,6 +144,57 @@ class AdoptCommandRuleParityTests(unittest.TestCase):
                 if f.category == "agent_stack_parity" and "code_review" in f.message
             ]
             self.assertFalse(alias_errors, "legacy alias should have been removed")
+
+
+class OpsxDelegationTests(unittest.TestCase):
+    """Bundle does not manage opsx-* commands; parity ignores the opsx namespace."""
+
+    def test_adopt_does_not_install_opsx_commands(self) -> None:
+        """adopt installs only lsi-* commands; no opsx-* files are written."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            _run_adopt(target, MINIMAL_CONFIG)
+            cmd_dir = target / ".cursor" / "commands"
+            opsx = list(cmd_dir.glob("opsx-*.md"))
+            self.assertEqual(opsx, [], f"adopt wrote opsx commands: {opsx}")
+            self.assertTrue(
+                (cmd_dir / "lsi-commit.md").is_file(), "expected lsi commands installed"
+            )
+
+    def test_parity_ignores_opsx_commands(self) -> None:
+        """An adopter-owned opsx-* command is never flagged surplus and never removed."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            _run_adopt(target, MINIMAL_CONFIG)
+            # OpenSpec-owned command present in the adopter (e.g. from openspec init).
+            opsx_cmd = target / ".cursor" / "commands" / "opsx-apply.md"
+            opsx_cmd.write_text("# opsx\n", encoding="utf-8")
+
+            findings = audit.check_agent_stack_parity(target)
+            opsx_errs = [
+                f for f in findings
+                if f.category == "agent_stack_parity" and "opsx-apply" in f.message
+            ]
+            self.assertEqual(opsx_errs, [], "opsx command must not be flagged surplus")
+
+    def test_resolve_preserve_globs_for_registered_adopter(self) -> None:
+        """verify-adopters resolves patch preserve globs from PROJECT.md REPO_NAME."""
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            repo.joinpath("PROJECT.md").write_text(
+                "| Token | Value |\n|---|---|\n| `REPO_NAME` | `video-encoder` |\n",
+                encoding="utf-8",
+            )
+            preserve = verify_adopters.resolve_preserve_globs(repo)
+            self.assertIn(".cursor/rules/ffmpeg.mdc", preserve)
+
+    def test_resolve_preserve_globs_unregistered_defaults_empty(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp)
+            repo.joinpath("PROJECT.md").write_text(
+                "| `REPO_NAME` | `no-such-repo-xyz` |\n", encoding="utf-8"
+            )
+            self.assertEqual(verify_adopters.resolve_preserve_globs(repo), [])
 
 
 if __name__ == "__main__":

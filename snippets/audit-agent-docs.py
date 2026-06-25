@@ -46,7 +46,6 @@ _eas = _ilu.module_from_spec(_eas_spec)  # type: ignore[arg-type]
 _eas_spec.loader.exec_module(_eas)  # type: ignore[union-attr]
 
 LSI_COMMANDS = _eas.LSI_COMMANDS
-OPSX_COMMANDS = list(_eas.OPSX_COMMANDS)
 
 
 @dataclass
@@ -207,7 +206,7 @@ def check_commands(repo_root: Path) -> list[Finding]:
             )
         ]
     present = {p.stem for p in cmd_dir.glob("*.md")}
-    for name in LSI_COMMANDS + OPSX_COMMANDS:
+    for name in LSI_COMMANDS:
         if name not in present:
             findings.append(
                 Finding(
@@ -223,7 +222,6 @@ def check_commands(repo_root: Path) -> list[Finding]:
 def check_agent_stack_parity(
     repo_root: Path,
     *,
-    sync_opsx: bool = False,
     extra_rules: list[str] | None = None,
     preserve_globs: list[str] | None = None,
 ) -> list[Finding]:
@@ -232,12 +230,15 @@ def check_agent_stack_parity(
     - Missing expected files: WARN
     - Surplus files not in expected set and not allowlisted: ERROR
     - Legacy alias pairs both present: ERROR
+
+    Commands in an unmanaged namespace (e.g. `opsx-*`, owned by OpenSpec) are
+    ignored entirely: never expected, never flagged surplus, never removed.
     """
     findings: list[Finding] = []
     cmd_dir = repo_root / ".cursor" / "commands"
     rules_dir = repo_root / ".cursor" / "rules"
 
-    exp_cmds = _eas.expected_commands(sync_opsx=sync_opsx)
+    exp_cmds = _eas.expected_commands()
     exp_rules = _eas.expected_rules(extra_rules)
     alias_pairs = _eas.legacy_rule_aliases()
 
@@ -269,7 +270,7 @@ def check_agent_stack_parity(
                     )
                 )
         for name in sorted(present_cmds - exp_cmds):
-            if name in preserved_cmds:
+            if name in preserved_cmds or _eas.is_unmanaged_command(name):
                 continue
             findings.append(
                 Finding(
@@ -412,7 +413,6 @@ def audit(
     extra_paths: list[Path] | None = None,
     *,
     check_parity: bool = False,
-    sync_opsx: bool = False,
     extra_rules: list[str] | None = None,
     preserve_globs: list[str] | None = None,
 ) -> list[Finding]:
@@ -426,7 +426,6 @@ def audit(
         findings.extend(
             check_agent_stack_parity(
                 repo_root,
-                sync_opsx=sync_opsx,
                 extra_rules=extra_rules,
                 preserve_globs=preserve_globs,
             )
@@ -496,16 +495,19 @@ def main(argv: list[str] | None = None) -> int:
         help="Also run agent-stack parity check (surplus/missing commands and rules)",
     )
     parser.add_argument(
-        "--sync-opsx",
-        action="store_true",
-        help="Expect all opsx-* commands (for repos with sync_opsx: true)",
+        "--preserve",
+        action="append",
+        default=None,
+        metavar="GLOB",
+        help="Glob (relative to repo root) for adopter-owned files the parity check must "
+        "not flag as surplus (e.g. patch `preserve` entries). Repeatable.",
     )
     args = parser.parse_args(argv)
 
     raw_findings = audit(
         args.repo_root.resolve(),
         check_parity=args.check_parity,
-        sync_opsx=getattr(args, "sync_opsx", False),
+        preserve_globs=args.preserve,
     )
     accepted_map = load_resolutions(
         args.accept_resolutions.resolve() if args.accept_resolutions else None
