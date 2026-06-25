@@ -1,9 +1,12 @@
 # Copy to patches/<repo>.yaml and fill in. See docs/adopt-new-repo.md.
+# Supported agents: Cursor (.cursor/commands/, .cursor/rules/) + Claude (.claude/commands/).
+# Legacy keys agents_opencode, agents_junie, agents_jetbrains, bin are NOT supported and will
+# cause adopt to exit with an error.
 repo: my-repo
 overlay: lsi
 layout: lsi
 canonical: .lsi/workflows
-sync_opsx: false  # true only to overwrite root .cursor/commands/opsx-* from bundle
+sync_opsx: false  # true to install all opsx-* commands to .cursor/commands/
 
 project:
   REPO_NAME: my-repo

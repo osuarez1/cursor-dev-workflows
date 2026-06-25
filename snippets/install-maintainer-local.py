@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install gitignored .cursor/ stack for bundle maintainers (this repo only).
+"""Install gitignored .cursor/ stack and tracked .claude/commands/ for bundle maintainers.
 
 Copies slash commands from overlays/lsi/agent-stack/commands/ with path rewrites
 for the bundle repo layout. Re-run after overlay command changes:
@@ -21,6 +21,7 @@ MAINTAINER_RULES = BUNDLE_ROOT / "snippets" / "maintainer-local" / "rules"
 CURSOR_RULES_SNIPPETS = BUNDLE_ROOT / "snippets" / "cursor-rules"
 CURSOR_COMMANDS = BUNDLE_ROOT / ".cursor" / "commands"
 CURSOR_RULES = BUNDLE_ROOT / ".cursor" / "rules"
+CLAUDE_COMMANDS = BUNDLE_ROOT / ".claude" / "commands"
 
 # Overlay commands use paths relative to overlays/lsi/agent-stack/commands/.
 # From .cursor/commands/ at repo root, rewrite LSI-only and template paths.
@@ -55,11 +56,34 @@ COMMAND_REWRITES: list[tuple[re.Pattern[str], str]] = [
     ),
 ]
 
+_FRONTMATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
+_DESCRIPTION_RE = re.compile(r"^description:\s*(.+)$", re.MULTILINE)
+
 
 def transform_command(text: str) -> str:
     for pattern, repl in COMMAND_REWRITES:
         text = pattern.sub(repl, text)
     return text
+
+
+def _claude_frontmatter(text: str) -> str:
+    """Replace multi-field cursor frontmatter with minimal Claude description-only header."""
+    m = _FRONTMATTER_RE.match(text)
+    if not m:
+        return text
+    frontmatter = m.group(0)
+    desc_m = _DESCRIPTION_RE.search(frontmatter)
+    description = desc_m.group(1).strip() if desc_m else ""
+    body = text[m.end():]
+    return f"---\ndescription: {description}\n---\n{body}"
+
+
+def _claude_subdir(stem: str) -> tuple[str, str]:
+    """Return (subdir, filename) for a command stem like 'lsi-branch' → ('lsi', 'branch')."""
+    for prefix in ("lsi-", "opsx-"):
+        if stem.startswith(prefix):
+            return prefix.rstrip("-"), stem[len(prefix):]
+    return "", stem
 
 
 def install_commands() -> int:
@@ -73,6 +97,27 @@ def install_commands() -> int:
         (CURSOR_COMMANDS / src.name).write_text(content, encoding="utf-8")
         count += 1
     print(f"Installed {count} slash commands → .cursor/commands/")
+    return 0
+
+
+def install_claude_commands() -> int:
+    """Generate .claude/commands/ from overlay sources (tracked in bundle git)."""
+    if not OVERLAY_COMMANDS.is_dir():
+        print(f"Missing overlay commands: {OVERLAY_COMMANDS}", file=sys.stderr)
+        return 1
+    count = 0
+    for src in sorted(OVERLAY_COMMANDS.glob("*.md")):
+        raw = src.read_text(encoding="utf-8")
+        content = _claude_frontmatter(transform_command(raw))
+        subdir, name = _claude_subdir(src.stem)
+        if subdir:
+            dst_dir = CLAUDE_COMMANDS / subdir
+        else:
+            dst_dir = CLAUDE_COMMANDS
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        (dst_dir / f"{name}.md").write_text(content, encoding="utf-8")
+        count += 1
+    print(f"Installed {count} Claude commands → .claude/commands/")
     return 0
 
 
@@ -94,6 +139,9 @@ def install_rules() -> int:
 
 def main() -> int:
     code = install_commands()
+    if code:
+        return code
+    code = install_claude_commands()
     if code:
         return code
     return install_rules()
