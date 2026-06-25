@@ -157,5 +157,83 @@ class AdoptLinksRegressionTests(unittest.TestCase):
         self.assertIn(f"v{bundle_version}", adopt_doc)
 
 
+    def _adopt_commands(self, repo_name: str, test_cmd: str, source_root: str, protected: str) -> dict[str, str]:
+        """Adopt into a temp dir and return {filename: content} for lsi-*.md commands."""
+        cfg_text = (
+            f"repo: {repo_name}\n"
+            "overlay: lsi\n"
+            "layout: lsi\n"
+            "canonical: .lsi/workflows\n"
+            "project:\n"
+            f"  REPO_NAME: {repo_name}\n"
+            f"  TEST_COMMAND: \"{test_cmd}\"\n"
+            "  BASE_BRANCH: main\n"
+            f"  PROTECTED_BRANCHES: \"{protected}\"\n"
+            f"  SOURCE_ROOT: \"{source_root}\"\n"
+            f"  TITLE_PREFIX: \"X | \"\n"
+            "  PR_HOST: Bitbucket\n"
+            f"  BITBUCKET_REMOTE: lsi/{repo_name}\n"
+            "  PR_WARN_FILES: \"15\"\n"
+            "  PR_MAX_FILES: \"25\"\n"
+            "  PR_WARN_LINES: \"250\"\n"
+            "  PR_MAX_LINES: \"400\"\n"
+            "  PR_MAX_COMMITS: \"12\"\n"
+            "  PR_MAX_PRIMARY_CONCERNS: \"1\"\n"
+            "  PR_MAX_SCOPES: \"3\"\n"
+            "bootstrap:\n"
+            "  version.txt: \"0.1.0\"\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            target = Path(tmpdir)
+            cfg_path = target / "patch.yaml"
+            cfg_path.write_text(cfg_text, encoding="utf-8")
+            (target / "PROJECT.md").write_text("# stub\n", encoding="utf-8")
+            seed_link_targets(target)
+            config = adopt.load_config(cfg_path)
+            bundle_version = (BUNDLE_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+            tokens = {**adopt.build_tokens(config), "BUNDLE_VERSION": bundle_version}
+            adopt.copy_core_bundle(target, tokens)
+            adopt.copy_overlay(target, tokens, config)
+            adopt.install_agent_stack(target, tokens, config)
+            cmds_dir = target / ".cursor" / "commands"
+            return {
+                p.name: p.read_text(encoding="utf-8")
+                for p in sorted(cmds_dir.glob("lsi-*.md"))
+            }
+
+    def test_lsi_commands_byte_identical_across_repos(self) -> None:
+        """lsi-*.md commands are byte-identical regardless of per-repo project tokens."""
+        adopted = {
+            "repo-rails": self._adopt_commands("repo-rails", "bin/check && bin/rspec", "app/, lib/", "main, staging, master"),
+            "repo-python": self._adopt_commands("repo-python", "pytest", "src/", "main, staging"),
+            "repo-make": self._adopt_commands("repo-make", "make test", "frontend/, backend/", "main"),
+        }
+        base_name, base_cmds = "repo-rails", adopted["repo-rails"]
+        diffs: list[str] = []
+        for other_name, other_cmds in adopted.items():
+            if other_name == base_name:
+                continue
+            for fname in sorted(set(base_cmds) | set(other_cmds)):
+                if base_cmds.get(fname) != other_cmds.get(fname):
+                    diffs.append(f"{fname}: differs between {base_name!r} and {other_name!r}")
+        self.assertEqual(diffs, [], msg="\n".join(diffs))
+
+    def test_adopted_commands_have_no_domain_strings(self) -> None:
+        """After adoption, lsi-*.md commands contain no repo-specific domain strings."""
+        domain_strings = [
+            "FFmpeg", "fastapi", "FastAPI", "rspec", "pytest",
+            "make test", "bin/check-schema-sync", "uv run pytest",
+        ]
+        self.run_adopt()
+        cmds_dir = self.target / ".cursor" / "commands"
+        hits: list[str] = []
+        for md in sorted(cmds_dir.glob("lsi-*.md")):
+            text = md.read_text(encoding="utf-8")
+            for needle in domain_strings:
+                if needle in text:
+                    hits.append(f"{md.name}: contains {needle!r}")
+        self.assertEqual(hits, [], msg="\n".join(hits))
+
+
 if __name__ == "__main__":
     unittest.main()
