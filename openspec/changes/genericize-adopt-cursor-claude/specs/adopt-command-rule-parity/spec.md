@@ -6,8 +6,13 @@
 
 #### Scenario: Surplus command is reported
 
-- **WHEN** an adopter has an extra `.cursor/commands/opsx-new.md` not in the expected set and not covered by `preserve_agent_stack`
+- **WHEN** an adopter has an extra `.cursor/commands/legacy-helper.md` (a bundle-managed-namespace command not in the expected set) not covered by `preserve_agent_stack`
 - **THEN** `check_agent_stack_parity` SHALL report an error with the actionable path list
+
+#### Scenario: OpenSpec commands are exempt from surplus detection
+
+- **WHEN** an adopter has `.cursor/commands/opsx-*.md` files (owned by OpenSpec)
+- **THEN** `check_agent_stack_parity` SHALL NOT report them as surplus
 
 #### Scenario: Legacy alias pair is reported
 

@@ -80,19 +80,19 @@ def _claude_frontmatter(text: str) -> str:
 
 def _claude_subdir(stem: str) -> tuple[str, str]:
     """Return (subdir, filename) for a command stem like 'lsi-branch' → ('lsi', 'branch')."""
-    for prefix in ("lsi-", "opsx-"):
-        if stem.startswith(prefix):
-            return prefix.rstrip("-"), stem[len(prefix):]
+    if stem.startswith("lsi-"):
+        return "lsi", stem[len("lsi-"):]
     return "", stem
 
 
 def install_commands() -> int:
+    """Install LSI slash commands to .cursor/commands/ (OpenSpec commands excluded)."""
     if not OVERLAY_COMMANDS.is_dir():
         print(f"Missing overlay commands: {OVERLAY_COMMANDS}", file=sys.stderr)
         return 1
     CURSOR_COMMANDS.mkdir(parents=True, exist_ok=True)
     count = 0
-    for src in sorted(OVERLAY_COMMANDS.glob("*.md")):
+    for src in sorted(OVERLAY_COMMANDS.glob("lsi-*.md")):
         content = transform_command(src.read_text(encoding="utf-8"))
         (CURSOR_COMMANDS / src.name).write_text(content, encoding="utf-8")
         count += 1
@@ -101,19 +101,19 @@ def install_commands() -> int:
 
 
 def install_claude_commands() -> int:
-    """Generate .claude/commands/ from overlay sources (tracked in bundle git)."""
+    """Generate .claude/commands/lsi/ from LSI overlay sources (tracked in bundle git).
+
+    OpenSpec (`opsx-*`) commands are owned by OpenSpec and not generated here.
+    """
     if not OVERLAY_COMMANDS.is_dir():
         print(f"Missing overlay commands: {OVERLAY_COMMANDS}", file=sys.stderr)
         return 1
     count = 0
-    for src in sorted(OVERLAY_COMMANDS.glob("*.md")):
+    for src in sorted(OVERLAY_COMMANDS.glob("lsi-*.md")):
         raw = src.read_text(encoding="utf-8")
         content = _claude_frontmatter(transform_command(raw))
         subdir, name = _claude_subdir(src.stem)
-        if subdir:
-            dst_dir = CLAUDE_COMMANDS / subdir
-        else:
-            dst_dir = CLAUDE_COMMANDS
+        dst_dir = CLAUDE_COMMANDS / subdir if subdir else CLAUDE_COMMANDS
         dst_dir.mkdir(parents=True, exist_ok=True)
         (dst_dir / f"{name}.md").write_text(content, encoding="utf-8")
         count += 1

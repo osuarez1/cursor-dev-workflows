@@ -11,21 +11,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ### Adopters
 
-**Registered LSI adopters must run `/lsi:update`** after pulling this bundle release. Adopt output changed: 6 new OPSX commands, genericized LSI commands (domain moved to per-repo integration doc), parity gate on every update, and per-repo `openspec-git-integration.md` overlays.
+**Registered LSI adopters must run `/lsi:update`** after pulling this bundle release. Adopt output changed: genericized LSI commands (domain moved to per-repo integration doc), parity gate on every update, and per-repo `openspec-git-integration.md` overlays. OpenSpec (`opsx-*`) slash commands are now owned by OpenSpec (`openspec init` / config profile) — the bundle no longer installs, regenerates, or removes them.
 
 ### Added
 
 - **Cursor + Claude only policy** — `adopt.py` rejects configs with `agents_opencode`, `agents_junie`, `agents_jetbrains`, or `bin` keys; forbidden dirs removed from bundle and added to `.gitignore`
-- **6 new OPSX commands** — `opsx-new`, `opsx-ff`, `opsx-continue`, `opsx-onboard`, `opsx-verify`, `opsx-bulk-archive` (generic; installed via `sync_opsx: true`)
 - **`snippets/expected_agent_stack.py`** — single source of truth for expected command/rule sets; imported by `audit-agent-docs.py` and `verify-adopters.py`
 - **`check_agent_stack_parity()`** in `audit-agent-docs.py` — detects missing (WARN), surplus (ERROR), and legacy alias pairs (ERROR); wired into `verify-all-adopters.sh`
 - **Parity gate in `update-workflows.py`** — after adopt, lists surplus/legacy paths and asks adopter which to remove; never auto-prunes
 - **`rule_overlays` in `adopt.py`** — patch YAML key to install repo-specific `.cursor/rules/*.mdc` files from bundle sources
 - **Per-repo integration docs** — `patches/files/{web,ai-agent,video-encoder}/openspec-git-integration.md` with domain commit mapping, test gates, and review checklists
-- **`sync_opsx: true`** on all three registered patches (`web`, `ai-agent`, `video-encoder`)
 - **`snippets/test_supported_agents_only.py`** — 6 tests: git tree has no forbidden dirs, legacy keys raise SystemExit, adopt output clean
 - **`snippets/test_commands_generic.py`** — 3 tests: no domain strings, no domain scope phrases, LSI commands defer to integration doc
-- **`snippets/test_adopt_command_rule_parity.py`** — 5 tests: parity detection, surplus command detection, legacy alias detection, clean after remove_after_adopt
+- **`snippets/test_adopt_command_rule_parity.py`** — 9 tests: parity detection, surplus command/legacy-alias detection, clean after remove_after_adopt, opsx delegation (adopt installs no opsx, parity ignores opsx namespace), and `verify-adopters` preserve-glob resolution
+- **`audit-agent-docs.py --preserve`** — repeatable CLI flag so the parity check honors adopter-owned files (patch `preserve` entries) instead of flagging them surplus
 - **`test_lsi_commands_byte_identical_across_repos`** + **`test_adopted_commands_have_no_domain_strings`** added to `test_adopt_links.py`
 
 ### Changed
@@ -33,9 +32,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 - **LSI command genericization** — `lsi-review`, `lsi-commit`, `lsi-senior`, `lsi-readiness`, `lsi-pr`, `lsi-promote`, `lsi-merge-desc` defer all domain content (test commands, commit scopes, review checklists) to per-repo `openspec-git-integration.md`; no `{{TEST_COMMAND}}` token in command sources — commands are byte-identical across repos
 - **Generic `openspec-git-integration.md` baseline** — title, commit mapping, test gate, and review sections genericized; `{{TEST_COMMAND}}` / `{{SOURCE_ROOT}}` tokens as placeholders (overridden by per-repo overlay)
 - **`which-workflow.md`** — "runtime-critical, integration-heavy, multi-module" replaces "FFmpeg, contracts, multi-module"
-- **`patches/_template.yaml`** and `patches/README.md`** — document supported agents policy, `rule_overlays` key, and `sync_opsx`
+- **`patches/_template.yaml`** and `patches/README.md`** — document supported agents policy, `rule_overlays` key, and OpenSpec command delegation (bundle manages `lsi-*` only)
 - **`lsi-update.md`** — step 5 documents the post-adopt parity check flow
 - **`install-maintainer-local.py`** — `install_claude_commands()` generates `.claude/commands/{lsi,opsx}/` from overlay sources with stripped frontmatter
+- **`verify-adopters.py` parity accuracy** — auto-resolves `preserve` globs from each adopter's registered patch (via `PROJECT.md` `REPO_NAME` → `patches/<repo>.yaml`) and forwards them to the audit, so preserved domain rules (e.g. `ffmpeg.mdc`) are not reported as surplus
+- **OpenSpec commands delegated to OpenSpec** — the bundle no longer ships, installs, regenerates, or removes `opsx-*` slash commands; `adopt.py` installs `lsi-*` only and the parity gate ignores the `opsx-*` namespace (owned by `openspec init` / config profile)
 
 ### Removed
 

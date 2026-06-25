@@ -42,6 +42,8 @@ Paths for this workspace:
 
 This bundle emits artifacts for **Cursor** (`.cursor/commands/`, `.cursor/rules/`) and **Claude** (`.claude/commands/`) only. OpenCode, Junie, JetBrains AI, and workflow shell wrappers (`bin/lsi-*`, `bin/opsx-*`) are not supported. Legacy keys `agents_opencode`, `agents_junie`, `agents_jetbrains`, and `bin` cause adopt to exit with an error.
 
+The bundle installs **LSI** (`lsi-*`) slash commands only. **OpenSpec** (`opsx-*`) commands are owned by OpenSpec (`openspec init` / config profile): adopt never installs or removes them, and the parity gate ignores the `opsx-*` namespace.
+
 ## Patch YAML keys
 
 | Key | Purpose |
@@ -53,7 +55,6 @@ This bundle emits artifacts for **Cursor** (`.cursor/commands/`, `.cursor/rules/
 | `remove_after_adopt` | Delete pre-listed legacy paths after adopt (no interactive prompt) |
 | `agents_claude` | `AGENTS.md` canonical + `CLAUDE.md` symlink |
 | `bootstrap` | Create `version.txt` / `VERSION` if missing |
-| `sync_opsx` | Install all `opsx-*.md` commands to `.cursor/commands/` (default `false`) |
 | `ci_hook.add_check_version` | Document only — see `docs/ci/` |
 
 Full token list: [docs/token-registry.md](../docs/token-registry.md).

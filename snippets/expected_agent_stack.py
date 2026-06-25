@@ -4,8 +4,14 @@ Single source of truth for:
 - expected_commands(): cursor command basenames that every adopter must have
 - expected_rules(): cursor rule filenames that every adopter must have
 - legacy_rule_aliases(): pairs that must not coexist (legacy alias duplication)
+- is_unmanaged_command(): commands the bundle neither installs nor removes
 
 Used by audit-agent-docs.py (check_agent_stack_parity) and verify-adopters.py.
+
+Scope: this bundle manages **LSI** (`lsi-*`) slash commands only. **OpenSpec**
+(`opsx-*`) commands are owned by OpenSpec itself (`openspec init` / config
+profile); the bundle does not install, regenerate, or remove them, and the
+parity gate ignores the `opsx-` namespace entirely.
 """
 
 from __future__ import annotations
@@ -16,7 +22,7 @@ BUNDLE_ROOT = Path(__file__).resolve().parents[1]
 COMMANDS_DIR = BUNDLE_ROOT / "overlays" / "lsi" / "agent-stack" / "commands"
 CURSOR_RULES_DIR = BUNDLE_ROOT / "snippets" / "cursor-rules"
 
-# Commands always installed regardless of sync_opsx.
+# Commands the bundle installs and verifies on every adopter.
 LSI_COMMANDS = [
     "lsi-help",
     "lsi-card",
@@ -39,20 +45,10 @@ LSI_COMMANDS = [
     "lsi-update",
 ]
 
-# OPSX commands installed when sync_opsx: true.
-OPSX_COMMANDS = [
-    "opsx-explore",
-    "opsx-propose",
-    "opsx-apply",
-    "opsx-sync",
-    "opsx-archive",
-    "opsx-new",
-    "opsx-ff",
-    "opsx-continue",
-    "opsx-onboard",
-    "opsx-verify",
-    "opsx-bulk-archive",
-]
+# Command namespaces the bundle does NOT manage. Files with these prefixes are
+# owned by an external tool (OpenSpec) and must never be installed, regenerated,
+# or flagged as surplus by the parity gate.
+UNMANAGED_COMMAND_PREFIXES = ("opsx-",)
 
 # Rules installed by adopt on every adopter.
 ALWAYS_ON_RULES = [
@@ -72,19 +68,21 @@ LEGACY_RULE_ALIAS_PAIRS = [
 ]
 
 
-def expected_commands(*, sync_opsx: bool = False) -> set[str]:
+def is_unmanaged_command(name: str) -> bool:
+    """Return True for command basenames the bundle delegates to another tool.
+
+    `name` is a command basename without the .md extension (e.g. ``opsx-apply``).
+    """
+    return name.startswith(UNMANAGED_COMMAND_PREFIXES)
+
+
+def expected_commands() -> set[str]:
     """Return expected cursor command basenames (without .md extension).
 
-    If sync_opsx is True, includes all opsx-* commands.
-    Otherwise includes only the base opsx-* commands that are always installed.
+    Only LSI commands are bundle-managed; OpenSpec commands are delegated to
+    OpenSpec and intentionally excluded.
     """
-    base_opsx = {"opsx-explore", "opsx-propose", "opsx-apply", "opsx-sync", "opsx-archive"}
-    cmds = set(LSI_COMMANDS)
-    if sync_opsx:
-        cmds.update(OPSX_COMMANDS)
-    else:
-        cmds.update(base_opsx)
-    return cmds
+    return set(LSI_COMMANDS)
 
 
 def expected_rules(extra_rules: list[str] | None = None) -> set[str]:

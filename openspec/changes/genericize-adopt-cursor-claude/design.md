@@ -37,9 +37,9 @@ Three-layer model (from drift audit):
 | D1 | Delete (not deprecate) multi-tool adopt flags; adopt errors on legacy YAML keys (`agents_opencode`, `agents_junie`, `agents_jetbrains`, `bin`) |
 | D2 | Commands defer to `openspec-git-integration.md` § Commit mapping / Code review — no per-repo `command_overlays` unless step flow differs |
 | D3 | `rule_overlays` in `adopt.py` mirrors `command_overlays` |
-| D4 | `sync_opsx: true` default for registered patches once OPSX commands ship |
+| D4 | OpenSpec (`opsx-*`) commands are owned by OpenSpec (`openspec init` / config profile). The bundle ships no `opsx-*` sources; `adopt.py` installs `lsi-*` only and never installs/removes `opsx-*`; the parity gate ignores the `opsx-*` namespace. No `sync_opsx` key. |
 | D5 | Pre-release gate order: `test_supported_agents_only` → `test_commands_generic` → `test_adopt_command_rule_parity` → `test_adopt_links` → temp adopts |
-| D6 | Expected command/rule sets derived from bundle `overlays/lsi/agent-stack/commands/*.md` + `snippets/cursor-rules/*.md` + patch `rule_overlays` — single helper (`expected_agent_stack.py`), not three hardcoded lists |
+| D6 | Expected command/rule sets derived from bundle `overlays/lsi/agent-stack/commands/lsi-*.md` + `snippets/cursor-rules/*.md` + patch `rule_overlays` — single helper (`expected_agent_stack.py`), not three hardcoded lists |
 | D7 | Gate **detects** surplus/duplicate commands and rules and **blocks verify PASS** until resolved — adopt **never silently deletes** adopter files; removal only after explicit adopter confirmation during `/lsi:update` or via pre-listed `remove_after_adopt` in patch YAML |
 | D8 | Pre-listed `remove_after_adopt` in `patches/<repo>.yaml` = adopter-maintainer decision documented in patch (no per-run prompt); **interactive surplus** = gate finds unexpected extras → ask → delete only if confirmed |
 

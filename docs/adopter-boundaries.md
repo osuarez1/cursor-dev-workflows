@@ -3,7 +3,7 @@
 ## Adopt manages
 
 - `.lsi/workflows/**`
-- `.cursor/commands/lsi-*.md` (and `opsx-*` when `sync_opsx: true`)
+- `.cursor/commands/lsi-*.md`
 - `.cursor/rules/branch-workflow.mdc`, `openspec-git-integration.mdc`, `commit-pr-conventions.mdc`
 - `CONVENTION.md` `<!-- lsi:commits -->` block
 - `AGENTS.md` / `.cursorrules` workflow marker blocks
@@ -12,6 +12,7 @@
 
 ## Adopt never touches
 
+- `.cursor/commands/opsx-*.md` (OpenSpec commands — owned by `openspec init` / config profile)
 - `bitbucket-pipelines.yml` (document CI hook only)
 - App domain docs in `docs/workflows/` listed under `preserve`
 - Domain `.mdc` rules (ffmpeg, rails, etc.)

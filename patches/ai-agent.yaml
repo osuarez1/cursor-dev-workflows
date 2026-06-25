@@ -3,7 +3,6 @@ overlay: lsi
 layout: lsi
 canonical: .lsi/workflows
 audit_resolutions: patches/files/ai-agent/audit-resolutions.yaml
-sync_opsx: true
 project:
   REPO_NAME: ai-agent
   TITLE_PREFIX: "AI Agent | "

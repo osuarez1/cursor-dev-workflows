@@ -2,7 +2,6 @@ repo: video-encoder
 overlay: lsi
 layout: lsi
 canonical: .lsi/workflows
-sync_opsx: true
 project:
   REPO_NAME: video-encoder
   TITLE_PREFIX: "VE | "

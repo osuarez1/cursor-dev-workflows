@@ -345,12 +345,10 @@ def install_agent_stack(target: Path, tokens: dict[str, str], config: dict) -> N
             content = substitute_tokens(src.read_text(encoding="utf-8"), tokens)
             (rules_dir / mdc).write_text(content, encoding="utf-8")
 
-    sync_opsx = config.get("sync_opsx", False)
-    for cmd in sorted((OVERLAY_ROOT / "agent-stack" / "commands").glob("*.md")):
-        if cmd.name.startswith("opsx-") and not sync_opsx:
-            dst = cmds_dir / cmd.name
-            if dst.exists():
-                continue
+    # Install LSI commands only. OpenSpec (`opsx-*`) slash commands are owned by
+    # OpenSpec (`openspec init` / config profile); the bundle never installs or
+    # removes them.
+    for cmd in sorted((OVERLAY_ROOT / "agent-stack" / "commands").glob("lsi-*.md")):
         content = substitute_tokens(cmd.read_text(encoding="utf-8"), tokens)
         content = content.replace("docs/workflows/", ".lsi/workflows/")
         content = content.replace("../../docs/sdlc/", "../../.lsi/workflows/sdlc/")

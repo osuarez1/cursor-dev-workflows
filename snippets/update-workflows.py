@@ -162,12 +162,10 @@ def run_parity_check(
         print(f"Config error: {e}", file=sys.stderr)
         return 1
 
-    sync_opsx = config.get("sync_opsx", False)
     preserve_globs = list(config.get("preserve") or [])
 
     findings = audit_mod.check_agent_stack_parity(
         target,
-        sync_opsx=sync_opsx,
         preserve_globs=preserve_globs,
     )
 
@@ -216,7 +214,7 @@ def run_parity_check(
 
     # Re-run parity after cleanup
     findings_after = audit_mod.check_agent_stack_parity(
-        target, sync_opsx=sync_opsx, preserve_globs=preserve_globs
+        target, preserve_globs=preserve_globs
     )
     surplus_after = [
         f for f in findings_after
