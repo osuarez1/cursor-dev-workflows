@@ -1,0 +1,52 @@
+repo: stream-api
+overlay: lsi
+layout: lsi
+canonical: .lsi/workflows
+audit_resolutions: patches/files/stream-api/audit-resolutions.yaml
+project:
+  REPO_NAME: stream-api
+  TITLE_PREFIX: "API | "
+  BASE_BRANCH: main
+  PR_TARGET_BRANCH: staging
+  PROTECTED_BRANCHES: "main, staging, master"
+  SOURCE_ROOT: "app/, lib/"
+  TEST_ROOT: spec/
+  TEST_COMMAND: "bundle exec rspec"
+  PR_HOST: Bitbucket
+  BITBUCKET_REMOTE: lsistreaming/stream-api
+  PR_WARN_FILES: "15"
+  PR_MAX_FILES: "25"
+  PR_WARN_LINES: "250"
+  PR_MAX_LINES: "400"
+  PR_MAX_COMMITS: "12"
+  PR_MAX_PRIMARY_CONCERNS: "1"
+  PR_MAX_SCOPES: "3"
+scope_exclude_globs:
+  - Gemfile.lock
+preserve:
+  - bitbucket-pipelines.yml
+  - PROJECT.md
+  - openspec/**
+  - docs/workflows/postgres-app-test-database.md
+  - .cursor/commands/opsx-*.md
+  - .cursor/skills/**
+  - .claude/skills/**
+overlay_files:
+  openspec-git-integration.md: patches/files/stream-api/openspec-git-integration.md
+  test-requirements.md: patches/files/stream-api/test-requirements.md
+  versioning-and-releases.md: patches/files/stream-api/versioning-and-releases.md
+  ticket-card-info.md: patches/files/stream-api/ticket-card-info.md
+agents_claude:
+  canonical: AGENTS.md
+  claude_symlink: true
+  reconcile_sources:
+    - CLAUDE.md
+merge:
+  AGENTS.md:
+    markers: [lsi:workflows, lsi:domain]
+  cursorrules:
+    marker_block: lsi:workflows
+bootstrap:
+  version.txt: "0.1.0"
+ci_hook:
+  add_check_version: true

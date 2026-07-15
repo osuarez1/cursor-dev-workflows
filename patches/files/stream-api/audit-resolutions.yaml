@@ -1,0 +1,10 @@
+# Recorded decisions for stream-api first adopt (staging-first LSI overlay)
+- id: claude_symlink
+  choice: symlink_to_agents
+  note: "No pre-existing CLAUDE.md; AGENTS.md is canonical with CLAUDE.md symlink"
+- id: openspec_archive_timing
+  choice: lsi_close_on_main
+  note: "Keep OpenSpec opsx-* commands; use .lsi/workflows for LSI close on main"
+- id: pr_target
+  choice: staging_first
+  note: "Feature PRs target staging; /lsi:promote to main"

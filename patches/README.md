@@ -11,6 +11,8 @@ Each LSI application repo has a `patches/<repo>.yaml` consumed by `snippets/adop
 | [video-encoder.yaml](video-encoder.yaml) | video-encoder | `version.txt` | `main`, `staging` |
 | [web.yaml](web.yaml) | web | `version.txt` | `main`, `staging`, `master` |
 | [ai-agent.yaml](ai-agent.yaml) | ai-agent (monorepo) | `VERSION` | `main`, `staging`, `test` |
+| [office-assistant.yaml](office-assistant.yaml) | office-assistant (monorepo) | `VERSION` | `main`, `staging` |
+| [stream-api.yaml](stream-api.yaml) | stream-api | `version.txt` | `main`, `staging`, `master` |
 | [_template.yaml](_template.yaml) | — copy for new repos | configurable | configurable |
 
 Per-repo markdown overlays: `patches/files/<repo>/` (template: `patches/files/_template/`).
@@ -37,6 +39,8 @@ Paths for this workspace:
 | video-encoder | `../video-encoder` |
 | web | `../web` |
 | ai-agent | `../agents/ai-agent` |
+| office-assistant | `../office-assistant` |
+| stream-api | `../stream-api` |
 
 ## Supported agents
 

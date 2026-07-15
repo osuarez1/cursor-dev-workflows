@@ -11,6 +11,7 @@ Step-by-step for registering and adopting a **new** application repo into the LS
 | [patches/video-encoder.yaml](../patches/video-encoder.yaml) | `../video-encoder` | Python worker; `version.txt` |
 | [patches/web.yaml](../patches/web.yaml) | `../web` | Rails; `master` protected; app docs in `docs/workflows/` |
 | [patches/ai-agent.yaml](../patches/ai-agent.yaml) | `../agents/ai-agent` | Monorepo; `VERSION`; `test` protected |
+| [patches/stream-api.yaml](../patches/stream-api.yaml) | `../stream-api` | Rails API; `version.txt`; `master` protected; OpenSpec `opsx-*` preserved |
 
 ## 1. Create patch YAML
 
