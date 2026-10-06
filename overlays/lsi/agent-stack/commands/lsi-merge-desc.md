@@ -147,3 +147,5 @@ Related
 - First line of the copy block is PR title in Conventional Commits form.
 - **Do not** use `gh pr view` unless user explicitly asks and `PR_HOST` is GitHub.
 - Squash merge: use PR title as squash subject and shortened Overview — not this extended format.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

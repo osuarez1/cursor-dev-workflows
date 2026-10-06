@@ -2,12 +2,12 @@
 name: /lsi-readiness
 id: lsi-readiness
 category: Workflow
-description: PR production readiness with test gate
+description: PR production readiness with local TEST_COMMAND gate
 ---
 
 Run PR production readiness checks for the active OpenSpec change before opening or merging a PR.
 
-**Canonical source:** [pr-production-readiness.md](../../docs/workflows/pr-production-readiness.md) · [`docs/workflows/openspec-git-integration.md` § PR production readiness](../../docs/workflows/openspec-git-integration.md#pr-production-readiness)
+**Canonical source:** [pr-production-readiness.md](../../docs/workflows/pr-production-readiness.md) · [`docs/workflows/openspec-git-integration.md` § PR production readiness](../../docs/workflows/openspec-git-integration.md#pr-production-readiness) · [PROJECT.md](../../PROJECT.md) (`TEST_COMMAND`)
 
 **Input:** Optionally specify change slug. Use **promotion mode** when invoked from `/lsi:promote` or when the PR target is **`main`**.
 
@@ -35,10 +35,11 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 
 3. **Run CI gates locally (required)**
 
-   Run the test command per [`docs/workflows/openspec-git-integration.md` § PR production readiness](../../docs/workflows/openspec-git-integration.md#pr-production-readiness) (also in `PROJECT.md` as `TEST_COMMAND`).
+   Use **`TEST_COMMAND` from [PROJECT.md](../../PROJECT.md)**. Cite the integration doc § PR production readiness for repo-specific notes.
 
    - Fix failures before reporting `Ready`.
-   - Docs-only changes: run tests if source changed; document exemption explicitly if CI would not apply.
+   - Docs-only / OpenSpec-only with no `SOURCE_ROOT` / `TEST_ROOT` changes: document exemption (**N/A**) instead of inventing a suite.
+   - Do **not** hardcode adopter test runners in this shared command.
 
 4. **Review diff scope**
 
@@ -56,15 +57,7 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 
    Read `proposal.md`, `design.md`, `tasks.md` — confirm implementation matches ticket.
 
-5. **PR metadata preview**
-
-   - Title: Conventional Commits — primary theme of change
-   - Body sections: Overview, Changes, Potential risks, Testing, Related
-   - Related: `openspec/changes/<slug>/proposal.md` + Trello card id/URL
-   - PR target: **`staging`** (feature) or **`main`** (promotion)
-   - Promotion: note staging QA passed; call out if diff is a cumulative staging catch-up
-
-6. **Verdict**
+5. **Verdict only** — do **not** draft PR title or body (that is `/lsi:pr`).
 
    Output exactly one of: **`Ready`** | **`Needs fixes`** | **`Blocked`**
 
@@ -74,6 +67,8 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 ## PR Production Readiness: <slug>
 
 **Verdict:** <Ready|Needs fixes|Blocked>
+**Mode:** feature | promotion
+**TEST_COMMAND:** <from PROJECT.md or N/A docs-only>
 
 ### Checks
 | Check | Status |
@@ -81,21 +76,28 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 | Branch | ✓/✗ |
 | Ticket match | ✓/✗ |
 | Trello id in branch | ✓/✗ |
-| Test suite (see integration doc) | ✓/✗ |
+| TEST_COMMAND | ✓/✗/N/A |
 | Secrets scan | ✓/✗ |
 
-### Issues (if any)
-- ...
+### Issues
+- (none)
+```
 
-### Next
-- Ready → `/lsi:review`
-- Needs fixes → address items, re-run readiness
-- Blocked → explain blocker
+**Output (refuse)**
+
+```
+## Refuse: /lsi-readiness
+
+**Reason:** <wrong branch for mode>
+**Fix:** <one line>
 ```
 
 **Guardrails**
 
-- Do not report `Ready` if test gate failed locally.
+- Do not report `Ready` if test gate failed locally (unless documented N/A).
 - Never post readiness report to Bitbucket unless user asks.
+- Never draft PR title/body — name `/lsi:pr` instead.
 - Feature mode: refuse on `main` or `staging`.
 - Promotion mode: refuse on `main` only; **`staging`** branch is allowed.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

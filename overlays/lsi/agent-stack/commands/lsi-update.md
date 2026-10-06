@@ -120,3 +120,5 @@ Review adopter repo diffs and commit when asked.
 - On adopt audit errors, stop and point to `--audit-only` + `audit-resolutions.yaml`.
 - Adopter repos: refuse if bundle path cannot be resolved.
 - Protected branches: updating workflows is allowed; do not mix with feature implementation on `main`/`staging` unless user intent is sync-only.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).
