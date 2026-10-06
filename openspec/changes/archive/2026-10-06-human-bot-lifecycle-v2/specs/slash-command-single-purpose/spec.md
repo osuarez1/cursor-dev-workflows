@@ -17,7 +17,7 @@ LSI and OpenSpec slash commands SHALL complete their defined deliverable and SHA
 
 ### Requirement: Nested commands only when part of defined deliverable
 
-A slash command MAY execute another slash command only when that nested command is an explicit part of the invoking command’s defined deliverable. Opportunistic chaining outside the documented deliverable is forbidden.
+A slash command SHALL execute another slash command only when that nested command is an explicit part of the invoking command’s defined deliverable. Opportunistic chaining outside the documented deliverable is forbidden.
 
 #### Scenario: PR does not run readiness review or verify
 

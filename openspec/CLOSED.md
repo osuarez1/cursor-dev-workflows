@@ -10,4 +10,4 @@ Format:
 
 ## Entries
 
-(none yet)
+- `2026-10-06` — `human-bot-lifecycle-v2` — Human/bot lifecycle, close-before-promote, address-*, CLOSED.md, OpenCode opt-in, adopt install/cleanup, infra host-log — archived `openspec/changes/archive/2026-10-06-human-bot-lifecycle-v2/` — [PR #14](https://github.com/osuarez1/cursor-dev-workflows/pull/14)
