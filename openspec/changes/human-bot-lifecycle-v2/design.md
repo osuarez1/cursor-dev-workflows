@@ -29,9 +29,9 @@ Stakeholders: bundle maintainers, web/infra adopters, coding agents (Cursor, Cla
 
 ### D1 — Close timing: after staging QA, before promote (option A)
 
-**Choice:** Human runs `/lsi:close` on the ticket branch (or staging-synced ticket branch) after QA/CI pass, then `/lsi:promote`. Archive + sync land in commits that promote carries to main.
+**Choice:** Human runs `/lsi:close` on the **ticket branch** after QA/CI pass, then `/lsi:promote`. When promote is from accumulated `staging`, close still runs on the ticket branch **with staging merged into it** (not on a bare `staging` checkout). Archive + sync land in commits that promote carries to main.
 
-**Alternatives:** Close on main after promote (current) — rejected (main churn). Close before staging code PR — rejected (archives before staging validation).
+**Alternatives:** Close on main after promote (current) — rejected (main churn). Close before staging code PR — rejected (archives before staging validation). Close while checked out on `staging` — rejected (prefer ticket branch + staging merge).
 
 **Implication:** Audit id `openspec_archive_timing` default becomes close-before-promote (not `lsi_close_on_main`). Hotfix path: close on ticket/hotfix branch before promote, or document hotfix exception.
 
@@ -39,11 +39,22 @@ Stakeholders: bundle maintainers, web/infra adopters, coding agents (Cursor, Cla
 
 | Mode | Scope | Gate |
 |------|--------|------|
-| A | `openspec/` (+ allowed workflow docs); no `SOURCE_ROOT` | Default first PR |
+| A | **`openspec/` only**; no `SOURCE_ROOT`; no overlay/workflow/snippet paths | Default first PR |
 | B | Implementation; OpenSpec edits OK | After A merged (unless C) |
 | C | Docs + impl one PR | Explicit opt-in; ≤ `PR_WARN_LINES` and ≤ `PR_WARN_FILES`; refuse if over `PR_MAX_LINES` / `PR_MAX_FILES` |
 
-`/lsi:pr` requires mode argument or infers from diff and asks to confirm.
+`/lsi:pr` requires mode argument or infers from diff and asks to confirm. Mode A purity: refuse if the PR diff touches anything outside `openspec/`.
+
+**Mode C token defaults** (from `patches/_template.yaml` / adopter PROJECT tokens):
+
+| Token | Default |
+|-------|---------|
+| `PR_WARN_FILES` | `15` |
+| `PR_WARN_LINES` | `250` |
+| `PR_MAX_FILES` | `25` |
+| `PR_MAX_LINES` | `400` |
+
+Warn at WARN_*; hard refuse above MAX_*. On the docs-only bundle (no adopter `SOURCE_ROOT` / Mode C impl), Mode C is rarely used; if tokens are unset, `/lsi:pr` uses the template defaults above rather than inventing other numbers.
 
 ### D3 — CLOSED.md index
 
@@ -61,17 +72,19 @@ Single markdown playbook (e.g. `overlays/lsi/agent-stack/bot-lane.md` or under a
 
 New commands: `lsi-address-senior`, `lsi-address-review`, `lsi-address-verify`, `lsi-address-readiness`, `lsi-address-prowler`.
 
-Prowler: before `/lsi:review`, if open Bitbucket PR comments include a body starting with `Prowler · Grok Bot review`, run address-prowler first (or instruct user). Skip if no PR / no matching comment.
+Prowler: `/lsi:review` **MAY auto-invoke** `/lsi:address-prowler` first when an open Bitbucket PR has a comment body starting with `Prowler · Grok Bot review`, then continue with the review deliverable. Skip auto-chain when no PR / no matching comment. Standalone `/lsi:address-prowler` remains available. No Next footer after either path (D11).
 
 ### D6 — OpenCode support
 
-Emit `.opencode/` command or instruction stubs mirroring LSI+opsx entry points (or a thin pointer to the bot playbook). `adopt.py` accepts optional `agents_opencode: { enabled: true }` (default on for new template, or default off with opt-in — **prefer default on** when regenerating agent stack so QwenCoder works without patch surgery). Still reject `agents_junie`, `agents_jetbrains`, `bin`.
+Emit `.opencode/` command or instruction stubs mirroring LSI+opsx entry points (or a thin pointer to the bot playbook). `adopt.py` accepts optional `agents_opencode: { enabled: true }` — **opt-in** (default off / omitted = do not emit OpenCode). Patches that need QwenCoder set `agents_opencode` explicitly. Still reject `agents_junie`, `agents_jetbrains`, `bin`.
 
-Amends sibling change’s “Cursor + Claude only” tests to allow `.opencode/`.
+Amends sibling change’s “Cursor + Claude only” tests to allow `.opencode/` when opted in.
 
 ### D7 — install-adopt.sh
 
 Modeled on git-trello `install.sh`: run from target repo; flags/env for `--bundle`, `--repo-name`, `--accept-policy-defaults`; calls `adopt.py`; runs structural verify; exits non-zero on failure. Does not invent domain overlay prose — leaves that to humans + `/lsi:adopt-verify`.
+
+**Supply chain:** Prefer required local `--bundle <path-to-cursor-dev-workflows>` (or env `LSI_BUNDLE`). Remote curl|bash install, if documented at all, MUST pin tag/commit and checksum; default docs and examples use local `--bundle` only.
 
 ### D7b — Cleanup for fresh install
 
@@ -95,7 +108,9 @@ Ship under `patches/files/infra/` (skill tree) + `preserve_agent_stack` / overla
 
 ### D10 — Upstream web commands
 
-**New command files:** Copy/adapt `lsi-release-train`, `lsi-release-summary`, `lsi-change-summary` into `overlays/lsi/agent-stack/commands/` with bundle-relative paths (not `.lsi/`-only). Genericize web-only script paths via PROJECT.md / versioning overlay.
+**Inventory (2026-10-05):** Diff of `web/.cursor/commands/lsi-*.md` vs overlay `agent-stack/commands/lsi-*.md` shows **exactly three** web-only commands: `lsi-release-train`, `lsi-release-summary`, `lsi-change-summary`. No other web `/lsi-*` files are missing from the overlay. All three are **in scope** for this change (tasks §5 / capability `lsi-release-train-commands`). Infra’s extra surface is the `lsi-host-log` skill (D9), not additional slash commands.
+
+**New command files:** Copy/adapt those three into `overlays/lsi/agent-stack/commands/` with bundle-relative paths (not `.lsi/`-only). Genericize web-only script paths via PROJECT.md / versioning overlay. Note: `/lsi:release-train` intentionally composes version → changelog → release → summary as **one defined deliverable** (D11 allows that composition; still no Next footer).
 
 **Harden existing commands from web** (source of truth: web `.cursor/commands/`, strip domain contamination):
 
@@ -107,17 +122,17 @@ Ship under `patches/files/infra/` (skill tree) + `preserve_agent_stack` / overla
 | `/lsi:review` | Never draft PR title/body; single-purpose stop | Focus areas from integration doc / patch — not embedded FFmpeg/S3 tables in shared command |
 | `/lsi:senior` | Full report shape from `senior-analysis-report.template.md` / web dogfood: executive summary, design verdict vocabulary (Sound / Acceptable with follow-ups / Rethink), per-LC Intent/Before-After/Alternatives/Unit verdict, relationship to code review; Deep for multi-capability or BREAKING workflow changes (do not Skip OpenSpec lifecycle work as “docs-only”) | Tier signals + `TEST_COMMAND` from integration overlay / PROJECT — not hardcoded FFmpeg/pytest; no Next footer (D11) |
 
-### D11 — Slash commands are single-purpose (no Next, no chaining)
+### D11 — Slash commands are single-purpose (no Next; chaining only when defined)
 
-**Choice:** Every slash command ends after its deliverable. No `Next:` footers, no “run X then Y”, no follow-up questions that pick the user’s next workflow step. The user (or bot playbook / human lane doc) decides sequencing.
+**Choice:** The hard rule is **no `Next:` footers** and no follow-up questions that pick the user’s next workflow step. Nested slash-command execution **is allowed** when it is an **explicit part of the invoking command’s defined deliverable** (examples: `/lsi:release-train` composing version/changelog/release/summary; `/lsi:review` auto-running `/lsi:address-prowler` when a Prowler comment exists; address-* running `/lsi:commit`). Undocumented / opportunistic chaining is forbidden.
 
-**`/lsi:pr` specifically:** Draft title/body (modes A/B/C), optional push/PR create confirmation only. Do **not** invoke `/lsi:readiness`, `/lsi:review`, or `/opsx:verify` inside `/lsi:pr`. Prerequisites remain documented in the lifecycle playbook; agents do not auto-run them.
+**`/lsi:pr` specifically:** Draft title/body (modes A/B/C), optional push/PR create confirmation only. Do **not** invoke `/lsi:readiness`, `/lsi:review`, or `/opsx:verify` inside `/lsi:pr` (those are not part of the PR deliverable). Prerequisites remain in the lifecycle playbook for humans/bots to run separately.
 
-**Model:** `/opsx:verify` — report verdict and stop.
+**Model for stop-after-report:** `/opsx:verify` — report verdict and stop (no Next).
 
-**Exceptions:** `/lsi:help` topics `status` / `next` may suggest a command because that **is** the topic’s job. Address-* commands may run `/lsi:commit` when that is part of their defined deliverable (fix + commit), but MUST NOT emit a further Next after that.
+**Exceptions:** `/lsi:help` topics `status` / `next` may suggest a command because that **is** the topic’s job.
 
-**Alternatives rejected:** Orchestrator commands that chain readiness→review→PR (hides failures, steers the human).
+**Alternatives rejected:** Next footers that steer sequencing; silent orchestration of readiness→review→PR inside `/lsi:pr`.
 
 ### D12 — Structured Output on every slash command (verify-shaped)
 
@@ -146,20 +161,32 @@ Ship under `patches/files/infra/` (skill tree) + `preserve_agent_stack` / overla
 | install-adopt.sh curl\|bash supply chain | Prefer local `--bundle` path; document checksum/tag pin for remote install |
 | Deep adopt-verify false positives | Severity tiers; resolutions file pattern like audit-resolutions |
 | Adopter AGENTS.md archive lists huge | Migration: generate CLOSED.md from existing AGENTS section once, then delete bullets |
-| Users forget readiness before PR | Lifecycle + bot playbook document order; `/lsi:pr` stays PR-only (D11) |
+| Users forget readiness before PR | Lifecycle + bot playbook document order; `/lsi:pr` stays PR-only (does not auto-run readiness/review/verify) |
 
 ## Migration Plan
 
-1. Land OpenSpec docs (this change) via Mode A PR on bundle.
+1. Land OpenSpec docs (this change) via Mode A PR on bundle (`openspec/` only).
 2. Apply: overlay commands/docs/scripts; bump expected command lists.
-3. Amend or finish `genericize-adopt-cursor-claude` OpenCode tests.
-4. Re-sync adopters (`/lsi:update` + `/lsi:adopt-verify`); migrate AGENTS archives → CLOSED.md.
+3. Amend or finish `genericize-adopt-cursor-claude` OpenCode opt-in tests.
+4. Re-sync adopters (`/lsi:update` + `/lsi:adopt-verify`); migrate AGENTS archives → CLOSED.md; enable `agents_opencode` only on patches that need it.
 5. Bundle VERSION minor/major per docs versioning (BREAKING lifecycle) at release.
 
 **Rollback:** Revert overlay lifecycle to close-on-main; keep new commands inert or behind help text. CLOSED.md can coexist with AGENTS lists temporarily.
 
 ## Open Questions
 
-- Default `agents_opencode` on vs opt-in per patch (design leans **on**).
-- Exact branch gate for `/lsi:close` when promoting from accumulated `staging` (ticket branch vs staging checkout) — prefer ticket branch with staging merged.
-- Whether Mode A may include non-openspec workflow docs under `.lsi/workflows` patches only (lean **openspec/ only** for Mode A purity).
+- (none — resolved 2026-10-05: OpenCode **opt-in**; close on **ticket branch with staging merged**; Mode A = **`openspec/` only**; Prowler **auto-chain from `/lsi:review` allowed**, no Next is the hard rule.)
+
+## Senior analysis follow-ups (addressed)
+
+Deep senior (2026-10-05) verdict was Acceptable with follow-ups. Closed in OpenSpec docs as follows:
+
+| Follow-up | Resolution |
+|-----------|------------|
+| OpenCode default on vs opt-in | **Opt-in** (D6); sibling `genericize-adopt-cursor-claude` amended to allow opt-in |
+| Close branch gate for accumulated staging | Ticket branch **with staging merged** (D1) |
+| Mode A purity | **`openspec/` only** (D2) |
+| D5 vs D11 Prowler | Auto-chain from `/lsi:review` allowed; hard rule is **no Next** (D5/D11) |
+| `PR_WARN_*` / `PR_MAX_*` defaults | Template defaults 15/250 warn, 25/400 max (D2) |
+| install-adopt supply chain | Local `--bundle` preferred/required in docs (D7) |
+| AGENTS → CLOSED.md migration | Already in D3 + migration plan step 4; task 4.2 |

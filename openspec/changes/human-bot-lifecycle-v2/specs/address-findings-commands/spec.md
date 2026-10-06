@@ -29,15 +29,21 @@ The LSI agent stack SHALL provide slash commands that resolve findings from seni
 - **THEN** the agent resolves the listed gate failures until local checks pass
 - **AND** then runs `/lsi:commit` and emits a summary table
 
-### Requirement: Optional Prowler step is separate from review
+### Requirement: Review may auto-chain Prowler when a matching comment exists
 
-`/lsi:address-prowler` SHALL be a standalone command. Lifecycle docs and the bot playbook MAY list it before `/lsi:review` when a Prowler · Grok Bot review exists on the PR. `/lsi:review` SHALL NOT auto-invoke `/lsi:address-prowler`.
+`/lsi:address-prowler` SHALL remain a standalone command. `/lsi:review` SHALL auto-invoke `/lsi:address-prowler` first when an open Bitbucket PR has a comment body starting with `Prowler · Grok Bot review`, then continue with the review deliverable. When no PR or no matching comment exists, `/lsi:review` SHALL skip Prowler and run the review only. Neither path SHALL emit a Next footer.
 
-#### Scenario: Review does not chain Prowler
+#### Scenario: Review auto-chains Prowler
 
-- **WHEN** a user invokes `/lsi:review`
+- **WHEN** a user invokes `/lsi:review` and the open PR has a comment beginning with `Prowler · Grok Bot review`
+- **THEN** the agent runs `/lsi:address-prowler` (or equivalent triage) before the review findings
+- **AND** then emits the structured code-review Output
+- **AND** does not emit a Next footer
+
+#### Scenario: Review skips Prowler when absent
+
+- **WHEN** a user invokes `/lsi:review` and there is no PR or no matching Prowler comment
 - **THEN** the agent performs the review deliverable only
-- **AND** the agent does not run `/lsi:address-prowler` unless the user invoked that command
 
 #### Scenario: Prowler command is invokable alone
 

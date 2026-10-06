@@ -2,7 +2,7 @@
 
 ### Requirement: Slash commands do not steer next steps
 
-LSI and OpenSpec slash commands SHALL complete only their defined deliverable and SHALL NOT emit “Next:” footers, suggested follow-up slash commands, or questions whose purpose is to choose the user’s next workflow step.
+LSI and OpenSpec slash commands SHALL complete their defined deliverable and SHALL NOT emit “Next:” footers, suggested follow-up slash commands, or questions whose purpose is to choose the user’s next workflow step.
 
 #### Scenario: Command output has no Next footer
 
@@ -15,15 +15,21 @@ LSI and OpenSpec slash commands SHALL complete only their defined deliverable an
 - **WHEN** a user invokes `/lsi:help next` or `/lsi:help status`
 - **THEN** suggesting a command is allowed because that is the topic’s defined deliverable
 
-### Requirement: Commands do not chain other slash commands
+### Requirement: Nested commands only when part of defined deliverable
 
-A slash command SHALL NOT execute another slash command unless that nested command is an explicit part of the invoking command’s defined deliverable.
+A slash command MAY execute another slash command only when that nested command is an explicit part of the invoking command’s defined deliverable. Opportunistic chaining outside the documented deliverable is forbidden.
 
 #### Scenario: PR does not run readiness review or verify
 
 - **WHEN** a user invokes `/lsi:pr`
 - **THEN** the agent drafts (and optionally pushes/creates) the pull request per mode A/B/C
 - **AND** the agent does not run `/lsi:readiness`, `/lsi:review`, or `/opsx:verify` as part of `/lsi:pr`
+
+#### Scenario: Review may chain Prowler as defined deliverable
+
+- **WHEN** a user invokes `/lsi:review` and a matching Prowler · Grok Bot review comment exists on the open PR
+- **THEN** the agent MAY run `/lsi:address-prowler` before the review findings as documented for `/lsi:review`
+- **AND** the response still has no Next footer
 
 #### Scenario: Verify stops after verdict
 
@@ -33,7 +39,7 @@ A slash command SHALL NOT execute another slash command unless that nested comma
 
 ### Requirement: Command sources document single-purpose guardrails
 
-Each updated `/lsi:*` command source under `overlays/lsi/agent-stack/commands/` SHALL state in Guardrails that the command must not emit Next steering and must not chain unrelated slash commands. Structured success/refuse report shapes are specified by the sibling capability `slash-command-structured-output`.
+Each updated `/lsi:*` command source under `overlays/lsi/agent-stack/commands/` SHALL state in Guardrails that the command must not emit Next steering and must not chain slash commands outside its documented deliverable. Structured success/refuse report shapes are specified by the sibling capability `slash-command-structured-output`.
 
 #### Scenario: Guardrail present on PR command
 
