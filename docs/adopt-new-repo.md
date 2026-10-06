@@ -47,10 +47,21 @@ Fix blocking contradictions or record decisions in `patches/files/<repo>/audit-r
 Common fixes:
 
 - Staging-first PR target vs prose in `CLAUDE.md` / `CONTRIBUTING.md`
-- `/opsx:archive` after merge → `/lsi:close` on `main`
+- `/opsx:archive` after merge → `/lsi:close` on the **ticket branch** after staging QA (before promote)
 - `CLAUDE.md` regular file → merge into `AGENTS.md`, then symlink
 
 ## 3. Run adopt
+
+**Preferred (local bundle):** from the application repo root:
+
+```bash
+/path/to/cursor-dev-workflows/snippets/install-adopt.sh \
+  --bundle /path/to/cursor-dev-workflows \
+  --repo-name <repo> \
+  --accept-policy-defaults
+```
+
+Or call adopt directly from the bundle:
 
 ```bash
 python3 snippets/adopt.py \
@@ -60,6 +71,10 @@ python3 snippets/adopt.py \
 ```
 
 Dry run first if desired: add `--dry-run` (skips writes).
+
+**Fresh reinstall:** `cleanup-adopt.sh` (dry-run, then `--yes`) → `install-adopt.sh` → `/lsi:adopt-verify`. Do not chain these into one command.
+
+**Remote curl|bash:** not the default. If used at all, pin tag/commit and checksum; prefer local `--bundle`.
 
 ## 4. Post-adopt manual steps
 

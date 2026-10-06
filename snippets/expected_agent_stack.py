@@ -38,11 +38,21 @@ LSI_COMMANDS = [
     "lsi-promote",
     "lsi-merge-desc",
     "lsi-close",
+    "lsi-address-senior",
+    "lsi-address-review",
+    "lsi-address-verify",
+    "lsi-address-readiness",
+    "lsi-address-prowler",
     "lsi-version",
     "lsi-changelog",
     "lsi-release",
+    "lsi-release-train",
+    "lsi-release-summary",
+    "lsi-change-summary",
     "lsi-bootstrap-release",
     "lsi-update",
+    "lsi-adopt-verify",
+    "lsi-adopt-clean",
 ]
 
 # Command namespaces the bundle does NOT manage. Files with these prefixes are
