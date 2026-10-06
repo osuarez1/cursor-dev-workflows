@@ -89,8 +89,7 @@ Generate the mandatory extended merge description for Bitbucket's merge-commit d
    **Mandatory clipboard output (always):** emit the extended description **only** inside a **`text`** fenced block labeled **Extended description (copy below)**. Do not put merge body content in prose, bullets, or un-fenced markdown outside that block.
 
    **Next steps footer** (after the copy block, not inside it):
-   - PR to **`staging`**: "Next: staging QA, then `/lsi:promote`. Do **not** sync or archive."
-   - PR to **`main`**: "Next: checkout **`main`**, pull, then `/lsi:close`."
+   - Do **not** emit Next/steering lines. Sequencing lives in the lifecycle / bot playbook.
 
 **Output**
 

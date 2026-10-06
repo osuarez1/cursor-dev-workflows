@@ -1,18 +1,18 @@
 ## 1. Lifecycle docs and bot playbook
 
-- [ ] 1.1 Rewrite `overlays/lsi/docs/workflows/openspec-git-integration.md` lifecycle for human 1–8 / bot 9–19 / human 20–24, close-before-promote, PR modes A/B/C
-- [ ] 1.2 Update `overlays/lsi/docs/workflows/which-workflow.md` and `overlays/lsi/which-workflow-lsi.md` for new close timing and lanes
-- [ ] 1.3 Add shared bot playbook artifact (e.g. `overlays/lsi/agent-stack/bot-lane.md`) covering steps 9–19 only
-- [ ] 1.4 Update adopter-facing adopt docs / `overlays/lsi/docs/ai/openspec.md` archive timing prose
-- [ ] 1.5 Update `snippets/audit-agent-docs.py` (and resolutions defaults) so `openspec_archive_timing` expects close-before-promote, not close-on-main-after-promote
+- [x] 1.1 Rewrite `overlays/lsi/docs/workflows/openspec-git-integration.md` lifecycle for human 1–8 / bot 9–19 / human 20–24, close-before-promote, PR modes A/B/C
+- [x] 1.2 Update `overlays/lsi/docs/workflows/which-workflow.md` and `overlays/lsi/which-workflow-lsi.md` for new close timing and lanes
+- [x] 1.3 Add shared bot playbook artifact (e.g. `overlays/lsi/agent-stack/bot-lane.md`) covering steps 9–19 only
+- [x] 1.4 Update adopter-facing adopt docs / `overlays/lsi/docs/ai/openspec.md` archive timing prose
+- [x] 1.5 Update `snippets/audit-agent-docs.py` (and resolutions defaults) so `openspec_archive_timing` expects close-before-promote, not close-on-main-after-promote
 
 ## 2. Core command rewrites
 
-- [ ] 2.1 Rewrite `/lsi:close` for ticket-branch gate (staging merged into ticket branch when promoting accumulated staging), CLOSED.md append, commit handoff; remove main-only gate and AGENTS archive append; no Next footer
-- [ ] 2.2 Rewrite `/lsi:pr` for modes A/B/C — Mode A = `openspec/` only; Mode C uses PR_WARN_*=15/250 and PR_MAX_*=25/400 from PROJECT or template defaults; PR draft/push only — do not run readiness, review, or verify; no Next footer
-- [ ] 2.3 Update `/lsi:promote` and `/lsi:merge-desc` for close-before-promote; strip Next/steering footers
+- [x] 2.1 Rewrite `/lsi:close` for ticket-branch gate (staging merged into ticket branch when promoting accumulated staging), CLOSED.md append, commit handoff; remove main-only gate and AGENTS archive append; no Next footer
+- [x] 2.2 Rewrite `/lsi:pr` for modes A/B/C — Mode A = `openspec/` only; Mode C uses PR_WARN_*=15/250 and PR_MAX_*=25/400 from PROJECT or template defaults; PR draft/push only — do not run readiness, review, or verify; no Next footer
+- [x] 2.3 Update `/lsi:promote` and `/lsi:merge-desc` for close-before-promote; strip Next/steering footers
 - [ ] 2.4 Update `/lsi:help` sections (lifecycle, sdlc, policies, next) for human/bot lanes and close-before-promote (`next`/`status` topics may still suggest commands)
-- [ ] 2.5 Update `/lsi:update` output: review ask + pasteable commit suggestions only (no Next steering to adopt-verify)
+- [x] 2.5 Update `/lsi:update` output: review ask + pasteable commit suggestions only (no Next steering to adopt-verify)
 
 ## 3. Address-findings and Prowler
 

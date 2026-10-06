@@ -110,7 +110,7 @@ Review adopter repo diffs and commit when asked.
 **Bundle:** <path-to-cursor-dev-workflows> @ 1.3.0
 **Verify:** PASS
 
-Next: review diff; `/lsi:commit` when ready.
+**Review:** ask human to review the diff; provide pasteable `/lsi:commit` suggestions only when asked — do not emit a Next footer.
 ```
 
 **Guardrails**

@@ -2,14 +2,22 @@
 name: /lsi-pr
 id: lsi-pr
 category: Workflow
-description: Readiness, review, draft PR for Bitbucket (default target staging)
+description: Draft PR for Bitbucket (modes A/B/C; default target staging)
 ---
 
-Prepare and open a pull request for the active OpenSpec change after readiness and code review pass.
+Draft (and optionally push) a pull request for the active OpenSpec change. **PR-only** — do not run readiness, review, or verify.
 
 **Canonical source:** [pull-requests.md](../../docs/workflows/pull-requests.md) · [pr-description.template.md](../../docs/workflows/templates/pr-description.template.md) · [`docs/workflows/openspec-git-integration.md` § Pull request](../../docs/workflows/openspec-git-integration.md#pull-request-from-openspec)
 
-**Input:** Optionally specify change slug or base branch (default **`staging`**).
+**Input:** Change slug (optional). Mode **A** | **B** | **C** (required or inferred + confirm). Base branch default **`staging`**.
+
+**Modes**
+
+| Mode | Scope | Gate |
+|------|--------|------|
+| **A** | `openspec/` only | Refuse any path outside `openspec/` |
+| **B** | Implementation; OpenSpec edits OK | Normal code PR after Mode A (unless C) |
+| **C** | Docs + impl one PR | Explicit opt-in; warn at `PR_WARN_FILES=15` / `PR_WARN_LINES=250`; refuse above `PR_MAX_FILES=25` / `PR_MAX_LINES=400` (PROJECT/patch tokens override; else those defaults) |
 
 **Steps**
 
@@ -17,31 +25,27 @@ Prepare and open a pull request for the active OpenSpec change after readiness a
 
 2. **Verify branch** — ticket-linked branch only; refuse `main` or `staging`.
 
-3. **Run `/lsi:readiness`**
+3. **Resolve mode**
 
-   - Block if verdict is not `Ready` unless user documents explicit exemption.
-   - Test suite must pass locally (see integration doc § PR production readiness).
+   - Use user-provided mode, or infer from `git diff staging...HEAD` and **confirm** with the user.
+   - Mode A: if any path outside `openspec/` → refuse Mode A.
+   - Mode C: compute changed files/lines vs `staging`; warn at WARN_*; refuse above MAX_*.
 
-4. **Run `/lsi:review`**
-
-   - Block on blockers unless user accepts risk.
-   - Request-changes items must be fixed or waived explicitly.
-
-5. **Gather PR metadata from OpenSpec**
+4. **Gather PR metadata from OpenSpec**
 
    | Section | Source |
    |---------|--------|
-   | **Overview** | `proposal.md` → Why |
+   | **Overview** | `proposal.md` → Why (+ mode A/B/C note) |
    | **Changes** | What Changes + `design.md` |
-   | **Potential risks** | BREAKING in proposal + design risks + review |
-   | **Testing** | tasks.md test tasks + test results from readiness |
+   | **Potential risks** | BREAKING in proposal + design risks |
+   | **Testing** | tasks.md + `{{TEST_COMMAND}}` when applicable; docs-only N/A for Mode A |
    | **Related** | `openspec/changes/<slug>/proposal.md` + Trello card id/URL |
 
-6. **Draft PR**
+5. **Draft PR**
 
    ```bash
    git status
-   git diff staging...HEAD
+   git diff staging...HEAD --stat
    git log staging..HEAD --oneline
    ```
 
@@ -49,11 +53,11 @@ Prepare and open a pull request for the active OpenSpec change after readiness a
 
    Present full PR body per [pr-description.template.md](../../docs/workflows/templates/pr-description.template.md).
 
-   If `git log staging..HEAD` spans multiple themes or a large catch-up vs `staging`, state that explicitly in **Overview** (cumulative staging catch-up, not a single-ticket diff).
+   If `git log staging..HEAD` spans multiple themes or a large catch-up vs `staging`, state that explicitly in **Overview**.
 
-   **Mandatory clipboard output (always):** after the summary header, emit **exactly two** fenced blocks — **Title (copy below)** then **Body (copy below)**. Put **all** title and body content **only** inside those blocks; do not repeat title or body as prose, bullets, or un-fenced markdown elsewhere in the response.
+   **Mandatory clipboard output (always):** after the summary header, emit **exactly two** fenced blocks — **Title (copy below)** then **Body (copy below)**. Put **all** title and body content **only** inside those blocks.
 
-7. **Push (only if user confirms)**
+6. **Push (only if user confirms)**
 
    Ask: "Push branch and create Bitbucket PR to `staging` with the above title and body?"
 
@@ -65,74 +69,33 @@ Prepare and open a pull request for the active OpenSpec change after readiness a
 
    Then instruct user to create the PR in **Bitbucket** with the drafted title and body.
 
-   **Do not** run `gh pr create` — this repo uses Bitbucket only.
-
-8. **Post-push CI**
-
-   Confirm Bitbucket Pipelines test job passes on the PR. Report status in output.
+   **Do not** run `gh pr create` — this repo uses Bitbucket only (unless `PROJECT.md` `PR_HOST` is GitHub for that adopter).
 
 **Output**
-
-Emit in this order:
-
-1. Summary header (metadata only — no title/body prose here):
 
 ```
 ## PR: <slug>
 
-**Target:** staging (default)
+**Mode:** A | B | C
+**Target:** staging
 **URL:** <PR create URL or "not created — awaiting confirmation">
-
-**Readiness:** Ready
-**Review:** Approve
-
-**CI:** Test suite ✓/✗
 ```
 
-2. **Title (copy below)** — single line, `text` fence only:
+Then **Title (copy below)** (`text` fence) and **Body (copy below)** (`markdown` fence) as today.
 
-````markdown
-**Title (copy below):**
-
-```text
-<type>(<scope>): <imperative description>
-```
-````
-
-3. **Body (copy below)** — full PR description, `markdown` fence only:
-
-````markdown
-**Body (copy below):**
-
-```markdown
-## Overview
-...
-
-## Changes
-- ...
-
-## Potential risks
-- ...
-
-## Testing
-1. ...
-
-## Related
-- ...
-```
-````
-
-4. Footer (after both blocks):
+**Output (refuse)**
 
 ```
-After merge: `/lsi:merge-desc` for extended merge description — **do not** sync or archive.
-Next: staging QA → `/lsi:promote` → after main merge → `/lsi:close` on **main**.
+## Refuse: /lsi:pr
+
+**Reason:** <wrong branch | Mode A purity | Mode C over max>
+**Fix:** <checkout ticket branch | use Mode B/C | split PR>
 ```
 
 **Guardrails**
 
-- **Always** emit separate **Title (copy below)** and **Body (copy below)** fenced blocks — never title/body as inline prose only.
-- Do **not** run `gh pr create` or any GitHub CLI PR commands.
-- Do **not** auto-push without user confirmation.
-- Default PR target is **`staging`**, not `main`.
-- Full lifecycle (card → propose → apply → commits → PR → promote → close) requires separate confirmation per integration doc — mention in footer if scope unclear.
+- **PR-only:** do **not** run `/lsi:readiness`, `/lsi:review`, or `/opsx:verify` inside this command
+- **Always** emit separate Title/Body fenced blocks
+- Do **not** auto-push without user confirmation
+- Default PR target is **`staging`**, not `main`
+- Do **not** emit a Next footer; agents MUST emit the Output skeleton
