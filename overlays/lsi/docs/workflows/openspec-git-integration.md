@@ -53,7 +53,7 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 
 **Release scripts:** `scripts/check_version.py` (version bump, changelog, and tag via `/lsi:version`, `/lsi:changelog`, `/lsi:release`)
 
-**Command Output:** Every `/lsi:*` / `/opsx:*` command documents a stable `**Output**` skeleton (verify-shaped). Do **not** emit `Next:` footers; sequencing lives in this lifecycle + bot playbook. Nested commands only when the command’s deliverable documents them.
+**Command Output (verify-shaped):** Every maintained `/lsi:*` command (and adopter `/opsx:*` copies) documents a stable `**Output**` / path-specific Output fence. Agents MUST fill that skeleton; MUST NOT invent alternate report shapes or append follow-up questions. Required empty lists use `(none)`. Refuse paths use `## Refuse:` + `**Reason:**`. Do **not** emit `Next:` footers; sequencing lives in this lifecycle + [bot-lane.md](../../agent-stack/bot-lane.md). Nested commands only when the command’s deliverable documents them (e.g. review→Prowler, release-train composition). OpenSpec-owned `/opsx:verify` is the stop-after-verdict model — the bundle does not install `opsx-*` files.
 
 ---
 

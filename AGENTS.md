@@ -51,6 +51,10 @@ Examples: [examples/commit-messages-good-vs-weak.md](examples/commit-messages-go
 | [templates/](templates/) | Copy-paste output shapes (PR body, review, ticket card, etc.) |
 | [snippets/](snippets/) | Adoption exports — Cursor rules, user rules, gitignore fragments |
 
+## Closed OpenSpec changes
+
+Index: [openspec/CLOSED.md](openspec/CLOSED.md) — do not maintain a growing archive bullet list in this file.
+
 ## Boundaries (this repo)
 
 - **Docs-only:** no `TEST_COMMAND`, `SOURCE_ROOT`, or protected-branch enforcement applies to edits in this tree
