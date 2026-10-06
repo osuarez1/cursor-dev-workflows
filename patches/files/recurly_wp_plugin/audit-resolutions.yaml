@@ -1,0 +1,8 @@
+- id: claude_symlink
+  choice: symlink_to_agents
+  note: "No prior CLAUDE.md; AGENTS.md created by adopt"
+- id: pr_target
+  choice: staging_first
+  note: "LSI staging-first; remote default is still master until main/staging exist"
+- id: openspec_archive_timing
+  choice: lsi_close_on_main

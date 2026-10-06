@@ -1,0 +1,42 @@
+repo: office-assistant
+overlay: lsi
+layout: lsi
+canonical: .lsi/workflows
+audit_resolutions: patches/files/office-assistant/audit-resolutions.yaml
+project:
+  REPO_NAME: office-assistant
+  TITLE_PREFIX: "Office Assistant | "
+  BASE_BRANCH: main
+  PR_TARGET_BRANCH: staging
+  PROTECTED_BRANCHES: "main, staging"
+  SOURCE_ROOT: "frontend/, backend/, intelligence/"
+  TEST_ROOT: "frontend/, backend/, intelligence/"
+  TEST_COMMAND: "make test"
+  PR_HOST: Bitbucket
+  BITBUCKET_REMOTE: lsistreaming/office-assistant
+  VERSION_FILE: VERSION
+  PR_WARN_FILES: "15"
+  PR_MAX_FILES: "25"
+  PR_WARN_LINES: "250"
+  PR_MAX_LINES: "400"
+  PR_MAX_COMMITS: "12"
+  PR_MAX_PRIMARY_CONCERNS: "1"
+  PR_MAX_SCOPES: "3"
+overlay_files:
+  openspec-git-integration.md: patches/files/office-assistant/openspec-git-integration.md
+  versioning-and-releases.md: patches/files/office-assistant/versioning-and-releases.md
+preserve:
+  - bitbucket-pipelines.yml
+  - openspec/project.md
+  - .cursor/rules/*.mdc
+agents_claude:
+  canonical: AGENTS.md
+  claude_symlink: true
+  reconcile_sources:
+    - CLAUDE.md
+merge:
+  AGENTS.md:
+    markers: [lsi:workflows, lsi:domain]
+bootstrap:
+  VERSION: "0.1.0"
+  VERSION_FILE: VERSION

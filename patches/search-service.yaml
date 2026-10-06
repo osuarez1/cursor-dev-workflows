@@ -1,0 +1,65 @@
+# Go Typesense indexing sidecar — lsistreaming/search-service
+# Workspace path in this clone layout: ../go/search-service
+repo: search-service
+overlay: lsi
+layout: lsi
+canonical: .lsi/workflows
+
+project:
+  REPO_NAME: search-service
+  TITLE_PREFIX: "Search | "
+  BASE_BRANCH: main
+  PR_TARGET_BRANCH: staging
+  PROTECTED_BRANCHES: "main, staging"
+  SOURCE_ROOT: "."
+  TEST_ROOT: "."
+  TEST_COMMAND: "go test ./..."
+  TICKET_TOOL: Trello
+  TICKET_ID_PATTERN: 24-character hex id
+  BRANCH_PATTERN: "feature|bugfix|hotfix|chore/{24-char-id}-slug"
+  PR_HOST: Bitbucket
+  BITBUCKET_REMOTE: lsistreaming/search-service
+  VERSION_FILE: version.txt
+  PR_WARN_FILES: "15"
+  PR_WARN_LINES: "250"
+  PR_MAX_FILES: "25"
+  PR_MAX_LINES: "400"
+  PR_MAX_COMMITS: "12"
+  PR_MAX_PRIMARY_CONCERNS: "1"
+  PR_MAX_SCOPES: "3"
+
+preserve:
+  - bitbucket-pipelines.yml
+  - openspec/config.yaml
+  - openspec/specs/
+  - docs/ai/openspec.md
+  - docs/sdlc/bitbucket.md
+  - docs/deployment/secrets.md
+  - docs/deployment/ecs.md
+  - README.md
+  - CHANGELOG.md
+  - AGENTS.md
+
+overlay_files:
+  openspec-git-integration.md: patches/files/search-service/openspec-git-integration.md
+  ticket-card-info.md: patches/files/search-service/ticket-card-info.md
+  test-requirements.md: patches/files/search-service/test-requirements.md
+  versioning-and-releases.md: patches/files/search-service/versioning-and-releases.md
+
+agents_claude:
+  canonical: AGENTS.md
+  claude_symlink: true
+  reconcile_sources:
+    - CLAUDE.md
+
+merge:
+  AGENTS.md:
+    markers: [lsi:workflows, lsi:domain]
+  cursorrules:
+    marker_block: lsi:workflows
+
+bootstrap:
+  version.txt: "0.1.0"
+
+ci_hook:
+  add_check_version: true

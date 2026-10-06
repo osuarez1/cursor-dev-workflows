@@ -13,6 +13,8 @@ Each LSI application repo has a `patches/<repo>.yaml` consumed by `snippets/adop
 | [ai-agent.yaml](ai-agent.yaml) | ai-agent (monorepo) | `VERSION` | `main`, `staging`, `test` |
 | [office-assistant.yaml](office-assistant.yaml) | office-assistant (monorepo) | `VERSION` | `main`, `staging` |
 | [stream-api.yaml](stream-api.yaml) | stream-api | `version.txt` | `main`, `staging`, `master` |
+| [search-service.yaml](search-service.yaml) | search-service (Go) | `version.txt` | `main`, `staging` |
+| [recurly_wp_plugin.yaml](recurly_wp_plugin.yaml) | recurly_wp_plugin (WordPress) | `version.txt` | `main`, `staging`, `master` |
 | [_template.yaml](_template.yaml) | — copy for new repos | configurable | configurable |
 
 Per-repo markdown overlays: `patches/files/<repo>/` (template: `patches/files/_template/`).
@@ -41,6 +43,8 @@ Paths for this workspace:
 | ai-agent | `../agents/ai-agent` |
 | office-assistant | `../office-assistant` |
 | stream-api | `../stream-api` |
+| search-service | `../go/search-service` |
+| recurly_wp_plugin | `../recurly_wp_plugin` |
 
 ## Supported agents
 
