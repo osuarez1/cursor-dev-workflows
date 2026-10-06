@@ -16,6 +16,7 @@ Each LSI application repo has a `patches/<repo>.yaml` consumed by `snippets/adop
 | [search-service.yaml](search-service.yaml) | search-service (Go) | `version.txt` | `main`, `staging` |
 | [recurly_wp_plugin.yaml](recurly_wp_plugin.yaml) | recurly_wp_plugin (WordPress) | `version.txt` | `main`, `staging`, `master` |
 | [infra.yaml](infra.yaml) | infra | `version.txt` | `main`, `staging` (ships `lsi-host-log` skill) |
+| [cs-chatbot.yaml](cs-chatbot.yaml) | cs-chatbot | `VERSION` | `main`, `staging` |
 | [_template.yaml](_template.yaml) | — copy for new repos | configurable | configurable |
 
 Per-repo markdown overlays: `patches/files/<repo>/` (template: `patches/files/_template/`).
@@ -46,6 +47,7 @@ Paths for this workspace:
 | stream-api | `../stream-api` |
 | search-service | `../go/search-service` |
 | recurly_wp_plugin | `../recurly_wp_plugin` |
+| cs-chatbot | `../cs-chatbot` |
 
 ## Supported agents
 

@@ -1,0 +1,7 @@
+- id: claude_symlink
+  choice: symlink_to_agents
+  note: "Greenfield: AGENTS.md canonical; CLAUDE.md symlink after adopt"
+- id: pr_target
+  choice: staging_first
+- id: openspec_archive_timing
+  choice: close_before_promote
