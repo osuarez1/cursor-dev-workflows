@@ -482,7 +482,7 @@ def merge_convention(target: Path) -> None:
         if "<!-- lsi:commits:start -->" in text:
             text = re.sub(
                 r"<!-- lsi:commits:start -->.*?<!-- lsi:commits:end -->",
-                block.strip(),
+                f"<!-- lsi:commits:start -->\n{block.strip()}\n<!-- lsi:commits:end -->",
                 text,
                 flags=re.DOTALL,
             )
@@ -504,7 +504,7 @@ def merge_agents_markers(target: Path) -> None:
         if "<!-- lsi:workflows:start -->" in text:
             text = re.sub(
                 r"<!-- lsi:workflows:start -->.*?<!-- lsi:workflows:end -->",
-                block.strip(),
+                f"<!-- lsi:workflows:start -->\n{block.strip()}\n<!-- lsi:workflows:end -->",
                 text,
                 flags=re.DOTALL,
             )
@@ -531,7 +531,7 @@ def merge_cursorrules(target: Path) -> None:
         if "<!-- lsi:workflows:start -->" in text:
             text = re.sub(
                 r"<!-- lsi:workflows:start -->.*?<!-- lsi:workflows:end -->",
-                block.strip(),
+                f"<!-- lsi:workflows:start -->\n{block.strip()}\n<!-- lsi:workflows:end -->",
                 text,
                 flags=re.DOTALL,
             )

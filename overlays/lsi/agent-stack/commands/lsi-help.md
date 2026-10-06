@@ -184,7 +184,7 @@ Extract `{id}` and `{change-slug}` from ticket branch. Compare `{change-slug}` t
 | Ticket | After review; Mode A or B ready | PR to staging | `/lsi:pr` (mode A or B) |
 | Ticket | After staging QA; change still active | Close before promote | `/lsi:close` on ticket branch |
 | Ticket | After close; ready to promote | Promotion | `/lsi:promote` — only when staging QA + close done |
-| Protected `main` | After promotion merge | Merge desc only | `/lsi:merge-desc` — do **not** `/lsi:close` on main |
+| Protected `main` | After promotion merge | Merge desc only | `/lsi:merge-desc` only (close already ran on the ticket branch) |
 
 **Ambiguity:** prefer earlier lifecycle step; when staging merge / promotion / close cannot be inferred, say **phase unclear** and suggest **`/lsi:help lifecycle`** or **`/lsi:branch`** — do not guess.
 

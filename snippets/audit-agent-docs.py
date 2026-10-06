@@ -116,8 +116,17 @@ def scan_file(
                     "Rewrite to .lsi/workflows/...",
                 )
             )
-        if OPSX_ARCHIVE_AFTER_MERGE.search(line) or CLOSE_ON_MAIN_AFTER_PROMOTE.search(
-            line
+        close_on_main_hit = CLOSE_ON_MAIN_AFTER_PROMOTE.search(line)
+        # Skip correct prohibitions: "do not /lsi:close on main"
+        prohibits_close_on_main = bool(
+            re.search(
+                r"(?:do\s+\*\*not\*\*|do\s+not|don't|never).{0,40}/lsi:close",
+                line,
+                re.IGNORECASE,
+            )
+        )
+        if OPSX_ARCHIVE_AFTER_MERGE.search(line) or (
+            close_on_main_hit and not prohibits_close_on_main
         ):
             findings.append(
                 Finding(
