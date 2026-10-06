@@ -72,6 +72,18 @@ Amends sibling change’s “Cursor + Claude only” tests to allow `.opencode/`
 
 Modeled on git-trello `install.sh`: run from target repo; flags/env for `--bundle`, `--repo-name`, `--accept-policy-defaults`; calls `adopt.py`; runs structural verify; exits non-zero on failure. Does not invent domain overlay prose — leaves that to humans + `/lsi:adopt-verify`.
 
+### D7b — Cleanup for fresh install
+
+**Choice:** Ship `cleanup-adopt.sh` (deterministic) plus `/lsi:adopt-clean` (slash wrapper that runs/documents the script). Removes **adopt-managed** artifacts so `install-adopt.sh` can reinstall cleanly.
+
+**Remove (default):** adopt-installed LSI commands under `.cursor/commands/lsi-*.md` (and Claude/OpenCode mirrors if present), adopt-managed `.cursor/rules/` workflow rules, regenerable `.lsi/workflows/` tree (except paths listed in patch `preserve` / `preserve_agent_stack`).
+
+**Never remove without explicit override:** `PROJECT.md`, `patches` are N/A on adopter, application source, `preserve` globs, `openspec/` change history, `AGENTS.md` domain content outside LSI marker blocks (marker blocks may be stripped or left for merge — prefer strip only `<!-- lsi:workflows -->` managed sections when safe).
+
+**Safety:** dry-run lists paths; require `--yes` (script) or explicit user confirm (slash) before delete. Single-purpose: cleanup only — does not run install or adopt-verify (D11).
+
+**Fresh install sequence (documented, not chained):** `cleanup-adopt.sh` → `install-adopt.sh` → `/lsi:adopt-verify`.
+
 ### D8 — `/lsi:adopt-verify`
 
 Two layers: (1) deterministic scripts (parity, links, token presence, unresolved `{{`, hash/version drift); (2) agent checklist comparing PROJECT.md / AGENTS domain claims to repo reality. Output findings table + fix suggestions; no auto-commit.
@@ -82,7 +94,16 @@ Ship under `patches/files/infra/` (skill tree) + `preserve_agent_stack` / overla
 
 ### D10 — Upstream web commands
 
-Copy/adapt `lsi-release-train`, `lsi-release-summary`, `lsi-change-summary` into `overlays/lsi/agent-stack/commands/` with bundle-relative paths (not `.lsi/`-only). Genericize any web-only script paths via PROJECT.md / versioning overlay.
+**New command files:** Copy/adapt `lsi-release-train`, `lsi-release-summary`, `lsi-change-summary` into `overlays/lsi/agent-stack/commands/` with bundle-relative paths (not `.lsi/`-only). Genericize web-only script paths via PROJECT.md / versioning overlay.
+
+**Harden existing commands from web** (source of truth: web `.cursor/commands/`, strip domain contamination):
+
+| Command | Upstream from web | Keep generic |
+|---------|-------------------|--------------|
+| `/lsi:commit` | Required explanatory body; plan entries with files + body; never subject-only; do not hand-write `Trello-Card:` | Scope table from per-repo integration overlay / PROJECT — not video-encoder worker table |
+| `/lsi:changelog` | Required rewrite of generator draft: strip `type(scope):`, one user-visible bullet, collapse dupes, fold OpenSpec archive noise | Script path via versioning overlay / PROJECT |
+| `/lsi:readiness` | Use `TEST_COMMAND` from PROJECT.md; docs-only N/A exemption; never draft PR title/body | No hardcoded `bin/rspec-changed` / pytest in shared command |
+| `/lsi:review` | Never draft PR title/body; single-purpose stop | Focus areas from integration doc / patch — not embedded FFmpeg/S3 tables in shared command |
 
 ### D11 — Slash commands are single-purpose (no Next, no chaining)
 

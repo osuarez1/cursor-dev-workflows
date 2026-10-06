@@ -37,17 +37,27 @@
 - [ ] 5.1 Port `lsi-release-train`, `lsi-release-summary`, `lsi-change-summary` into `overlays/lsi/agent-stack/commands/` with bundle paths
 - [ ] 5.2 Register them in expected-agent-stack and genericize web-only script assumptions via PROJECT/versioning overlay
 
+## 5b. Web command hardening (commit / changelog / readiness / review)
+
+- [ ] 5b.1 Port web `/lsi:commit` improvements: required body, plan with files+body, no subject-only, no hand-written `Trello-Card:`; scopes via integration overlay not video-encoder table
+- [ ] 5b.2 Port web `/lsi:changelog` rewrite rules: strip `type(scope):`, user-visible bullets, collapse dupes, fold OpenSpec archive noise; keep generator script invocation
+- [ ] 5b.3 Port web `/lsi:readiness` improvements: `TEST_COMMAND` from PROJECT.md, docs-only N/A, never emit PR title/body; strip Rails/pytest hardcoding from shared command
+- [ ] 5b.4 Port web `/lsi:review` “never draft PR” guardrail; keep focus areas pointed at integration doc / patch (no embedded worker domain table in shared command)
+- [ ] 5b.5 Align all four with D11 (no Next footer; no chaining)
+
 ## 6. OpenCode support
 
 - [ ] 6.1 Add OpenCode emit path in `adopt.py` / agent-stack (playbook + command stubs); accept `agents_opencode`
 - [ ] 6.2 Update `test_supported_agents_only.py` (or successor) to allow `.opencode/`, still forbid Junie/JetBrains/`bin`
 - [ ] 6.3 Note amendment in `genericize-adopt-cursor-claude` design/tasks or complete that change’s remaining work consistently
 
-## 7. Adopt verify and install-adopt.sh
+## 7. Adopt verify, install-adopt, and cleanup
 
 - [ ] 7.1 Add `/lsi:adopt-verify` command + deepen structural checks (unresolved tokens, PROJECT vs repo heuristics)
 - [ ] 7.2 Add `install-adopt.sh` (git-trello-shaped): `--bundle`, `--repo-name`, `--accept-policy-defaults`, verify, non-zero on failure
-- [ ] 7.3 Document installer + adopt-verify in `docs/adopt-new-repo.md` and `docs/adopt-and-update.md` (and adopter dual-copy)
+- [ ] 7.3 Add `cleanup-adopt.sh` + `/lsi:adopt-clean`: dry-run default, `--yes`/confirm to delete adopt-managed agent-stack and regenerable `.lsi/workflows/` while honoring `preserve` / `preserve_agent_stack`; never touch `PROJECT.md` or app source
+- [ ] 7.4 Document fresh-install sequence (cleanup → install → adopt-verify) in `docs/adopt-new-repo.md` and `docs/adopt-and-update.md` (and adopter dual-copy) — as docs only, not chained from one command
+- [ ] 7.5 Register `/lsi:adopt-clean` in expected-agent-stack / parity
 
 ## 8. Infra host-log
 
