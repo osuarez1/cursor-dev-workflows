@@ -13,6 +13,11 @@ maintainer-adopters.local.yaml
 .junie/
 bin/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Test / smoke artifacts
 .coverage
 .tmp-adopt-smoke-*/
