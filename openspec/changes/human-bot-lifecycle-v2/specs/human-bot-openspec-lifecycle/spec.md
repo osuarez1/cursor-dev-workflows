@@ -71,5 +71,6 @@ The bundle SHALL ship a bot-lane playbook artifact that enumerates steps 9–19 
 #### Scenario: Playbook lists bot steps only
 
 - **WHEN** an agent loads the bot playbook
-- **THEN** the playbook SHALL include apply, commit, optional Prowler address, review, address loops, verify, readiness, mode-B PR, and merge-desc
+- **THEN** the playbook SHALL include apply, commit, optional Prowler address, review, address loops, verify, readiness, mode-B PR, and merge-desc as an ordered checklist
 - **AND** the playbook SHALL forbid promote, release-train, and close (human lane)
+- **AND** individual slash commands SHALL NOT restate that order as a Next footer (sequencing lives in the playbook/lifecycle docs only)

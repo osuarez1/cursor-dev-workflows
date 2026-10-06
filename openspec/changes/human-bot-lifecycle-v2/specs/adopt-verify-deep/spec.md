@@ -18,12 +18,13 @@ The LSI agent stack SHALL provide `/lsi:adopt-verify` that runs structural adopt
 - **AND** emits a findings table with severity and recommended fixes
 - **AND** does not auto-commit fixes
 
-### Requirement: Update recommends adopt-verify
+### Requirement: Update ends with review and commit suggestion
 
-`/lsi:update` SHALL instruct the user to run `/lsi:adopt-verify` after a successful adopt/bootstrap sync and SHALL provide commit-command suggestions for review.
+`/lsi:update` SHALL ask the user to review the diff and SHALL provide pasteable commit-command suggestions. It SHALL NOT auto-commit and SHALL NOT emit a Next footer steering to `/lsi:adopt-verify` or other commands.
 
-#### Scenario: Post-update next step
+#### Scenario: Post-update stops after handoff
 
 - **WHEN** `/lsi:update` completes a sync with file changes
-- **THEN** the output asks the user to review the diff, run `/lsi:adopt-verify`, and shows pasteable commit commands
+- **THEN** the output asks the user to review the diff and shows pasteable commit commands
 - **AND** the agent does not auto-commit
+- **AND** the agent does not prescribe the next slash command

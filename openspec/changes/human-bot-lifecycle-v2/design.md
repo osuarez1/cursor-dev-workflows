@@ -84,6 +84,18 @@ Ship under `patches/files/infra/` (skill tree) + `preserve_agent_stack` / overla
 
 Copy/adapt `lsi-release-train`, `lsi-release-summary`, `lsi-change-summary` into `overlays/lsi/agent-stack/commands/` with bundle-relative paths (not `.lsi/`-only). Genericize any web-only script paths via PROJECT.md / versioning overlay.
 
+### D11 — Slash commands are single-purpose (no Next, no chaining)
+
+**Choice:** Every slash command ends after its deliverable. No `Next:` footers, no “run X then Y”, no follow-up questions that pick the user’s next workflow step. The user (or bot playbook / human lane doc) decides sequencing.
+
+**`/lsi:pr` specifically:** Draft title/body (modes A/B/C), optional push/PR create confirmation only. Do **not** invoke `/lsi:readiness`, `/lsi:review`, or `/opsx:verify` inside `/lsi:pr`. Prerequisites remain documented in the lifecycle playbook; agents do not auto-run them.
+
+**Model:** `/opsx:verify` — report verdict and stop.
+
+**Exceptions:** `/lsi:help` topics `status` / `next` may suggest a command because that **is** the topic’s job. Address-* commands may run `/lsi:commit` when that is part of their defined deliverable (fix + commit), but MUST NOT emit a further Next after that.
+
+**Alternatives rejected:** Orchestrator commands that chain readiness→review→PR (hides failures, steers the human).
+
 ## Risks / Trade-offs
 
 | Risk | Mitigation |
@@ -94,6 +106,7 @@ Copy/adapt `lsi-release-train`, `lsi-release-summary`, `lsi-change-summary` into
 | install-adopt.sh curl\|bash supply chain | Prefer local `--bundle` path; document checksum/tag pin for remote install |
 | Deep adopt-verify false positives | Severity tiers; resolutions file pattern like audit-resolutions |
 | Adopter AGENTS.md archive lists huge | Migration: generate CLOSED.md from existing AGENTS section once, then delete bullets |
+| Users forget readiness before PR | Lifecycle + bot playbook document order; `/lsi:pr` stays PR-only (D11) |
 
 ## Migration Plan
 

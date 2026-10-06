@@ -8,17 +8,24 @@
 
 ## 2. Core command rewrites
 
-- [ ] 2.1 Rewrite `/lsi:close` for ticket-branch gate, CLOSED.md append, commit handoff; remove main-only gate and AGENTS archive append
-- [ ] 2.2 Rewrite `/lsi:pr` for modes A/B/C with SOURCE_ROOT / PR_WARN_* / PR_MAX_* gates
-- [ ] 2.3 Update `/lsi:promote` and `/lsi:merge-desc` footers: no close-on-main; require prior close
-- [ ] 2.4 Update `/lsi:help` sections (lifecycle, sdlc, policies, next) for human/bot lanes and close-before-promote
-- [ ] 2.5 Update `/lsi:update` output: review ask, `/lsi:adopt-verify` next, pasteable commit suggestions
+- [ ] 2.1 Rewrite `/lsi:close` for ticket-branch gate, CLOSED.md append, commit handoff; remove main-only gate and AGENTS archive append; no Next footer
+- [ ] 2.2 Rewrite `/lsi:pr` for modes A/B/C with SOURCE_ROOT / PR_WARN_* / PR_MAX_* gates; PR draft/push only — do not run readiness, review, or verify; no Next footer
+- [ ] 2.3 Update `/lsi:promote` and `/lsi:merge-desc` for close-before-promote; strip Next/steering footers
+- [ ] 2.4 Update `/lsi:help` sections (lifecycle, sdlc, policies, next) for human/bot lanes and close-before-promote (`next`/`status` topics may still suggest commands)
+- [ ] 2.5 Update `/lsi:update` output: review ask + pasteable commit suggestions only (no Next steering to adopt-verify)
 
 ## 3. Address-findings and Prowler
 
-- [ ] 3.1 Add `lsi-address-senior.md`, `lsi-address-review.md`, `lsi-address-verify.md`, `lsi-address-readiness.md` from AI prompt library
-- [ ] 3.2 Add `lsi-address-prowler.md` (Bitbucket comment fetch + triage) and wire optional pre-`/lsi:review` gate in `lsi-review.md`
+- [ ] 3.1 Add `lsi-address-senior.md`, `lsi-address-review.md`, `lsi-address-verify.md`, `lsi-address-readiness.md` from AI prompt library (fix + optional `/lsi:commit` only; no Next footer)
+- [ ] 3.2 Add `lsi-address-prowler.md` (Bitbucket comment fetch + triage); document optional Prowler step in lifecycle/playbook — do not auto-chain from `/lsi:review`
 - [ ] 3.3 Register address-* (+ prowler) in `expected_agent_stack.py` / verify-adopters / Claude install path
+
+## 3b. Single-purpose slash commands
+
+- [ ] 3b.1 Strip `Next:` / follow-up steering from all `overlays/lsi/agent-stack/commands/lsi-*.md` and mirrored Claude/OpenCode command sources (except `/lsi:help` next/status topics)
+- [ ] 3b.2 Remove readiness/review/verify orchestration steps from `/lsi:pr` and `/lsi:promote` command sources
+- [ ] 3b.3 Align `/opsx:verify` (and other opsx command copies the bundle maintains) with single-purpose stop-after-verdict pattern
+- [ ] 3b.4 Update bot playbook and `openspec-git-integration.md` to document sequencing without embedding Next into individual commands
 
 ## 4. Closed-change index
 

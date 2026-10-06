@@ -16,12 +16,14 @@ Adopter repos (`web` at bundle 1.4.2, `infra` at 1.5.0) have drifted: web minted
 - Add **`/lsi:adopt-verify`** (deep semantic + structural adopt verification against hallucination/drift) and **`install-adopt.sh`** (git-trello-style, prompt-less first adopt).
 - Update `/lsi:update` to fix/sync, ask for human review, and provide commit-command suggestions (no auto-commit).
 - Update audit resolutions / `openspec_archive_timing` defaults and adopter patches for the new close timing.
+- **Slash commands are single-purpose:** each `/lsi:*` / `/opsx:*` command executes only its own job. No “Next:” / follow-up prompts that steer the user to another command. `/lsi:pr` drafts/pushes the PR only — it MUST NOT run `/lsi:readiness`, `/lsi:review`, or `/opsx:verify`. Same non-chaining rule for other commands (model: `/opsx:verify`).
 
 ## Capabilities
 
 ### New Capabilities
 
 - `human-bot-openspec-lifecycle`: Human/bot/promote lanes, close-before-promote, PR modes A/B/C, bot playbook, docs-baseline commit, lifecycle doc/command updates.
+- `slash-command-single-purpose`: Commands do not chain other slash commands or emit Next/follow-up steering; `/lsi:pr` is PR-only.
 - `address-findings-commands`: Slash commands to address senior/review/verify/readiness findings; optional Prowler gate before `/lsi:review`.
 - `closed-change-index`: Closed-change index file; AGENTS.md pointer only; close commit handoff.
 - `adopt-verify-deep`: `/lsi:adopt-verify` deep accuracy checks beyond structural parity.
