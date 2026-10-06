@@ -22,8 +22,8 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 | Branch | `feature\|bugfix\|hotfix\|chore/{id}-<change-slug>` via **`/lsi:card`**, **`/lsi:card-link`**, or **`/lsi:trello-list`** / **`/lsi:trello-branch`** |
 | Protected branches | **`{{PROTECTED_BRANCHES}}`** — no task work (except card-setup: `/lsi:card`, `/lsi:trello-list`, `/lsi:trello-branch` on protected branches) |
 | Implement | `/opsx:apply` on ticket branch |
-| Close ticket | After **`main`** promotion: **`/lsi:close`** (or `/opsx:sync` → `/opsx:archive` on `main`) |
-| Normative specs | [`openspec/specs/`](../../openspec/specs/) after production close on `main` |
+| Close ticket | After staging QA, **before** `/lsi:promote`: **`/lsi:close`** on the ticket branch (sync + archive + `openspec/CLOSED.md`) |
+| Normative specs | [`openspec/specs/`](../../openspec/specs/) after close; promote carries closed work to **`main`** |
 
 | Upstream workflow | Link | Command |
 |-------------------|------|---------|
@@ -47,34 +47,62 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 
 **OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive` — provided by OpenSpec (`openspec init` / config profile); this bundle does not install or manage OpenSpec slash commands.
 
-**LSI (git):** `/lsi:help`, `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`, `/lsi:update`
+**LSI (git):** `/lsi:help`, `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`, `/lsi:update`, plus address-*, adopt-*, and release-train family when installed.
+
+**Bot playbook:** [bot-lane.md](../../agent-stack/bot-lane.md) — coding-agent steps only (no promote/close/release).
 
 **Release scripts:** `scripts/check_version.py` (version bump, changelog, and tag via `/lsi:version`, `/lsi:changelog`, `/lsi:release`)
+
+**Command Output:** Every `/lsi:*` / `/opsx:*` command documents a stable `**Output**` skeleton (verify-shaped). Do **not** emit `Next:` footers; sequencing lives in this lifecycle + bot playbook. Nested commands only when the command’s deliverable documents them.
 
 ---
 
 ## Lifecycle
 
+Three lanes. Humans own shaping and close/promote; coding agents own the bot lane via the [bot playbook](../../agent-stack/bot-lane.md). Slash commands do not chain via Next footers.
+
+### Human lane (1–8) — shape and Mode A docs PR
+
 1. **Explore** (optional) — `/opsx:explore`; docs-only on protected branches.
 2. **Propose** — `/opsx:propose <slug>`.
-3. **Senior analysis** (large changes) — `/lsi:senior` after `design.md`.
-4. **Card + branch** — choose one (OpenSpec change must exist for all except list-only exit):
+3. **Card + branch** — choose one (OpenSpec change must exist for all except list-only exit):
    - **`/lsi:card`** from **`main`** or **`staging`** → `git ts` (new card + branch)
    - **`/lsi:card-link`** on existing branch without Trello id → API + `git branch -m`
    - **`/lsi:trello-list`** → confirm → **`/lsi:trello-branch`** flow for existing To Do card → `git tb`
    - Card title/body from OpenSpec artifacts, redacted before Trello API
-5. **Apply** — `/opsx:apply`; complete `tasks.md`.
-6. **Commit** (when asked) — `/lsi:commit`.
-7. **Readiness + review** (when asked) — `/lsi:readiness` → `/lsi:review`.
-8. **PR to staging** (when asked) — `/lsi:pr`; default target **`staging`**.
-9. **After staging merge** — `/lsi:merge-desc`; keep `openspec/changes/<slug>/` **active**; run `openspec list` to track in-flight changes.
-10. **Staging QA** — validate on staging environment.
-11. **Promotion PR** (when asked) — `/lsi:promote`; target **`main`** after QA passes.
-12. **Production close** (after main merge) — checkout **`main`**, pull; **`/lsi:close`** → update `AGENTS.md` archive list.
+4. **Initial docs commit** — `/lsi:commit` baseline OpenSpec artifacts before senior edits.
+5. **Senior analysis** (large / multi-capability / BREAKING) — `/lsi:senior` after `design.md` (Deep/Light; do not Skip OpenSpec lifecycle work as “docs-only”).
+6. **Address senior** (when needed) — `/lsi:address-senior` then commit.
+7. **Mode A PR** — `/lsi:pr` mode **A** (`openspec/` only) to **`staging`**. Modes: **A** = OpenSpec docs only; **B** = implementation (+ OpenSpec OK); **C** = tiny single PR (opt-in; `PR_WARN_*` / `PR_MAX_*` gates).
+8. **After Mode A merge** — `/lsi:merge-desc`; keep change **active**.
 
-**Rule:** A spec change is not normative truth until code runs in production. Do **not** run `/opsx:sync` or `/opsx:archive` when a feature PR merges to **`staging`** only.
+### Bot lane (9–19) — implement and Mode B staging PR
 
-**`tasks.md` rule:** Do **not** add `/opsx:sync`, `/opsx:archive`, or `/lsi:close` as implementation tasks. Those steps belong to **production close** on **`main`** (step 12 below), not `/opsx:apply`. When all `tasks.md` checkboxes are complete, the change is ready for PR — not archived.
+See [bot-lane.md](../../agent-stack/bot-lane.md). Summary:
+
+9. **Apply** — `/opsx:apply`; complete `tasks.md`.
+10. **Commit** (when asked) — `/lsi:commit`.
+11. **Verify** (when asked) — `/opsx:verify`; address with `/lsi:address-verify` if needed.
+12. **Readiness** (when asked) — `/lsi:readiness`; address with `/lsi:address-readiness` if needed.
+13. **Review** (when asked) — `/lsi:review` (auto-chains `/lsi:address-prowler` when a matching Prowler · Grok comment exists).
+14. **Address review** (when needed) — `/lsi:address-review` then commit.
+15. **Mode B PR** — `/lsi:pr` mode **B** to **`staging`** (implementation). Mode **C** only when explicitly opted in and under size gates.
+16. **After Mode B merge** — `/lsi:merge-desc`; keep change **active** until post-QA close.
+17–19. Reserved for bot playbook detail (re-verify / re-readiness loops as needed).
+
+### Human lane (20–24) — QA, close, promote, release
+
+20. **Staging QA** — validate on staging environment / CI.
+21. **Close before promote** — on the **ticket branch** (merge `staging` into it when promoting accumulated staging work): **`/lsi:close`** → `/opsx:sync` if needed → `/opsx:archive` → append `openspec/CLOSED.md` → pasteable commit handoff. Do **not** require `main`. Do **not** append long archive lists to `AGENTS.md` (pointer only).
+22. **Promotion PR** — `/lsi:promote` to **`main`** (already-closed work; main needs no sync/archive for that change).
+23. **After main merge** — `/lsi:merge-desc` only (no `/lsi:close` on `main` for this change).
+24. **Release** (optional) — `/lsi:release-train` or `/lsi:version` → `/lsi:changelog` → `/lsi:release` on **`main`**.
+
+**Rule:** Do **not** run `/opsx:sync` or `/opsx:archive` when a feature PR merges to **`staging`** only. Close runs **after staging QA, before promote**.
+
+**`tasks.md` rule:** Do **not** add `/opsx:sync`, `/opsx:archive`, or `/lsi:close` as `/opsx:apply` deliverables. Close is a human post-QA step (21), not apply.
+
+**Staging defects after close:** open a **follow-up** OpenSpec change; do not reopen the archived folder as the primary workflow.
 
 ---
 
@@ -111,22 +139,23 @@ PR **Related:** `openspec/changes/<slug>/` + Trello card id/URL.
 
 Template: [templates/pr-description.template.md](templates/pr-description.template.md)
 
-### Staging-first archive policy
+### Close-before-promote archive policy
 
 | Phase | Branch | `openspec/changes/<slug>/` | Sync / archive |
 |-------|--------|----------------------------|----------------|
-| Develop | Ticket branch | Active | Neither |
+| Develop / Mode A–B | Ticket branch | Active | Neither |
 | Staging QA | After merge to `staging` | **Still active** | **Do not** sync or archive |
-| Production | After merge to `main` | Archive on `main` | `/lsi:close` |
+| Post-QA close | Ticket branch (staging merged in if needed) | Archive via `/lsi:close` | Sync + archive + `CLOSED.md` **before** promote |
+| Production | After `/lsi:promote` → `main` | Already archived | No close on `main` |
 
 Use `openspec list` to see in-flight changes accumulated on staging.
 
 ### Hotfix path
 
-1. Implement on `hotfix/{id}-<slug>` or minimal delta on `main` (OpenSpec artifacts only on protected branches).
-2. Merge to **`main`**.
-3. Run **`/lsi:close`** on **`main`**.
-4. Merge **`main`** back into **`staging`** so environments and specs do not drift.
+1. Implement on `hotfix/{id}-<slug>` (OpenSpec artifacts only on protected branches).
+2. Validate (CI / hotfix QA as applicable).
+3. Run **`/lsi:close`** on the **hotfix/ticket branch** before promote.
+4. `/lsi:promote` to **`main`**, then merge **`main`** back into **`staging`** so environments and specs do not drift.
 
 ### Environment drift prevention
 
@@ -241,27 +270,31 @@ Do **not** auto-run branch → propose → apply → commits → PR → promote 
 
 ---
 
-## Post-staging merge (do not close)
+## Post-staging merge (do not close yet)
 
-After a feature PR merges to **`staging`**:
+After a Mode A or Mode B PR merges to **`staging`**:
 
 1. `/lsi:merge-desc` for Bitbucket extended merge description.
-2. Keep `openspec/changes/<slug>/` **active**.
-3. Do **not** run `/opsx:sync` or `/opsx:archive`.
+2. Keep `openspec/changes/<slug>/` **active** until post-QA close.
+3. Do **not** run `/opsx:sync` or `/opsx:archive` until step 21 (close before promote).
 
+<a id="close-before-promote"></a>
 <a id="production-close-after-main-merge"></a>
 
-## Production close (after main merge)
+## Close before promote (after staging QA)
 
-Run on **`main`** only — use **`/lsi:close`** or manual steps:
+Run on the **ticket branch** (not exclusively on `main`) — use **`/lsi:close`**:
 
-1. All `tasks.md` `[x]`.
-2. `/opsx:sync` if normative deltas exist.
-3. `/opsx:archive`.
-4. Update [`AGENTS.md`](../../AGENTS.md) archived-changes list.
-5. If hotfix path: merge `main` → `staging`.
+1. Staging QA / CI confirmed for the change.
+2. If promoting accumulated staging work: merge **`staging`** into the ticket branch first.
+3. All `tasks.md` `[x]` for the change being closed.
+4. `/opsx:sync` if normative deltas exist.
+5. `/opsx:archive`.
+6. Append [`openspec/CLOSED.md`](../../openspec/CLOSED.md) (AGENTS.md keeps a pointer only — no bullet archive list).
+7. Emit pasteable commit commands (do not auto-commit).
+8. Then `/lsi:promote` to **`main`**.
 
-**Future (optional):** Bitbucket Pipeline hook to run archive automatically when a PR merges to `main` — not implemented yet.
+After main merge: `/lsi:merge-desc` only — **do not** run `/lsi:close` again on `main` for that change.
 
 ---
 
