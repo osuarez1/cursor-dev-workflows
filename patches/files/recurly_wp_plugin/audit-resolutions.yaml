@@ -5,4 +5,4 @@
   choice: staging_first
   note: "LSI staging-first; remote default is still master until main/staging exist"
 - id: openspec_archive_timing
-  choice: lsi_close_on_main
+  choice: close_before_promote

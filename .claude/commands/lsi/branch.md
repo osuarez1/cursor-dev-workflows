@@ -64,7 +64,6 @@ Run the branch checklist and verify the ticket-linked branch for the active Open
 **Branch status:** <verified | wrong branch | missing — use /lsi:card>
 **Checklist:** <N/5 complete>
 
-Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists and change is large.
 ```
 
 **Guardrails**
@@ -73,3 +72,5 @@ Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists a
 - **Never** create branches without Trello id — use **`/lsi:card`**, **`/lsi:card-link`**, **`/lsi:trello-list`**, or **`/lsi:trello-branch`** per [git-trello.md](../../overlays/lsi/docs/sdlc/git-trello.md); do not use raw `git checkout -b`.
 - Branch suffix must match active change slug exactly.
 - Do not auto-run full lifecycle — branch verification only unless user confirms broader scope.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

@@ -2,26 +2,26 @@
 name: /lsi-close
 id: lsi-close
 category: Workflow
-description: Production close — sync and archive OpenSpec change on main
+description: Close OpenSpec change after staging QA — sync, archive, CLOSED.md (before promote)
 ---
 
-Orchestrate **production close** after a change is merged to **`main`**: sync delta specs (if any), archive the change, update `AGENTS.md`.
+Orchestrate **close before promote** after staging QA: sync delta specs (if any), archive the change, append `openspec/CLOSED.md`, emit pasteable commits.
 
-**Canonical source:** [`docs/workflows/openspec-git-integration.md` § Production close](../../docs/workflows/openspec-git-integration.md#production-close-after-main-merge)
+**Canonical source:** [`docs/workflows/openspec-git-integration.md` § Close before promote](../../docs/workflows/openspec-git-integration.md#close-before-promote)
 
-**Input:** Optionally specify change slug. If omitted, infer from conversation, recent merge, or `openspec list`.
+**Input:** Optionally specify change slug. If omitted, infer from branch suffix or `openspec list`.
 
 **Steps**
 
-1. **Branch gate (`main` only)**
+1. **Branch gate (ticket branch)**
 
    ```bash
    git branch --show-current
-   git pull origin main
    ```
 
-   - **Refuse** on ticket branches or **`staging`**
-   - Instruct: checkout **`main`**, pull latest, then re-run `/lsi:close`
+   - **Require** ticket pattern `feature|bugfix|hotfix|chore/{24-char-id}-<change-slug>`
+   - **Refuse** `main` (close is not a post-main-merge step)
+   - **Refuse** bare `staging` checkout — merge `staging` into the ticket branch first when promoting accumulated staging work, then re-run on the ticket branch
 
 2. **Resolve change slug**
 
@@ -29,17 +29,12 @@ Orchestrate **production close** after a change is merged to **`main`**: sync de
    openspec list --json
    ```
 
-   - Prefer explicit slug from user input (especially after a cumulative promotion from **`staging`**)
-   - On **`main`**, do **not** infer slug from branch name — ticket branches are not checked out here
-   - If exactly one active change matches the recent promotion or conversation context, use it
-   - If **multiple** active changes remain (`openspec list` shows more than one), use **AskUserQuestion** — list each slug with a one-line summary from `proposal.md`; do **not** guess or auto-select
-   - If none match, ask user which change was just promoted to **`main`**
+   - Prefer user input; else branch suffix must match `openspec/changes/<slug>/`
+   - If multiple active changes, use **AskQuestion** — do not guess
 
-3. **Confirm production merge**
+3. **Confirm staging QA**
 
-   Ask user to confirm the change code is merged to **`main`** (promotion PR merged or hotfix on main).
-
-   Optionally verify `openspec/changes/<slug>/` still exists (not already archived).
+   Ask user to confirm staging QA / CI passed for this change. Do not close without that confirmation.
 
 4. **Verify task completion**
 
@@ -51,54 +46,58 @@ Orchestrate **production close** after a change is merged to **`main`**: sync de
 
    Check `openspec/changes/<slug>/specs/` for delta specs.
 
-   - If deltas exist: invoke `/opsx:sync` for `<slug>` (inherits **`main`** gate)
+   - If deltas exist: invoke `/opsx:sync` for `<slug>`
    - If none or only `specs/README.md`: skip sync
-   - If deltas exist but `openspec/specs/` already reflects them (e.g. sync ran on **`staging`** before staging-first policy): compare delta to target spec; skip sync when content is already merged and proceed to archive after user confirms
+   - If content already reflected in `openspec/specs/`: skip sync after user confirms
 
 6. **Archive change**
 
-   Invoke `/opsx:archive` for `<slug>` (inherits **`main`** gate).
+   Invoke `/opsx:archive` for `<slug>`.
 
-7. **Update AGENTS.md**
+7. **Append `openspec/CLOSED.md`**
 
-   Remind user to add archive path to **Archived OpenSpec changes** in [AGENTS.md](../../AGENTS.md):
+   Ensure `openspec/CLOSED.md` exists (create from template if missing). Append one row/bullet:
 
    ```markdown
-   - `openspec/changes/archive/YYYY-MM-DD-<slug>/` — <short description> ([PR #N](url))
+   - `YYYY-MM-DD` — `<slug>` — <one-line from proposal Why> — archived `openspec/changes/archive/YYYY-MM-DD-<slug>/`
    ```
 
-8. **Hotfix back-merge reminder**
+   Do **not** append a long archive list to `AGENTS.md`. AGENTS.md may only **link** `openspec/CLOSED.md`.
 
-   If user confirms hotfix path (change landed on **`main`** without staging QA):
+8. **Commit handoff (pasteable; do not auto-commit)**
 
-   Remind to merge **`main`** back into **`staging`**:
-
-   ```bash
-   git checkout staging
-   git pull origin staging
-   git merge origin/main
-   git push origin staging
-   ```
+   Emit copy-paste commands for archive + CLOSED.md (and sync diffs if any). Run `git commit` only if the user explicitly asks.
 
 **Output**
 
 ```
-## Production close: <slug>
+## Close: <slug>
 
-**Branch:** main ✓
+**Branch:** <ticket-branch> ✓
+**Staging QA:** confirmed
 **Synced:** yes / skipped (no delta specs)
 **Archived to:** openspec/changes/archive/YYYY-MM-DD-<slug>/
+**CLOSED.md:** appended
 
-**Next (optional):**
-- Update AGENTS.md archived-changes list
-- Hotfix only: merge main → staging
-- Release train: /lsi:version → /lsi:changelog → /lsi:release
+### Commit handoff
+git add openspec/changes/archive/YYYY-MM-DD-<slug>/ openspec/CLOSED.md openspec/specs/
+git commit -m "docs(openspec): close <slug> after staging QA"
+```
+
+**Output (refuse)**
+
+```
+## Refuse: /lsi:close
+
+**Reason:** Must run on ticket branch after staging QA (not on main or bare staging).
+**Fix:** checkout ticket branch; merge staging into it if needed; re-run /lsi:close
 ```
 
 **Guardrails**
 
-- **`main` only** — never close on staging merge
-- Do **not** skip archive if user only merged to staging
-- Prefer `/lsi:close` over manual sync+archive for consistent policy enforcement
-- When multiple active changes exist, always prompt for slug selection — never auto-select
-- Do **not** auto-commit AGENTS.md updates unless user asks
+- Ticket branch only after staging QA — never require `main`; never close on bare `staging`
+- Do **not** skip archive if user only merged Mode A/B to staging without QA
+- Prefer `/lsi:close` over manual sync+archive
+- When multiple active changes exist, always prompt for slug — never auto-select
+- Do **not** auto-commit; do **not** emit a Next footer
+- Agents MUST emit the Output skeleton above

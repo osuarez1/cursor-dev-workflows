@@ -50,7 +50,6 @@ Create annotated git tag and push to Bitbucket after version and changelog are c
 **Tag:** v0.4.1 @ <sha>
 **Remote:** Bitbucket (tag pushed)
 
-Next: confirm Bitbucket release notes if your team uses the Releases/Downloads UI.
 ```
 
 **Guardrails**
@@ -59,3 +58,5 @@ Next: confirm Bitbucket release notes if your team uses the Releases/Downloads U
 - Never force-push tags
 - **`main`-only**
 - Squash merge PRs use PR title for squash subject — this command is for merge-commit + annotated tags
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

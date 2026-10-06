@@ -15,6 +15,7 @@ Each LSI application repo has a `patches/<repo>.yaml` consumed by `snippets/adop
 | [stream-api.yaml](stream-api.yaml) | stream-api | `version.txt` | `main`, `staging`, `master` |
 | [search-service.yaml](search-service.yaml) | search-service (Go) | `version.txt` | `main`, `staging` |
 | [recurly_wp_plugin.yaml](recurly_wp_plugin.yaml) | recurly_wp_plugin (WordPress) | `version.txt` | `main`, `staging`, `master` |
+| [infra.yaml](infra.yaml) | infra | `version.txt` | `main`, `staging` (ships `lsi-host-log` skill) |
 | [_template.yaml](_template.yaml) | — copy for new repos | configurable | configurable |
 
 Per-repo markdown overlays: `patches/files/<repo>/` (template: `patches/files/_template/`).

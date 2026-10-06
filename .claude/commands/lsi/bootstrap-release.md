@@ -55,3 +55,5 @@ Optional: tag v0.4.0 @ <sha> if no tag existed
 - Do **not** run `npm run release:changelog -- --mode bootstrap` — forward-only policy
 - User confirms tag push; no `gh release create`
 - **`main`-only**
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

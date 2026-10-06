@@ -1,0 +1,49 @@
+# Infra adopter — registers lsi-host-log skill (not global).
+repo: infra
+overlay: lsi
+layout: lsi
+canonical: .lsi/workflows
+# audit_resolutions: patches/files/infra/audit-resolutions.yaml
+project:
+  REPO_NAME: infra
+  TITLE_PREFIX: "Infra | "
+  BASE_BRANCH: main
+  PR_TARGET_BRANCH: staging
+  PROTECTED_BRANCHES: "main, staging"
+  SOURCE_ROOT: ""
+  TEST_ROOT: ""
+  TEST_COMMAND: "true"
+  PR_HOST: Bitbucket
+  BITBUCKET_REMOTE: lsistreaming/infra
+  PR_WARN_FILES: "15"
+  PR_WARN_LINES: "250"
+  PR_MAX_FILES: "25"
+  PR_MAX_LINES: "400"
+  PR_MAX_COMMITS: "12"
+  PR_MAX_PRIMARY_CONCERNS: "1"
+  PR_MAX_SCOPES: "3"
+
+preserve:
+  - PROJECT.md
+  - bitbucket-pipelines.yml
+
+preserve_agent_stack:
+  - .cursor/skills/lsi-host-log/**
+
+skill_overlays:
+  lsi-host-log: patches/files/infra/skills/lsi-host-log
+
+agents_claude:
+  canonical: AGENTS.md
+  claude_symlink: true
+  reconcile_sources:
+    - CLAUDE.md
+
+merge:
+  AGENTS.md:
+    markers: [lsi:workflows, lsi:domain]
+  cursorrules:
+    marker_block: lsi:workflows
+
+bootstrap:
+  version.txt: "0.1.0"

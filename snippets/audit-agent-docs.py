@@ -20,7 +20,7 @@ except ImportError:
 POLICY_DEFAULT_CHOICES: dict[str, str] = {
     "pr_target": "staging_first",
     "claude_symlink": "symlink_to_agents",
-    "openspec_archive_timing": "lsi_close_on_main",
+    "openspec_archive_timing": "close_before_promote",
 }
 
 SEVERITY_ERROR = "error"
@@ -34,6 +34,11 @@ PR_TO_MAIN = re.compile(
 STALE_DOCS_WORKFLOWS = re.compile(r"docs/workflows/[a-z0-9_-]+\.md", re.IGNORECASE)
 OPSX_ARCHIVE_AFTER_MERGE = re.compile(
     r"/opsx:archive.*(?:after|on)\s+merge",
+    re.IGNORECASE,
+)
+# Stale close-on-main-after-promote policy (superseded by close-before-promote).
+CLOSE_ON_MAIN_AFTER_PROMOTE = re.compile(
+    r"(?:/lsi:close|/opsx:archive).*(?:on\s+[`']?main[`']?|after\s+(?:main\s+)?(?:merge|promotion))",
     re.IGNORECASE,
 )
 PROTECTED_TOKEN = re.compile(r"PROTECTED_BRANCHES\s*[=:]\s*([^\n]+)", re.IGNORECASE)
@@ -111,14 +116,16 @@ def scan_file(
                     "Rewrite to .lsi/workflows/...",
                 )
             )
-        if OPSX_ARCHIVE_AFTER_MERGE.search(line):
+        if OPSX_ARCHIVE_AFTER_MERGE.search(line) or CLOSE_ON_MAIN_AFTER_PROMOTE.search(
+            line
+        ):
             findings.append(
                 Finding(
                     SEVERITY_ERROR,
                     "openspec_archive_timing",
                     line.strip()[:120],
                     loc,
-                    "Use /lsi:close on main after promotion",
+                    "Use /lsi:close on the ticket branch after staging QA, before /lsi:promote",
                 )
             )
 

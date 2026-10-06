@@ -5,7 +5,8 @@
 - **Branch policy:** `.cursor/rules/branch-workflow.mdc` (always on)
 - **OpenSpec + Git:** `.cursor/rules/openspec-git-integration.mdc`
 - **Commits / PRs:** `CONVENTION.md` + `.cursor/rules/commit-pr-conventions.mdc`
+- **Closed OpenSpec changes:** [`openspec/CLOSED.md`](openspec/CLOSED.md) (no per-change archive list here)
 
-**Staging-first:** feature PRs target `staging`; promotion to `main` via `/lsi:promote`; close on `main` via `/lsi:close`.
+**Staging-first:** feature PRs target `staging`; after staging QA run `/lsi:close` on the **ticket branch**, then `/lsi:promote` to `main`.
 
 Do not edit files under `.lsi/workflows/` by hand — re-run adopt from `cursor-dev-workflows`.

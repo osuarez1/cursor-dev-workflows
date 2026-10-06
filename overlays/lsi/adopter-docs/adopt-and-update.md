@@ -16,6 +16,10 @@ All adopt-managed specs live under **`.lsi/workflows/`**:
 
 ## First adopt
 
+Prefer local `install-adopt.sh --bundle <path> --repo-name <repo>` from the app repo root. Fresh reinstall: `cleanup-adopt.sh` → `install-adopt.sh` → `/lsi:adopt-verify`.
+
+## First adopt (bundle-side)
+
 Performed by the bundle maintainer from the bundle repo:
 
 ```bash

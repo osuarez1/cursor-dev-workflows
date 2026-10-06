@@ -90,10 +90,10 @@ Re-sync the **cursor-dev-workflows** bundle after a release or overlay command e
 ```
 ## Workflow update — bundle maintainer
 
-**Bootstrap:** 30 commands → .cursor/commands/
+**Bootstrap:** 19 LSI commands → .cursor/commands/ (OpenSpec `opsx-*` commands managed by `openspec init`, not the bundle)
 **Adopters synced:** <from maintainer-adopters.local.yaml; skipped if missing>
 **Parity:** <clean | N surplus items listed — adopter confirmed removal>
-**Bundle version:** 1.4.x
+**Bundle version:** 1.5.x
 
 Review adopter repo diffs and commit when asked.
 ```
@@ -107,7 +107,7 @@ Review adopter repo diffs and commit when asked.
 **Bundle:** <path-to-cursor-dev-workflows> @ 1.3.0
 **Verify:** PASS
 
-Next: review diff; `/lsi:commit` when ready.
+**Review:** ask human to review the diff; provide pasteable `/lsi:commit` suggestions only when asked — do not emit a Next footer.
 ```
 
 **Guardrails**
@@ -117,3 +117,5 @@ Next: review diff; `/lsi:commit` when ready.
 - On adopt audit errors, stop and point to `--audit-only` + `audit-resolutions.yaml`.
 - Adopter repos: refuse if bundle path cannot be resolved.
 - Protected branches: updating workflows is allowed; do not mix with feature implementation on `main`/`staging` unless user intent is sync-only.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).
