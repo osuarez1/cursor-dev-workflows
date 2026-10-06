@@ -7,6 +7,46 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-05
+
+### Adopters
+
+**Registered LSI adopters must run `/lsi:update` (or re-adopt) after pulling this MAJOR release.** Lifecycle and command contracts changed: close OpenSpec after staging QA **before** `/lsi:promote` (not on `main` after promote); slash commands emit verify-shaped Output and must not steer with `Next:` footers; expected LSI command set grows (address-*, adopt-*, release-train family). Update `BUNDLE_VERSION` in `PROJECT.md` to `2.0.0` (or the release tag). Re-bootstrap maintainer/adopter agent stacks so new commands land. OpenCode emit remains **opt-in** via `agents_opencode` — enable only if you want `.opencode/` output.
+
+**Adopter action**
+
+- Switch close timing to **close-before-promote** on the ticket branch; stop appending archive lists to `AGENTS.md` (use `openspec/CLOSED.md`)
+- Re-run adopt / `/lsi:update` so address-*, adopt-clean/verify, and release-train commands exist
+- Retrain agents: no `Next:` footers; `/lsi:pr` is PR-only (does not run readiness/review/verify)
+- Confirm patch `openspec_archive_timing` / audit resolutions match `close_before_promote`
+- Infra-only: expect `lsi-host-log` skill when using `patches/infra.yaml`
+
+### Added
+
+- **Human / bot / promote-release lanes** — documented lifecycle split; shared bot playbook for coding agents
+- **`/lsi:pr` modes A / B / C** — A = OpenSpec-only; B = implementation; C = tiny single-PR escape with size gates
+- **address-* commands** — address-senior / review / verify / readiness / prowler; `/lsi:review` may chain Prowler when a matching PR comment exists
+- **Release-train family** — `/lsi:release-train`, `/lsi:release-summary`, `/lsi:change-summary` upstreamed into the shared overlay
+- **`openspec/CLOSED.md`** — closed-change index; AGENTS.md links it only
+- **OpenCode opt-in** — `agents_opencode` adopt emit for local models (Cursor + Claude remain default)
+- **`install-adopt.sh` / `cleanup-adopt.sh` / `/lsi:adopt-clean` / `/lsi:adopt-verify`** — prompt-less first adopt, cleanup, deep verify
+- **Infra `lsi-host-log` skill** — via `patches/infra.yaml` `skill_overlays` only
+- **Normative OpenSpec specs** for lifecycle, Output, single-purpose commands, adopt tooling, and related capabilities (archived `human-bot-lifecycle-v2`)
+- **Adopter patch registrations** — stream-api, office-assistant, search-service, recurly (from post-1.5.0 main)
+
+### Changed
+
+- **BREAKING — close-before-promote** — `/lsi:close` runs on the ticket branch after staging QA; promote carries already-closed work; no sync/archive on `main` for that change
+- **BREAKING — verify-shaped Output / no Next** — every maintained `/lsi:*` command documents and emits a stable Output skeleton; nested commands only when part of the documented deliverable
+- **`/lsi:close` / `/lsi:pr` / `/lsi:promote` / `/lsi:help`** — Mode A/B/C, ticket-branch close, promote requires prior close, lane-aware help
+- **`/lsi:commit`, `/lsi:changelog`, `/lsi:readiness`, `/lsi:review`, `/lsi:senior`** — web hardenings ported with PROJECT / integration-doc indirection
+- **Audit default** — `openspec_archive_timing` → `close_before_promote`; template resolution example aligned
+- **Expected agent stack** — expanded LSI command set (parity adopters must refresh)
+
+### Fixed
+
+- Audit template example kept in sync with close-before-promote default so new adopters do not record the old close-on-main policy
+
 ## [1.5.0] - 2026-06-25
 
 ### Adopters
