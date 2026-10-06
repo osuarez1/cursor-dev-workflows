@@ -27,6 +27,15 @@
 - [ ] 3b.3 Align `/opsx:verify` (and other opsx command copies the bundle maintains) with single-purpose stop-after-verdict pattern
 - [ ] 3b.4 Update bot playbook and `openspec-git-integration.md` to document sequencing without embedding Next into individual commands
 
+## 3c. Structured Output (verify-shaped) on all slash commands
+
+- [ ] 3c.1 Audit every `overlays/lsi/agent-stack/commands/lsi-*.md` and bundle-maintained `opsx-*.md`: ensure each has `**Output**` / path-specific Output fences matching D12 (title, labeled fields, named subsections, `(none)` for empty required lists)
+- [ ] 3c.2 Add or normalize Output for thin/missing commands (`opsx-apply`, `opsx-archive`, `opsx-explore`, `opsx-sync`, and any lsi command lacking a clear skeleton); keep `/lsi:help` as per-topic fixed templates
+- [ ] 3c.3 Strip `Next:` from all Output fences (including `/opsx:verify`); add structured refuse/early-exit skeletons where commands currently prose-only refuse
+- [ ] 3c.4 Guardrails on each command: agents MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions
+- [ ] 3c.5 Mirror the same Output skeletons into Claude/OpenCode command copies; require Output in every new command authored in this change (address-*, adopt-*, release-train family)
+- [ ] 3c.6 Document the convention once in `openspec-git-integration.md` (or bot playbook): command Output shape + no Next
+
 ## 4. Closed-change index
 
 - [ ] 4.1 Add `openspec/CLOSED.md` template/example and AGENTS.md / AGENTS.workflow template pointer (no archive bullet list)

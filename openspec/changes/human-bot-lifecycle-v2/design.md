@@ -15,6 +15,7 @@ Stakeholders: bundle maintainers, web/infra adopters, coding agents (Cursor, Cla
 - PR modes A/B/C with Mode C line/file gates from PROJECT.md tokens.
 - Address-* + optional Prowler commands; CLOSED.md index; adopt-verify + install-adopt.sh.
 - OpenCode emit; infra-only host-log skill; upstream web release-train family.
+- Single-purpose slash commands with verify-shaped structured Output (no Next / no follow-up steering).
 
 **Non-Goals:**
 
@@ -117,6 +118,23 @@ Ship under `patches/files/infra/` (skill tree) + `preserve_agent_stack` / overla
 **Exceptions:** `/lsi:help` topics `status` / `next` may suggest a command because that **is** the topic’s job. Address-* commands may run `/lsi:commit` when that is part of their defined deliverable (fix + commit), but MUST NOT emit a further Next after that.
 
 **Alternatives rejected:** Orchestrator commands that chain readiness→review→PR (hides failures, steers the human).
+
+### D12 — Structured Output on every slash command (verify-shaped)
+
+**Choice:** Every maintained `/lsi:*` and `/opsx:*` command file MUST include an `**Output**` (or path-specific `**Output (...)**`) fenced skeleton. Agents MUST fill that skeleton on success so responses are structurally stable run-to-run.
+
+**Skeleton rules (model: `/opsx:verify`):**
+
+1. Top-level `##` title with identity placeholders (slug, branch, repo, etc.).
+2. Labeled status lines with closed vocabularies where applicable (`**Verdict:**`, `**Recommendation:**`, `**Tasks:** N/M`).
+3. Named `###` subsections for lists/tables; required empty sections use `(none)` rather than omitting the heading.
+4. No `Next:` / follow-up steering inside the Output fence (D11).
+5. Refuse / early-exit: same shell with fail verdict, or a documented short `## Refuse:` / `**Reason:**` block — never unstructured-only refusals.
+6. Multi-path commands (e.g. `/lsi:update` maintainer vs adopter) document one skeleton per path; `/lsi:help` may use per-topic templates.
+
+**Apply work:** Audit overlay + opsx command sources; add missing Output to `lsi-help` (topic templates already count if labeled), normalize `lsi-trello-list` / `lsi-update` / thin opsx commands (`apply`, `archive`, `explore`, `sync`, …); strip Next from existing fences (including `/opsx:verify`); require Output on all new commands in this change.
+
+**Alternatives rejected:** Freeform “report and stop” prose (agents drift); JSON-only machine output (humans read chat); optional Output only on “important” commands.
 
 ## Risks / Trade-offs
 

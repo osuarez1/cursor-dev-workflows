@@ -33,7 +33,7 @@ A slash command SHALL NOT execute another slash command unless that nested comma
 
 ### Requirement: Command sources document single-purpose guardrails
 
-Each updated `/lsi:*` command source under `overlays/lsi/agent-stack/commands/` SHALL state in Guardrails that the command must not emit Next steering and must not chain unrelated slash commands.
+Each updated `/lsi:*` command source under `overlays/lsi/agent-stack/commands/` SHALL state in Guardrails that the command must not emit Next steering and must not chain unrelated slash commands. Structured success/refuse report shapes are specified by the sibling capability `slash-command-structured-output`.
 
 #### Scenario: Guardrail present on PR command
 
