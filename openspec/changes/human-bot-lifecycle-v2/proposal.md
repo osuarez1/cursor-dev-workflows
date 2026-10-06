@@ -10,7 +10,7 @@ Adopter repos (`web` at bundle 1.4.2, `infra` at 1.5.0) have drifted: web minted
 - Require **initial docs commit** after propose (baseline before senior edits) and **always** a mode-A docs PR for normal work (mode C is the only single-PR escape).
 - Add **address-findings** slash commands from the AI prompt library (senior, review, verify, readiness) plus optional **`/lsi:address-prowler`** before `/lsi:review` when a Prowler · Grok review exists on the Bitbucket PR.
 - Replace AGENTS.md archive appends with **`openspec/CLOSED.md`** (or equivalent index); AGENTS.md only links it. `/lsi:close` emits pasteable commit commands (web handoff pattern) and does **not** require `main`.
-- Upstream web-local commands into the overlay: `/lsi:release-train`, `/lsi:release-summary`, `/lsi:change-summary`, close commit handoff, and web hardenings for **`/lsi:commit`**, **`/lsi:changelog`**, **`/lsi:readiness`**, **`/lsi:review`** (genericized — no video-encoder/web domain hardcoding).
+- Upstream web-local commands into the overlay: `/lsi:release-train`, `/lsi:release-summary`, `/lsi:change-summary`, close commit handoff, and web hardenings for **`/lsi:commit`**, **`/lsi:changelog`**, **`/lsi:readiness`**, **`/lsi:review`**, **`/lsi:senior`** (genericized — no video-encoder/web domain hardcoding; senior output follows the full report template web dogfoods via `senior-analysis.md`).
 - Add **OpenCode** agent-stack emit for local models (e.g. QwenCoder). Keep Junie / JetBrains / workflow `bin/` out. **Amends** in-flight `genericize-adopt-cursor-claude` Cursor+Claude-only policy → Cursor + Claude + OpenCode.
 - Ship **`lsi-host-log`** as an **infra-only** Cursor skill via patch (not global).
 - Add **`/lsi:adopt-verify`** (deep semantic + structural adopt verification against hallucination/drift), **`install-adopt.sh`** (git-trello-style, prompt-less first adopt), and a **cleanup** path (`/lsi:adopt-clean` and/or `cleanup-adopt.sh`) so adopters can remove adopt-managed agent-stack / `.lsi/workflows` artifacts and do a fresh install without leftover drift.
@@ -32,7 +32,7 @@ Adopter repos (`web` at bundle 1.4.2, `infra` at 1.5.0) have drifted: web minted
 - `opencode-agent-support`: Adopt/bootstrap emit for OpenCode alongside Cursor and Claude.
 - `lsi-host-log-infra`: Infra patch skill for per-change SSH host logging.
 - `lsi-release-train-commands`: Upstream `/lsi:release-train`, `/lsi:release-summary`, `/lsi:change-summary` into the shared agent stack.
-- `web-upstreamed-command-hardening`: Port web improvements for `/lsi:commit`, `/lsi:changelog`, `/lsi:readiness`, `/lsi:review` into the overlay with PROJECT.md / integration-doc indirection (not repo-specific domain tables).
+- `web-upstreamed-command-hardening`: Port web improvements for `/lsi:commit`, `/lsi:changelog`, `/lsi:readiness`, `/lsi:review`, `/lsi:senior` into the overlay with PROJECT.md / integration-doc indirection (not repo-specific domain tables).
 
 ### Modified Capabilities
 
@@ -41,7 +41,7 @@ Adopter repos (`web` at bundle 1.4.2, `infra` at 1.5.0) have drifted: web minted
 ## Impact
 
 - Overlay docs: `openspec-git-integration.md`, `which-workflow.md`, adopt docs, `/lsi:help`, `/lsi:close`, `/lsi:pr`, `/lsi:promote`, `/lsi:update`, `/lsi:merge-desc`.
-- Hardened shared commands: `/lsi:commit`, `/lsi:changelog`, `/lsi:readiness`, `/lsi:review` (from web) plus new release-train family.
+- Hardened shared commands: `/lsi:commit`, `/lsi:changelog`, `/lsi:readiness`, `/lsi:review`, `/lsi:senior` (from web practice) plus new release-train family.
 - New commands under `overlays/lsi/agent-stack/commands/` (+ Claude/OpenCode mirrors); expected-agent-stack lists; verify/audit scripts.
 - `snippets/adopt.py` / `install-adopt.sh` / `cleanup-adopt.sh` / deeper verify scripts; audit rule for archive timing.
 - Adopter patches (`web`, `infra`, others): archive-timing resolutions, preserve globs for intentional extras during transition, infra `lsi-host-log` skill.

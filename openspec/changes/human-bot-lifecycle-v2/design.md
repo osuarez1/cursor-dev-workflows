@@ -104,6 +104,7 @@ Ship under `patches/files/infra/` (skill tree) + `preserve_agent_stack` / overla
 | `/lsi:changelog` | Required rewrite of generator draft: strip `type(scope):`, one user-visible bullet, collapse dupes, fold OpenSpec archive noise | Script path via versioning overlay / PROJECT |
 | `/lsi:readiness` | Use `TEST_COMMAND` from PROJECT.md; docs-only N/A exemption; never draft PR title/body | No hardcoded `bin/rspec-changed` / pytest in shared command |
 | `/lsi:review` | Never draft PR title/body; single-purpose stop | Focus areas from integration doc / patch — not embedded FFmpeg/S3 tables in shared command |
+| `/lsi:senior` | Full report shape from `senior-analysis-report.template.md` / web dogfood: executive summary, design verdict vocabulary (Sound / Acceptable with follow-ups / Rethink), per-LC Intent/Before-After/Alternatives/Unit verdict, relationship to code review; Deep for multi-capability or BREAKING workflow changes (do not Skip OpenSpec lifecycle work as “docs-only”) | Tier signals + `TEST_COMMAND` from integration overlay / PROJECT — not hardcoded FFmpeg/pytest; no Next footer (D11) |
 
 ### D11 — Slash commands are single-purpose (no Next, no chaining)
 

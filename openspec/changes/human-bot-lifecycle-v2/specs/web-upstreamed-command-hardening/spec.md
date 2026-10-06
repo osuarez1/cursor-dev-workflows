@@ -50,3 +50,26 @@ The shared `/lsi:review` command SHALL NOT emit a PR title or body draft. Domain
 - **WHEN** `/lsi:review` completes
 - **THEN** the output is the structured recommendation and findings
 - **AND** the agent does not emit PR title/body clipboard blocks
+
+### Requirement: Senior analysis matches full report template
+
+The shared `/lsi:senior` command SHALL require output shaped like `templates/senior-analysis-report.template.md` (as dogfooded with web’s `senior-analysis.md`): executive summary, overall design verdict (`Sound` / `Acceptable with follow-ups` / `Rethink`), per-LC coverage including alternatives and unit verdict, and relationship to code review. It SHALL NOT use merge-gate verdict words (`Ready` / `Blocked`).
+
+#### Scenario: Deep analysis uses full LC checklist
+
+- **WHEN** `/lsi:senior` runs at Deep or Light tier
+- **THEN** each logical unit includes alternatives (or an explicit N/A) and a unit verdict from the design vocabulary
+- **AND** the response includes an executive summary and overall design verdict
+- **AND** the response does not include a Next footer steering to another slash command
+
+#### Scenario: Tier signals stay generic
+
+- **WHEN** `/lsi:senior` documents Deep-tier signals or test strategy
+- **THEN** it refers to the per-repo integration overlay and `PROJECT.md` `TEST_COMMAND`
+- **AND** it does not hardcode video-encoder FFmpeg/S3 signals or a fixed pytest invocation in the shared command
+
+#### Scenario: OpenSpec lifecycle changes are not Skip-by-default
+
+- **WHEN** the active change is multi-capability or BREAKING workflow/OpenSpec policy work (even if file paths are docs-only)
+- **THEN** `/lsi:senior` SHALL NOT select Skip solely because the repo is docs-only
+- **AND** Deep or Light SHALL be used per scope

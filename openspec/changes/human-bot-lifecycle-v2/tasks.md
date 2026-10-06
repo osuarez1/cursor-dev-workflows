@@ -37,13 +37,14 @@
 - [ ] 5.1 Port `lsi-release-train`, `lsi-release-summary`, `lsi-change-summary` into `overlays/lsi/agent-stack/commands/` with bundle paths
 - [ ] 5.2 Register them in expected-agent-stack and genericize web-only script assumptions via PROJECT/versioning overlay
 
-## 5b. Web command hardening (commit / changelog / readiness / review)
+## 5b. Web command hardening (commit / changelog / readiness / review / senior)
 
 - [ ] 5b.1 Port web `/lsi:commit` improvements: required body, plan with files+body, no subject-only, no hand-written `Trello-Card:`; scopes via integration overlay not video-encoder table
 - [ ] 5b.2 Port web `/lsi:changelog` rewrite rules: strip `type(scope):`, user-visible bullets, collapse dupes, fold OpenSpec archive noise; keep generator script invocation
 - [ ] 5b.3 Port web `/lsi:readiness` improvements: `TEST_COMMAND` from PROJECT.md, docs-only N/A, never emit PR title/body; strip Rails/pytest hardcoding from shared command
 - [ ] 5b.4 Port web `/lsi:review` “never draft PR” guardrail; keep focus areas pointed at integration doc / patch (no embedded worker domain table in shared command)
-- [ ] 5b.5 Align all four with D11 (no Next footer; no chaining)
+- [ ] 5b.5 Rewrite `/lsi:senior` to require full `senior-analysis-report.template.md` output (executive summary, design verdicts, per-LC alternatives/unit verdict, relationship to code review); tier signals + TEST_COMMAND from overlay/PROJECT; Deep (not Skip) for multi-capability or BREAKING OpenSpec/workflow changes; strip Next footer
+- [ ] 5b.6 Align commit/changelog/readiness/review/senior with D11 (no Next footer; no chaining)
 
 ## 6. OpenCode support
 
