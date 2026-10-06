@@ -51,3 +51,8 @@
 
 - [ ] 6.1 Re-sync `web`, `ai-agent`, `video-encoder` via maintainer adopt loop
 - [ ] 6.2 `verify-adopters.py` passes each; announce release only after 6.1
+
+## 7. Amendment note (OpenCode opt-in — docs only here)
+
+- [x] 7.1 Record in `design.md` that `human-bot-lifecycle-v2` supersedes hard-reject of `agents_opencode` with **opt-in** OpenCode; Junie/JetBrains/`bin` stay rejected
+- [ ] 7.2 Implementation of opt-in emit/tests — tracked under `openspec/changes/human-bot-lifecycle-v2` tasks §6 (not re-opened here)
