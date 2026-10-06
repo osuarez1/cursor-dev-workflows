@@ -103,7 +103,6 @@ Create a Trello card and ticket-linked branch for the active OpenSpec change usi
 **Branch:** <type>/<id>-<slug>
 **Card fields:** (summary — type, title)
 
-Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists and change is large.
 ```
 
 **Guardrails**
@@ -114,3 +113,5 @@ Next: `/opsx:apply` to implement tasks, or `/lsi:senior` if `design.md` exists a
 - For "draft card only" requests (no `/lsi:card`), output the three **(copy below)** blocks per ticket-card-info **without** running `git ts`.
 - **Never** use `git-ts` — only **`git ts`** (space-separated Git subcommand via alias).
 - Prefer `git push -u origin "$(git branch --show-current)"` over `HEAD` if hooks require explicit branch names ([integrations.md](../../docs/workflows/integrations.md)).
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

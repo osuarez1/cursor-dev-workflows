@@ -26,7 +26,11 @@ Run code review for the active OpenSpec change after readiness passes and before
 
 2. **Verify branch** — feature: ticket-linked branch only; promotion: ticket branch or **`staging`**; never `main`.
 
-3. **Gather context**
+3. **Prowler auto-chain (when applicable)**
+
+   If an open Bitbucket PR exists for this branch and a comment body starts with `Prowler · Grok Bot review`, invoke `/lsi:address-prowler` first (same PR), then continue this review. Skip when no PR or no matching comment. Standalone `/lsi:address-prowler` remains available. No `Next:` footer after either path.
+
+4. **Gather context**
 
    Read:
    - `openspec/changes/<slug>/proposal.md`, `design.md`, `tasks.md`
@@ -34,19 +38,19 @@ Run code review for the active OpenSpec change after readiness passes and before
    - `docs/contracts/` when payload or wire format touched
    - Feature: `git diff staging...HEAD` · Promotion: `git diff main...HEAD`
 
-4. **Review focus areas**
+5. **Review focus areas**
 
-   Refer to [`docs/workflows/openspec-git-integration.md` § Code review](../../docs/workflows/openspec-git-integration.md#code-review) for this repo's specific focus areas (domain components, security, version scope, etc.).
+   Refer to [`docs/workflows/openspec-git-integration.md` § Code review](../../docs/workflows/openspec-git-integration.md#code-review) for this repo's specific focus areas (domain components, security, version scope, etc.). Do **not** embed adopter-specific domain tables in this shared command.
 
-5. **Structured findings**
+6. **Structured findings**
 
    For each issue: **severity** (blocker / major / minor / nit), **location**, **recommendation**.
 
-6. **Align with PR sections**
+7. **Align with PR sections**
 
-   Potential risks and Testing bullets must match what will appear in the PR body.
+   Potential risks and Testing bullets must match what will appear in the PR body. Do **not** draft the PR title or body here — `/lsi:pr` owns that.
 
-7. **Save locally (only if user asks)**
+8. **Save locally (only if user asks)**
 
    Path: `.reviews/YYYY-MM-DD-HHMM-<branch-slug>.md` (gitignored).
 
@@ -56,27 +60,35 @@ Run code review for the active OpenSpec change after readiness passes and before
 ## Code Review: <slug>
 
 **Recommendation:** <Approve | Approve with nits | Request changes>
+**Prowler:** skipped | addressed (see Address Prowler output above)
 
 ### Blockers
 - (none)
 
 ### Major
-- ...
+- (none)
 
 ### Minor / Nits
-- ...
+- (none)
 
 ### PR draft alignment
 - **Potential risks:** ...
 - **Testing:** ...
+```
 
-### Next
-- Approve (feature) → `/lsi:pr` (when user asks to open PR)
-- Approve (promotion) → push and open Bitbucket PR to **`main`** via `/lsi:promote` flow
-- Request changes → fix and re-run `/lsi:readiness`
+**Output (refuse)**
+
+```
+## Refuse: /lsi-review
+
+**Reason:** <wrong branch | readiness not Ready>
+**Fix:** <one line>
 ```
 
 **Guardrails**
 
 - Never post full review to Bitbucket unless user explicitly asks.
 - Never commit `.reviews/` files.
+- Never draft PR title/body — name `/lsi:pr` instead.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

@@ -17,6 +17,17 @@ All adopt-managed specs live under **`.lsi/workflows/`**:
 
 ## First adopt
 
+Prefer local bundle path (from the application repo root):
+
+```bash
+/path/to/cursor-dev-workflows/snippets/install-adopt.sh \
+  --bundle /path/to/cursor-dev-workflows \
+  --repo-name my-repo \
+  --accept-policy-defaults
+```
+
+Or from the bundle:
+
 ```bash
 cd cursor-dev-workflows
 python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --audit-only
@@ -24,6 +35,7 @@ python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --au
 python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --accept-policy-defaults
 ```
 
+**Fresh reinstall (documented sequence, not one chained command):** `cleanup-adopt.sh` → `install-adopt.sh` → `/lsi:adopt-verify`.
 ## Bundle update
 
 1. Bump `VERSION` and `CHANGELOG.md` in cursor-dev-workflows
@@ -58,6 +70,7 @@ python3 snippets/verify-adopters.py --repo-root ../my-repo
 
 Checks: `.lsi/workflows/`, 3 always-on rules, `/lsi:*` slash commands, `CLAUDE.md` symlink, `PROJECT.md`, `scripts/check_version.py`, link verify, audit.
 
+For accuracy (hallucinated PROJECT/AGENTS claims), run **`/lsi:adopt-verify`** in the adopter.
 ## CI: version gate
 
 Adopt installs `scripts/check_version.py` but **does not edit** `bitbucket-pipelines.yml`. Copy from:

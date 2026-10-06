@@ -96,7 +96,6 @@ Fetch the Trello **To Do** list via **`git tl`**, show an **interactive card pic
 **Branch:** {type}/{id}-{slug}
 **Card description:** updated (redacted from OpenSpec)
 
-Next: `/opsx:apply` or `/lsi:branch`.
 ```
 
 **Output (exit)**
@@ -116,3 +115,5 @@ No branch created.
 - **Always** use **AskQuestion** for picker and confirm.
 - **Never** run `git tb` on Exit or without OpenSpec sync (unless user explicitly skips card update in writing).
 - **Never** invent card ids or description copy.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

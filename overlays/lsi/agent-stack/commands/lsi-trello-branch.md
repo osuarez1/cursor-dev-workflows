@@ -109,7 +109,6 @@ Create and checkout a ticket branch from an **existing** Trello card using **`gi
 **Branch:** <type>/<id>-<slug>
 **Card description:** updated (redacted from OpenSpec)
 
-Next: `/opsx:apply`; `/lsi:branch` to verify.
 ```
 
 **Guardrails**
@@ -119,3 +118,5 @@ Next: `/opsx:apply`; `/lsi:branch` to verify.
 - **Never** use `git checkout -b` without Trello id.
 - Run from **`main`** or **`staging`** only.
 - Branch suffix **must** match OpenSpec change slug after rename.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

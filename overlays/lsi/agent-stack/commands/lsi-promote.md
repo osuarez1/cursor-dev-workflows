@@ -18,11 +18,12 @@ Prepare and open a **production promotion** pull request after staging QA passes
 2. **Verify prerequisites**
 
    Ask user to confirm:
-   - Feature PR merged to **`staging`**
+   - Feature PR(s) merged to **`staging`**
    - Staging QA passed
+   - **`/lsi:close` already completed** for the change (archived + CLOSED.md) — promote carries already-closed work
    - Code on current branch includes staging-validated commits
 
-   Refuse if user reports QA failed or feature was cut from release.
+   Refuse if user reports QA failed, feature was cut from release, or close has not run yet.
 
 3. **Verify branch**
 
@@ -32,26 +33,17 @@ Prepare and open a **production promotion** pull request after staging QA passes
 
    Refuse **`main`** for drafting (PR originates from feature/staging branch).
 
-4. **Run `/lsi:readiness`** in **promotion mode** (`git diff main...HEAD`, PR target **`main`**)
-
-   - Block if verdict is not `Ready` unless user documents explicit exemption.
-   - Test suite must pass locally (see integration doc § PR production readiness) when source changed.
-
-5. **Run `/lsi:review`** in **promotion mode** (`git diff main...HEAD`)
-
-   - Block on blockers unless user accepts risk.
-
-6. **Gather PR metadata from OpenSpec**
+4. **Gather PR metadata from OpenSpec** (do not run readiness/review inside this command)
 
    | Section | Source |
    |---------|--------|
-   | **Overview** | `proposal.md` → Why + note "promotion after staging validation" |
+   | **Overview** | `proposal.md` → Why + note "promotion after staging QA and close" |
    | **Changes** | What Changes + `design.md` |
-   | **Potential risks** | BREAKING in proposal + design risks + review |
+   | **Potential risks** | BREAKING in proposal + design risks |
    | **Testing** | Staging QA results + tasks.md test tasks |
-   | **Related** | `openspec/changes/<slug>/proposal.md` + Trello card id/URL |
+   | **Related** | archived path / CLOSED.md entry + Trello card id/URL |
 
-7. **Draft PR**
+5. **Draft PR**
 
    ```bash
    git status
@@ -65,7 +57,7 @@ Prepare and open a **production promotion** pull request after staging QA passes
 
    If `git log main..HEAD` spans multiple themes, note cumulative promotion scope in **Overview**.
 
-8. **Push (only if user confirms)**
+6. **Push (only if user confirms)**
 
    Ask: "Push branch and create Bitbucket PR to **`main`** with the above title and body?"
 
@@ -79,7 +71,7 @@ Prepare and open a **production promotion** pull request after staging QA passes
 
    **Do not** run `gh pr create` — this repo uses Bitbucket only.
 
-9. **Post-push CI**
+7. **Post-push CI**
 
    Confirm Bitbucket Pipelines test job passes on the PR. Report status in output.
 
@@ -90,15 +82,8 @@ Prepare and open a **production promotion** pull request after staging QA passes
 
 **Target:** main (production)
 **URL:** <bitbucket pr url or "not created — awaiting confirmation">
-
-**Readiness:** Ready
-**Review:** Approve
-
-**CI:** Test suite ✓/✗
-
-After merge: `/lsi:merge-desc` (target main).
-Next: checkout **main**, pull, then `/lsi:close`.
-Do **not** sync or archive until merged to **main**.
+**Close:** already done before promote ✓
+**CI:** Test suite ✓/✗ / N/A
 ```
 
 **Guardrails**
@@ -106,4 +91,6 @@ Do **not** sync or archive until merged to **main**.
 - Do **not** run `gh pr create` or any GitHub CLI PR commands.
 - Do **not** auto-push without user confirmation.
 - Target is **`main`**, not `staging`.
-- Do **not** suggest `/opsx:sync` or `/opsx:archive` before main merge.
+- Do **not** run readiness/review/verify inside promote; do **not** emit a Next footer
+- Refuse if `/lsi:close` has not been completed for the change
+- Agents MUST emit the Output skeleton

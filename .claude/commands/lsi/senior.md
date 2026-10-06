@@ -4,7 +4,7 @@ description: Deep, light, or skip senior analysis after design.md
 
 Run senior analysis tier selection for the active OpenSpec change after `design.md` exists and before bulk `/opsx:apply`.
 
-**Canonical source:** [senior-analysis.md](../../docs/workflows/senior-analysis.md) · [`overlays/lsi/docs/workflows/openspec-git-integration.md` § Senior analysis](../../overlays/lsi/docs/workflows/openspec-git-integration.md#senior-analysis)
+**Canonical source:** [senior-analysis.md](../../docs/workflows/senior-analysis.md) · [`overlays/lsi/docs/workflows/openspec-git-integration.md` § Senior analysis](../../overlays/lsi/docs/workflows/openspec-git-integration.md#senior-analysis) · [senior-analysis-report.template.md](../../templates/senior-analysis-report.template.md)
 
 **Input:** Optionally specify change slug or tier (`deep`, `light`, `skip`). If omitted, infer tier from change scope.
 
@@ -12,7 +12,7 @@ Run senior analysis tier selection for the active OpenSpec change after `design.
 
 1. **Resolve change** — same as `/lsi:branch` (announce slug; ask if ambiguous).
 
-2. **Verify branch** — must be ticket-linked branch, not `main` or `staging`. If wrong, stop and suggest `/lsi:card` or `/lsi:branch`.
+2. **Verify branch** — must be ticket-linked branch, not `main` or `staging`. If wrong, stop with refuse Output.
 
 3. **Confirm `design.md` exists**
 
@@ -22,18 +22,22 @@ Run senior analysis tier selection for the active OpenSpec change after `design.
 
    | Tier | When |
    |------|------|
-   | **Deep** | Runtime-critical, integration-heavy, or multi-capability change — see integration doc for this repo's tier signals |
-   | **Light** | ≤ ~3 `tasks.md` sections |
-   | **Skip** | Docs/openspec-only; point to `/lsi:review` instead |
+   | **Deep** | Runtime-critical, integration-heavy, multi-capability, or **BREAKING** OpenSpec/workflow change — see integration doc tier signals. Prefer Deep (not Skip) for multi-capability lifecycle/workflow OpenSpec work. |
+   | **Light** | ≤ ~3 `tasks.md` sections and low integration risk |
+   | **Skip** | Truly trivial docs-only with no design risk — still prefer Light/Deep when the change alters lifecycle policy |
 
-   If ambiguous, use **AskQuestion tool** with Deep / Light / Skip options.
+   If ambiguous, use **AskQuestion** with Deep / Light / Skip options.
 
 5. **Run analysis (Deep or Light)**
 
-   - Logical units **LC-1, LC-2, …** align with numbered `tasks.md` sections.
-   - Inputs: Why / What Changes, `design.md` decisions, capabilities from `proposal.md`.
-   - Cover: architecture fit, risks, test strategy (run the test command from [PROJECT.md](../../PROJECT.md)), rollback if BREAKING.
-   - **Do not** post full analysis to Bitbucket unless user explicitly asks.
+   Emit the **full** report shape from [senior-analysis-report.template.md](../../templates/senior-analysis-report.template.md):
+
+   - Executive summary; overall design verdict vocabulary: **Sound** / **Acceptable with follow-ups** / **Rethink**
+   - Per-LC: Intent, Before/After, Alternatives, Unit verdict
+   - Cross-cutting; open questions; relationship to code review
+   - Logical units **LC-1, LC-2, …** align with numbered `tasks.md` sections
+   - Test strategy: run / cite `TEST_COMMAND` from [PROJECT.md](../../PROJECT.md); rollback if BREAKING
+   - **Do not** post full analysis to Bitbucket unless user explicitly asks
 
 6. **Save locally (only if user asks)**
 
@@ -41,19 +45,45 @@ Run senior analysis tier selection for the active OpenSpec change after `design.
 
 **Output**
 
+Fill [senior-analysis-report.template.md](../../templates/senior-analysis-report.template.md) in chat (title through Relationship to code review). Required empty sections use `(none)` / `N/A` rather than omitting headings.
+
 ```
-## Senior Analysis: <slug> (tier: <Deep|Light|Skip>)
+# Senior analysis — <branch> — <YYYY-MM-DD>
 
-### LC-1: <tasks.md section title>
-<findings>
+**Base:** <base>...HEAD
+**Tier:** Deep | Light | Skip — <why>
+**Overall verdict:** Sound | Acceptable with follow-ups | Rethink
 
-### Summary
-- **Proceed?** <yes with caveats | recommend design update>
-- **Next:** `/opsx:apply` or update `design.md` if blockers found
+## Executive summary
+...
+
+## Logical changes overview
+| ID | Title | Files / area | Unit verdict |
+|----|-------|--------------|--------------|
+| LC-1 | ... | ... | ... |
+
+## LC-1: <title>
+...
+
+## Relationship to code review
+- Merge readiness is not this document’s verdict.
+```
+
+**Output (refuse)**
+
+```
+## Refuse: /lsi-senior
+
+**Reason:** <wrong branch | missing design.md>
+**Fix:** <one line>
 ```
 
 **Guardrails**
 
-- Skip tier: output one paragraph pointing to code review at PR time.
+- Skip tier: short Output with tier Skip and one paragraph pointing to code review at PR time — still use the title/verdict shell.
 - Never commit `.senior-analyses/` files.
 - Refuse on `main` or `staging`.
+- MUST emit the template-shaped Output; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

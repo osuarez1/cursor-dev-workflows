@@ -38,7 +38,6 @@ Propose and apply the next version bump on `main` using the release script.
 **Proposed:** 0.4.1 (patch)
 **Reason:** <from infer script>
 
-Next: `/lsi:changelog` then commit `chore(release): v0.4.1`
 ```
 
 **Guardrails**
@@ -46,3 +45,5 @@ Next: `/lsi:changelog` then commit `chore(release): v0.4.1`
 - Worker product semver in `version.txt` — not separate from CHANGELOG version
 - Invoke `scripts/release/infer_version.py` — do not reimplement bump logic inline
 - **`main`-only** — refuse on `staging` and ticket branches
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

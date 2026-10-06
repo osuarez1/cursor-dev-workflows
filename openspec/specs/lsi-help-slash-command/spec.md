@@ -5,9 +5,7 @@
 Define the `/lsi:help` slash command for LSI workflow discovery — one response per invocation, topic list or section content, SDLC diagram section, GitHub bundle spec links, and adopter parity expectations.
 
 **Verification note:** Topic rendering is **agent-dependent** — agents must read `## Section:` blocks from the command source; there is no programmatic renderer. Apply/review chat dogfood matched overview, `sdlc`, `lifecycle`, `next`, and invalid topic. Residual risk for other agents/models only.
-
 ## Requirements
-
 ### Requirement: One-shot help overview and topic list
 
 The LSI agent stack SHALL provide `/lsi:help` as a read-only reference command with exactly one response per invocation.
@@ -15,7 +13,7 @@ The LSI agent stack SHALL provide `/lsi:help` as a read-only reference command w
 #### Scenario: No topic shows overview and topic list only
 
 - **WHEN** a user invokes `/lsi:help` with no topic argument
-- **THEN** the agent emits a short LSI workflow overview (dual ticketing, staging-first, typical path, bundle version reference)
+- **THEN** the agent emits a short LSI workflow overview (dual ticketing, human vs bot lanes, close-before-promote, PR modes A/B/C, typical path, bundle version reference)
 - **AND** the agent presents a numbered list of eight topic ids with labels and `/lsi:help <topic>` invoke hints
 - **AND** the agent does not emit section bodies (lifecycle list, command table, SDLC diagram) in the same response
 
@@ -48,8 +46,9 @@ The help command SHALL provide a dedicated SDLC diagram section separate from th
 #### Scenario: SDLC topic shows diagram
 
 - **WHEN** the user invokes `/lsi:help sdlc`
-- **THEN** the agent emits a mermaid flowchart of the staging-first feature delivery path (explore through close on `main`, optional release)
-- **AND** the agent does not include the numbered 13-step lifecycle list in the same response
+- **THEN** the agent emits a mermaid flowchart of the feature delivery path (human docs PR → bot impl PR → staging QA → close before promote → promote to main → optional release)
+- **AND** the diagram does not show `/lsi:close` exclusively on `main` after promote as the happy path
+- **AND** the agent does not include the numbered lifecycle list in the same response
 
 ### Requirement: GitHub bundle spec links in help output
 
@@ -71,3 +70,14 @@ Help section output that references bundle workflow specs SHALL link to the publ
 
 - **WHEN** `verify-adopters.py` runs against an adopter with a synced agent stack after `/lsi:help` is implemented
 - **THEN** `lsi-help` is listed in `LSI_COMMANDS` and `.cursor/commands/lsi-help.md` is required for parity pass
+
+### Requirement: Lifecycle topic matches human-bot lanes
+
+The `/lsi:help lifecycle` section SHALL describe human steps 1–8, bot steps 9–19, and human close/promote steps 20–24 consistent with `openspec-git-integration.md`.
+
+#### Scenario: Lifecycle topic content
+
+- **WHEN** the user invokes `/lsi:help lifecycle`
+- **THEN** the emitted section includes mode-A docs PR before mode-B impl PR (unless mode C), bot-lane apply through staging PR, and `/lsi:close` before `/lsi:promote`
+- **AND** the section does not instruct production close only on `main` after promote as the default path
+

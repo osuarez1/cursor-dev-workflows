@@ -140,7 +140,7 @@ LINK_REWRITES = [
 ]
 
 
-_LEGACY_KEYS = ("agents_opencode", "agents_junie", "agents_jetbrains", "bin")
+_LEGACY_KEYS = ("agents_junie", "agents_jetbrains", "bin")
 
 
 def load_config(path: Path) -> dict:
@@ -151,10 +151,27 @@ def load_config(path: Path) -> dict:
     if legacy:
         raise SystemExit(
             f"Patch config {path} contains unsupported keys: {legacy}. "
-            "This bundle supports Cursor + Claude only. "
+            "This bundle supports Cursor + Claude; OpenCode is opt-in via "
+            "agents_opencode: {{ enabled: true }}. "
             "Remove these keys and re-run adopt."
         )
+    opencode = data.get("agents_opencode")
+    if opencode is not None:
+        if not isinstance(opencode, dict):
+            raise SystemExit(
+                f"Patch config {path}: agents_opencode must be a mapping "
+                "(e.g. agents_opencode: {{ enabled: true }})."
+            )
+        if "enabled" not in opencode:
+            raise SystemExit(
+                f"Patch config {path}: agents_opencode requires `enabled: true|false`."
+            )
     return data
+
+
+def agents_opencode_enabled(config: dict) -> bool:
+    opencode = config.get("agents_opencode") or {}
+    return bool(isinstance(opencode, dict) and opencode.get("enabled") is True)
 
 
 def run_script(script: Path, *args: str) -> int:
@@ -372,6 +389,7 @@ def install_agent_stack(target: Path, tokens: dict[str, str], config: dict) -> N
     # rule_overlays: install repo-specific .cursor/rules/*.mdc from patch
     # Applied after generic rules so domain-specific content overrides/extends baseline.
     _install_rule_overlays(target, tokens, config)
+    _install_skill_overlays(target, tokens, config)
 
 
 def _install_rule_overlays(target: Path, tokens: dict[str, str], config: dict) -> None:
@@ -388,6 +406,69 @@ def _install_rule_overlays(target: Path, tokens: dict[str, str], config: dict) -
             continue
         content = rewrite_links(substitute_tokens(src.read_text(encoding="utf-8"), tokens))
         (rules_dir / dest_name).write_text(content, encoding="utf-8")
+
+
+def _install_skill_overlays(target: Path, tokens: dict[str, str], config: dict) -> None:
+    """Install repo-specific Cursor skills from skill_overlays in patch config.
+
+    Mapping: skill-dir-name → bundle-relative path to skill directory containing SKILL.md.
+    Example: lsi-host-log: patches/files/infra/skills/lsi-host-log
+    """
+    skill_overlays = config.get("skill_overlays") or {}
+    if not skill_overlays:
+        return
+    skills_dir = target / ".cursor" / "skills"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    for dest_name, src_rel in skill_overlays.items():
+        src = BUNDLE_ROOT / src_rel
+        if not src.is_dir():
+            print(f"WARNING: skill_overlays source not found: {src}", file=sys.stderr)
+            continue
+        dest = skills_dir / dest_name
+        if dest.exists():
+            shutil.rmtree(dest)
+        def _skill_transform(content: str, in_subdir: str | None = None) -> str:
+            return substitute_tokens(content, tokens)
+
+        copy_tree(src, dest, transform=_skill_transform)
+
+
+def install_opencode_stack(target: Path, tokens: dict[str, str], config: dict) -> None:
+    """Emit thin OpenCode instruction stubs when agents_opencode.enabled is true."""
+    if not agents_opencode_enabled(config):
+        return
+    opencode_dir = target / ".opencode" / "commands"
+    opencode_dir.mkdir(parents=True, exist_ok=True)
+    playbook = OVERLAY_ROOT / "agent-stack" / "bot-lane.md"
+    playbook_body = ""
+    if playbook.is_file():
+        playbook_body = substitute_tokens(playbook.read_text(encoding="utf-8"), tokens)
+    index = [
+        "# OpenCode LSI entry points (opt-in)",
+        "",
+        "Load `AGENTS.md` and follow the bot playbook for steps 9–19.",
+        "",
+        "## Bot playbook",
+        "",
+        playbook_body or "(see overlays/lsi/agent-stack/bot-lane.md in the bundle)",
+        "",
+        "## Commands",
+        "",
+        "Mirror Cursor `/lsi:*` under `.cursor/commands/`. Core entry points:",
+        "",
+    ]
+    for cmd in sorted((OVERLAY_ROOT / "agent-stack" / "commands").glob("lsi-*.md")):
+        stub_name = cmd.stem.replace("lsi-", "") + ".md"
+        slash = "/" + cmd.stem.replace("lsi-", "lsi:", 1)
+        stub = (
+            f"# {slash}\n\n"
+            f"Canonical instructions: `.cursor/commands/{cmd.name}` "
+            f"(installed by adopt). Follow that file's `**Output**` skeleton; "
+            f"no `Next:` footers.\n"
+        )
+        (opencode_dir / stub_name).write_text(stub, encoding="utf-8")
+        index.append(f"- `{slash}` → `.opencode/commands/{stub_name}`")
+    (target / ".opencode" / "README.md").write_text("\n".join(index) + "\n", encoding="utf-8")
 
 
 def merge_convention(target: Path) -> None:
@@ -635,6 +716,7 @@ def adopt(
     copy_overlay(target, tokens, config)
     merge_which_workflow_lsi(target)
     install_agent_stack(target, tokens, config)
+    install_opencode_stack(target, tokens, config)
     merge_convention(target)
     merge_agents_markers(target)
     merge_cursorrules(target)

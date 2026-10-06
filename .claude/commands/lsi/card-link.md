@@ -151,7 +151,6 @@ Use when `/opsx:propose` or early implementation happened on a branch **before**
 **Branch:** <type>/<id>-<slug>  (renamed in place)
 **Description:** redacted from OpenSpec artifacts
 
-Next: `/opsx:apply` or continue implementation; `/lsi:branch` to re-verify.
 ```
 
 **Guardrails**
@@ -161,3 +160,5 @@ Next: `/opsx:apply` or continue implementation; `/lsi:branch` to re-verify.
 - **Only** on a non-protected feature branch — never on `main` or `staging`.
 - **Never** run `git ts` for this flow.
 - If branch already has valid id + matching slug, refuse — use `/lsi:branch`.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).

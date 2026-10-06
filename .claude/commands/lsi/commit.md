@@ -16,7 +16,7 @@ Create logical commits from the active OpenSpec change's `tasks.md` sections usi
 
    - Must be `feature|bugfix|hotfix|chore/{24-char-id}-<change-slug>`, not `main` or `staging`.
    - Suffix must match change slug.
-   - If wrong branch, stop and suggest `/lsi:card` or `/lsi:branch`.
+   - If wrong branch, stop with refuse Output.
 
 3. **Gather state**
 
@@ -37,11 +37,17 @@ Create logical commits from the active OpenSpec change's `tasks.md` sections usi
    ```markdown
    ## Commit plan
 
-   1. `type(scope): imperative description` — files: ...
-   2. `type(scope): imperative description` — files: ...
+   1. `type(scope): imperative description`
+      - **files:** ...
+      - **body:** what changed and why it matters
+   2. `type(scope): imperative description`
+      - **files:** ...
+      - **body:** what changed and why it matters
    ```
 
-   Derive commit scopes from [`overlays/lsi/docs/workflows/openspec-git-integration.md` § Commit mapping](../../overlays/lsi/docs/workflows/openspec-git-integration.md#commit-mapping). One logical change per commit.
+   Every entry carries a body — the user reviews the explanation before any commit runs.
+
+   Derive commit scopes from [`overlays/lsi/docs/workflows/openspec-git-integration.md` § Commit mapping](../../overlays/lsi/docs/workflows/openspec-git-integration.md#commit-mapping) (per-repo overlay). Do **not** embed adopter-specific domain scope tables in this command. One logical change per commit.
 
 5. **Execute commits (one at a time)**
 
@@ -54,11 +60,16 @@ Create logical commits from the active OpenSpec change's `tasks.md` sections usi
    git commit -m "$(cat <<'EOF'
    type(scope): imperative description
 
+   Explain what changed and why it matters — the constraint, the bug's
+   consequence, or the decision behind it. Wrap at ~72 characters and use
+   bullets when the commit has several distinct points.
    EOF
    )"
    ```
 
    - Verify with `git status` after each commit
+
+   The body is **required**. Never leave it empty, and never restate the subject in other words — if the body would only rephrase the subject, write the motivation or consequence instead. Do **not** hand-write `Trello-Card:`; git-trello `prepare-commit-msg` appends it from the branch id when present.
 
 6. **Never** use `--no-verify`, `--amend`, or squash unless user explicitly requests.
 
@@ -70,14 +81,26 @@ Create logical commits from the active OpenSpec change's `tasks.md` sections usi
 **Change:** <slug>
 **Commits created:** N
 
-<list of commit subjects>
+### Subjects
+- `type(scope): subject`
+```
 
-Next: `/lsi:readiness` before opening a PR.
+**Output (refuse)**
+
+```
+## Refuse: /lsi-commit
+
+**Reason:** <wrong branch | no changes | ambiguous slug>
+**Fix:** <one line>
 ```
 
 **Guardrails**
 
 - Run `git commit` **only when the user explicitly asks** (invoking this command counts as asking).
 - Never commit secrets (`.env`, credentials, key files, `tmp/`).
+- Never create a subject-only commit — every message carries an explanatory body.
+- Never hand-write the `Trello-Card:` trailer — the hook adds it when configured.
 - If pre-commit hook fails, fix and create a **new** commit — do not amend.
 - Refuse on `main` or `staging`.
+- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
+- No `Next:` footer (D11).
