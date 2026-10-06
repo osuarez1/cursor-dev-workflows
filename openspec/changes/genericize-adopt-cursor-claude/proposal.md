@@ -2,7 +2,7 @@
 
 Agent-stack commands in `overlays/lsi/agent-stack/commands/` embed **ai-agent** and **video-encoder** domain (FastAPI, FFmpeg, `uv run pytest`, data-lake scopes). After adopt, every org repo receives the wrong persona and test gates — `web` already has **video-encoder** contamination in `.lsi/workflows/openspec-git-integration.md` and `.cursor/commands/lsi-*.md` from a prior bad adopt.
 
-The bundle still ships **OpenCode**, **Junie**, **JetBrains AI**, and workflow `bin/lsi-*` / `bin/opsx-*` artifacts. Policy is **Cursor + Claude only**.
+The bundle still shipped **OpenCode**, **Junie**, **JetBrains AI**, and workflow `bin/lsi-*` / `bin/opsx-*` artifacts. This change’s policy was **Cursor + Claude only**. **Amendment (`human-bot-lifecycle-v2`):** OpenCode returns as **opt-in** via `agents_opencode`; Junie / JetBrains / `bin` remain out.
 
 The bundle also ships and installs **OpenSpec** (`opsx-*`) slash commands, which duplicates ownership: OpenSpec itself provides those commands via `openspec init` / config profile. The bundle should manage **LSI** (`lsi-*`) commands only and leave `opsx-*` to OpenSpec.
 

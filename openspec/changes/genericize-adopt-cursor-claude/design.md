@@ -28,13 +28,14 @@ Three-layer model (from drift audit):
 **Non-Goals**
 
 - Editing adopter application repos in the bundle PR
-- Supporting OpenCode / Junie / JetBrains / workflow shell wrappers
+- Supporting Junie / JetBrains / workflow shell wrappers
+- ~~Supporting OpenCode~~ — **superseded** by amendment below (`human-bot-lifecycle-v2`: OpenCode **opt-in**)
 
 ## Decisions
 
 | # | Decision |
 |---|----------|
-| D1 | Delete (not deprecate) multi-tool adopt flags; adopt errors on legacy YAML keys (`agents_opencode`, `agents_junie`, `agents_jetbrains`, `bin`) |
+| D1 | Delete (not deprecate) multi-tool adopt flags; adopt errors on legacy YAML keys (`agents_junie`, `agents_jetbrains`, `bin`). **Amended:** `agents_opencode` is **opt-in** again per `human-bot-lifecycle-v2` (default off; not a hard error when enabled). |
 | D2 | Commands defer to `openspec-git-integration.md` § Commit mapping / Code review — no per-repo `command_overlays` unless step flow differs |
 | D3 | `rule_overlays` in `adopt.py` mirrors `command_overlays` |
 | D4 | OpenSpec (`opsx-*`) commands are owned by OpenSpec (`openspec init` / config profile). The bundle ships no `opsx-*` sources; `adopt.py` installs `lsi-*` only and never installs/removes `opsx-*`; the parity gate ignores the `opsx-*` namespace. No `sync_opsx` key. |
@@ -82,3 +83,14 @@ flowchart TD
 ## Risks
 
 Dual maintainer/adopter doc drift — reuse three-tier link policy from v1.4.2 `fix-adopter-link-drift` change.
+
+## Amendment — OpenCode opt-in (`human-bot-lifecycle-v2`)
+
+**Date:** 2026-10-05
+
+Sibling change `human-bot-lifecycle-v2` re-adds **optional** OpenCode emit for local models (e.g. QwenCoder):
+
+- `agents_opencode: { enabled: true }` is accepted; default/omitted = no `.opencode/` emit.
+- Junie, JetBrains AI, and workflow `bin/lsi-*` / `bin/opsx-*` remain forbidden.
+- Apply work (adopt.py + `test_supported_agents_only.py`) lives in `human-bot-lifecycle-v2` tasks §6, not as a re-open of this change’s completed apply checklist.
+- Spec `supported-agents-cursor-claude` “reject `agents_opencode`” scenario is superseded by `opencode-agent-support` in the sibling change.
