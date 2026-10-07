@@ -9,9 +9,9 @@ project:
   BASE_BRANCH: main
   PR_TARGET_BRANCH: staging
   PROTECTED_BRANCHES: "main, staging"
-  SOURCE_ROOT: "app/"
-  TEST_ROOT: "tests/"
-  TEST_COMMAND: "uv run pytest"
+  SOURCE_ROOT: "frontend/, backend/, intelligence/, ingestion/"
+  TEST_ROOT: "frontend/, backend/, intelligence/, ingestion/"
+  TEST_COMMAND: "make test"
   PR_HOST: Bitbucket
   BITBUCKET_REMOTE: lsistreaming/cs-chatbot
   VERSION_FILE: VERSION
