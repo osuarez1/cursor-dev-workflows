@@ -63,12 +63,13 @@ Verify first because spec gaps drive the most code movement; review last because
 
 ### D4. Helper: `.lsi/bin/lsi-bitbucket`
 
-Bash + `curl` + `jq`. Source `overlays/lsi/snippets/bin/lsi-bitbucket`; installed by adopt with mode `0755`; directory `.lsi/bin/` wiped and rewritten each adopt (adopt-managed like `.lsi/workflows/`).
+Bash + `curl` + `jq`. Source `overlays/lsi/snippets/bin/lsi-bitbucket`; installed by adopt with mode `0755`; directory `.lsi/bin/` wiped and rewritten each adopt (adopt-managed like `.lsi/workflows/`). **Not a user toolbox** — adopters MUST NOT store custom scripts under `.lsi/bin/`; CHANGELOG Adopter action and adopt docs SHALL warn that every `/lsi:update` replaces the directory contents.
 
 Subcommands: `info <pr>`, `list <pr> [--match <regex>] [--exclude-bot]`, `post <pr> <file> [--step <label>] [--log <file>]`, `create-pr --source <b> --dest <b> --title <t> --body-file <f>`, `push [<branch>]`, `commit -m <subject> [-m <body>]`, `whoami`. Global `--dry-run` (no network, no credential requirement) and `LSI_BB_FIXTURE_DIR` (serve `info`/`list` from JSON files) for tests.
 
 - **Workspace / repo** parsed from `git remote get-url origin` (ssh or https); `BB_WORKSPACE` / `BB_REPO_SLUG` only override. No per-repo values in the secrets file are required.
 - **Auth precedence:** `BB_ACCESS_TOKEN_<WORKSPACE>_<REPO>` (uppercased, non-alnum → `_`) → `BB_ACCESS_TOKEN` → `BB_USERNAME`+`BB_API_TOKEN` → `BB_USERNAME`+`BB_APP_PASSWORD` (stderr deprecation warning). Access tokens use `Authorization: Bearer`; others HTTP Basic. `whoami` reports which method and whether it is a bot identity.
+- **Access-token availability (decided):** Prefer a **repository** access token stored as `BB_ACCESS_TOKEN_<WS>_<REPO>`. When the Bitbucket plan does not offer repository tokens, use a **workspace** access token as `BB_ACCESS_TOKEN` (still Bearer / bot identity for `--fix` and apply-bot). API token / app password remain read-only fallbacks only. `integrations.md` SHALL document both token forms.
 - **Secrets file** `${BB_SECRETS_FILE:-~/.bitbucket_secrets}` is parsed as `export KEY=value` / `KEY=value` lines for an allowlist of `BB_*` keys — not `source`d. Refuse if the file is group/world readable.
 - **Allowed HTTP:** `GET` on PR / comments; `POST` to `…/pullrequests/{id}/comments` and `…/pullrequests`. No other verbs or endpoints in the code (asserted by test).
 - **Header** `**LSI Bot Review**` (override `LSI_BOT_HEADER`). Bot's own comments are recognised by that header; `list --exclude-bot` drops them (prevents Prowler self-match).
@@ -103,12 +104,13 @@ Deterministic checklist emitted as a table, after the senior loop:
 6. No `/opsx:sync`, `/opsx:archive`, `/lsi:close` as apply deliverables.
 7. Proposal capabilities ↔ `specs/` folders match.
 
-Verdict **Plan ready** | **Plan gaps** (with `--fix`, gaps go through `/lsi:address-senior` within the same 3-cycle budget). The full senior report from every iteration is posted (multi-part per D4) and saved to `.senior-analyses/` — the bot invocation is the "user asks" for both.
+Verdict **Plan ready** | **Plan gaps**. With `--fix`, plan-gap remediation SHALL call `/lsi:address-senior` against the **same single budget of 3 address cycles** already used by the senior loop — there is **no second budget** for plan-gap. Cycles spent fixing senior findings count toward the cap; if the budget is already exhausted when gaps remain, session verdict is **NEEDS HUMAN** (do not start a fresh loop). The full senior report from every iteration is posted (multi-part per D4) and saved to `.senior-analyses/` — the bot invocation is the "user asks" for both.
 
 ### D9. Apply-bot: locked decisions, drift, human in the loop
 
 - **Preconditions:** `PR_HOST` = Bitbucket; Mode A PR id given or discovered (`--mode-a <PR>`), state `MERGED` into `PR_TARGET_BRANCH`; `origin/<PR_TARGET_BRANCH>` contains `openspec/changes/<slug>/`; on ticket branch with target merged in; clean tree; access token present.
 - **Lock:** record merge SHA; write `.reviews/<ts>_apply_<slug>.lock.md` listing design decisions (D-ids / headings) and requirement names with a hash of each artifact at the merge SHA.
+- **`TEST_COMMAND` after each `tasks.md` section:** If `TEST_COMMAND` from `PROJECT.md` is missing, empty, whitespace-only, or the literal `N/A`, the section SHALL **not** fail — post/log `Skipped — TEST_COMMAND unset` and proceed to the section commit. If set, run it; non-zero exit fails the section and raises a human checkpoint (same options as other apply failures).
 - **Drift check** after the gate loops: diff `openspec/changes/<slug>/` vs merge SHA, and evaluate implementation against each locked decision. Any artifact edit or contradiction is drift.
 - **Checkpoints (human in the loop):** on drift, on any gate exhausting its budget, on `Rethink`-class findings, or when an `address-*` proposes editing locked artifacts. The agent stops, writes the decision prompt into the state file, presents options (accept drift and record it in the PR body / revise implementation / abort), and waits. When no human is attached, the session ends with `PAUSED — awaiting decision`, and `/lsi:apply-bot <slug> --resume` continues from the state file.
 - **State file** `.reviews/<ts>_apply_<slug>.state.json`: step pointer, cycle counters, SHAs, pending decision. Local models crash; every step re-reads its command file instead of relying on memory.
@@ -140,7 +142,8 @@ Content sourced from `snippets/gitignore-local-artifacts.txt`; idempotent; adopt
 - [Local models drift from command specs] → per-step re-read, deterministic gates (`TEST_COMMAND`, `openspec validate`), state file + resume, human checkpoints.
 - [Full senior reports flood PR comments] → multi-part posting, one step label per part; accepted per product decision.
 - [Writing agent settings is persistent config in adopter repos] → narrow allowlist, no push / commit / curl entries, idempotent merge, listed in CHANGELOG Adopter action.
-- [Access-token plan availability varies] → API token / app password fall back for read-only sessions with a warning; `--fix` / apply-bot refuse with a fix line pointing to the token instructions.
+- [Access-token plan availability varies] → prefer repo token; workspace token via `BB_ACCESS_TOKEN` when repo tokens unavailable; API token / app password fall back for read-only sessions with a warning; `--fix` / apply-bot refuse without an access token (fix line → token instructions).
+- [Custom files under `.lsi/bin/`] → wipe on every adopt; Adopter action warns not to store custom tools there.
 - [Bot commits not signed / not attributable to a human] → PR body and session log name the human who started the session (`git config user.name`), without email.
 - [`.claude/commands/lsi/` emit collides with adopter custom commands] → parity gate flags, never deletes; `lsi/` subdirectory namespace.
 
@@ -148,12 +151,12 @@ Content sourced from `snippets/gitignore-local-artifacts.txt`; idempotent; adopt
 
 1. Land bundle changes; MINOR bump to 2.1.0 with Adopter action notes.
 2. Maintainer adopt loop / `/lsi:update` per adopter; `verify-adopters.py` passes.
-3. Each adopter creates a repository access token ("LSI Review Bot") and adds it to `~/.bitbucket_secrets`.
+3. Each adopter creates a bot access token ("LSI Review Bot") — repository-scoped when available, otherwise workspace-scoped as `BB_ACCESS_TOKEN` — and adds it to `~/.bitbucket_secrets` (`chmod 600`).
 4. Smoke test per adopter: `.lsi/bin/lsi-bitbucket whoami`, `/lsi:pr-bot <PR>` read-only on a throwaway PR.
+5. Adopter action MUST state that `.lsi/bin/` is wipe-managed on `/lsi:update` (do not store custom tools there).
 
 Rollback: revert adopter sync commit; helper and commands are additive.
 
 ## Open Questions
 
-- Exact Claude Code settings key for sandbox network allowlisting and OpenCode `permission` schema — confirm against current docs during implementation (tasks 6.3 / 6.4).
-- Whether the Bitbucket plan in use permits repository access tokens on every adopter repo, or a workspace token is preferred.
+- Exact Claude Code settings key for sandbox network allowlisting and OpenCode `permission` schema — confirm against current docs during implementation (tasks 3.1 / 3.2) and amend this design if keys differ from D10.

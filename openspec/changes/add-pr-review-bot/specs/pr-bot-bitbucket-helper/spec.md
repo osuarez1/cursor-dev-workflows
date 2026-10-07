@@ -2,7 +2,7 @@
 
 ### Requirement: Helper installed at a stable executable path
 
-The bundle SHALL ship a Bitbucket Cloud API helper sourced from `overlays/lsi/snippets/bin/lsi-bitbucket`, and `snippets/adopt.py` SHALL install it at `.lsi/bin/lsi-bitbucket` with mode `0755`. `.lsi/bin/` SHALL be adopt-managed: wiped and rewritten on every adopt.
+The bundle SHALL ship a Bitbucket Cloud API helper sourced from `overlays/lsi/snippets/bin/lsi-bitbucket`, and `snippets/adopt.py` SHALL install it at `.lsi/bin/lsi-bitbucket` with mode `0755`. `.lsi/bin/` SHALL be adopt-managed: wiped and rewritten on every adopt. Adopter-facing docs and the CHANGELOG Adopter action SHALL state that `.lsi/bin/` is not a place for custom tools and that `/lsi:update` replaces its contents.
 
 #### Scenario: Adopt installs executable helper
 
@@ -14,6 +14,11 @@ The bundle SHALL ship a Bitbucket Cloud API helper sourced from `overlays/lsi/sn
 
 - **WHEN** `.lsi/bin/` contains a file not shipped by the current bundle
 - **THEN** adopt removes it while rewriting `.lsi/bin/`
+
+#### Scenario: Adopter action warns wipe-managed bin
+
+- **WHEN** the release CHANGELOG Adopter action is read
+- **THEN** it states that `.lsi/bin/` is wiped on `/lsi:update` and must not hold custom tools
 
 ### Requirement: Subcommands
 
@@ -54,10 +59,18 @@ The helper SHALL derive workspace and repo slug from `git remote get-url origin`
 
 The helper SHALL read credentials from `${BB_SECRETS_FILE:-~/.bitbucket_secrets}` by parsing `KEY=value` or `export KEY=value` lines for `BB_*` keys only, without executing the file. It SHALL refuse a secrets file readable by group or others. Precedence SHALL be: `BB_ACCESS_TOKEN_<WORKSPACE>_<REPO>` → `BB_ACCESS_TOKEN` (Bearer) → `BB_USERNAME` + `BB_API_TOKEN` (Basic) → `BB_USERNAME` + `BB_APP_PASSWORD` (Basic, with a deprecation warning on stderr).
 
+Credential docs SHALL prefer a repository access token as `BB_ACCESS_TOKEN_<WORKSPACE>_<REPO>`, and SHALL document a workspace access token as `BB_ACCESS_TOKEN` when the Bitbucket plan does not provide repository tokens. Both access-token forms SHALL count as bot identity for `--fix` and `/lsi:apply-bot`. API token and app password SHALL remain read-only fallbacks only.
+
 #### Scenario: Repo-scoped access token preferred
 
 - **WHEN** both `BB_ACCESS_TOKEN_ACME_WIDGETS` and `BB_USERNAME`/`BB_API_TOKEN` are set for `acme/widgets`
 - **THEN** requests use `Authorization: Bearer` with the repo-scoped token
+
+#### Scenario: Workspace access token is bot identity
+
+- **WHEN** only `BB_ACCESS_TOKEN` is set (workspace token) and no repo-scoped token is present
+- **THEN** requests use `Authorization: Bearer` with that token
+- **AND** `whoami` reports bot identity
 
 #### Scenario: App password still works
 

@@ -87,6 +87,8 @@ After the gates, `/lsi:pr-bot` SHALL post `/lsi:change-summary` output and a QA 
 
 `/lsi:pr-bot-docs` SHALL run `/lsi:senior` at the Deep tier, post the **full** senior report each iteration (multi-part when long), save it under `.senior-analyses/`, and with `--fix` loop `/lsi:address-senior` up to **3** cycles until the verdict is `Sound`, or `Acceptable with follow-ups` with every follow-up captured in `tasks.md`. It SHALL then run the plan-gap check: `openspec validate <slug> --strict`; requirement/scenario → task coverage; design decision → spec/task reflection without contradiction; every task names files or areas and has no undefined or forward dependency; test work planned; no sync/archive/close apply deliverables; proposal capabilities match `specs/` folders. The verdict SHALL be `Plan ready` or `Plan gaps`.
 
+With `--fix`, remediating **Plan gaps** SHALL use `/lsi:address-senior` against the **same single budget of 3 address cycles** as the senior loop. There SHALL be no second or separate budget for plan-gap. Address cycles already spent on senior findings count toward the cap. If gaps remain after the budget is exhausted, the session verdict SHALL be `NEEDS HUMAN` and no further address cycle SHALL run.
+
 #### Scenario: Rethink verdict needs a human
 
 - **WHEN** `/lsi:senior` returns `Rethink`
@@ -96,6 +98,12 @@ After the gates, `/lsi:pr-bot` SHALL post `/lsi:change-summary` output and a QA 
 
 - **WHEN** a spec scenario has no corresponding `tasks.md` item
 - **THEN** the plan-gap table lists it and the verdict is `Plan gaps`
+
+#### Scenario: Plan-gap shares senior address budget
+
+- **WHEN** `--fix` is set and two address cycles were already used during the senior loop
+- **THEN** at most one further `/lsi:address-senior` cycle may run for plan-gap remediation
+- **AND** if plan gaps remain after that cycle, the session verdict is `NEEDS HUMAN`
 
 #### Scenario: Docs session never edits outside openspec
 

@@ -34,12 +34,21 @@ Before applying, the command SHALL record the Mode A merge SHA and write `.revie
 
 ### Requirement: Apply and gate loops
 
-The command SHALL run `/opsx:apply` task by task, run `TEST_COMMAND` after each `tasks.md` section, commit each section through `lsi-bitbucket commit`, then run verify, readiness, and review gates with at most **3** address cycles each, in the order and with the pass conditions defined for `/lsi:pr-bot`.
+The command SHALL run `/opsx:apply` task by task, run `TEST_COMMAND` after each `tasks.md` section when it is set, commit each section through `lsi-bitbucket commit`, then run verify, readiness, and review gates with at most **3** address cycles each, in the order and with the pass conditions defined for `/lsi:pr-bot`.
+
+When `TEST_COMMAND` from `PROJECT.md` is missing, empty, whitespace-only, or the literal `N/A`, the section SHALL NOT fail: the session SHALL post and log `Skipped — TEST_COMMAND unset` and proceed to the section commit. When `TEST_COMMAND` is set, a non-zero exit SHALL fail the section and raise a human checkpoint before continuing.
 
 #### Scenario: Section commit per tasks section
 
 - **WHEN** `tasks.md` has sections 1–4 and all apply cleanly
 - **THEN** at least four bot-authored commits exist since the session start SHA
+
+#### Scenario: Unset TEST_COMMAND skips without failing the section
+
+- **WHEN** `PROJECT.md` has no `TEST_COMMAND`, or its value is empty, whitespace-only, or `N/A`
+- **THEN** after a section's apply work the session posts `Skipped — TEST_COMMAND unset`
+- **AND** the section commit still proceeds
+- **AND** the session does not treat the skip as a gate failure
 
 ### Requirement: Drift check
 
