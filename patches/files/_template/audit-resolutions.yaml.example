@@ -5,5 +5,5 @@
 - id: pr_target
   choice: staging_first
 - id: openspec_archive_timing
-  choice: close_before_promote
-  note: "Close on ticket branch after staging QA, before /lsi:promote"
+  choice: close_after_promote_on_main
+  note: "Close on main after promotion merges"

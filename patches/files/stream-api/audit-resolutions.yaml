@@ -3,7 +3,7 @@
   choice: symlink_to_agents
   note: "No pre-existing CLAUDE.md; AGENTS.md is canonical with CLAUDE.md symlink"
 - id: openspec_archive_timing
-  choice: close_before_promote
+  choice: close_after_promote_on_main
   note: "Keep OpenSpec opsx-* commands; use .lsi/workflows for LSI close before promote"
 - id: pr_target
   choice: staging_first

@@ -4,4 +4,4 @@
 - id: pr_target
   choice: staging_first
 - id: openspec_archive_timing
-  choice: close_before_promote
+  choice: close_after_promote_on_main

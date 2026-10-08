@@ -20,7 +20,7 @@ except ImportError:
 POLICY_DEFAULT_CHOICES: dict[str, str] = {
     "pr_target": "staging_first",
     "claude_symlink": "symlink_to_agents",
-    "openspec_archive_timing": "close_before_promote",
+    "openspec_archive_timing": "close_after_promote_on_main",
 }
 
 SEVERITY_ERROR = "error"
@@ -33,12 +33,14 @@ PR_TO_MAIN = re.compile(
 )
 STALE_DOCS_WORKFLOWS = re.compile(r"docs/workflows/[a-z0-9_-]+\.md", re.IGNORECASE)
 OPSX_ARCHIVE_AFTER_MERGE = re.compile(
-    r"/opsx:archive.*(?:after|on)\s+merge",
+    r"/opsx:archive.{0,80}(?:after|on)\s+merge\b",
     re.IGNORECASE,
 )
-# Stale close-on-main-after-promote policy (superseded by close-before-promote).
-CLOSE_ON_MAIN_AFTER_PROMOTE = re.compile(
-    r"(?:/lsi:close|/opsx:archive).*(?:on\s+[`']?main[`']?|after\s+(?:main\s+)?(?:merge|promotion))",
+# Stale close-before-promote policy (superseded by close on main after promote).
+CLOSE_BEFORE_PROMOTE = re.compile(
+    r"(?:Close before promote"
+    r"|/lsi:close.{0,100}(?:ticket branch|before\s+/lsi:promote)"
+    r"|already-closed work)",
     re.IGNORECASE,
 )
 PROTECTED_TOKEN = re.compile(r"PROTECTED_BRANCHES\s*[=:]\s*([^\n]+)", re.IGNORECASE)
@@ -116,17 +118,19 @@ def scan_file(
                     "Rewrite to .lsi/workflows/...",
                 )
             )
-        close_on_main_hit = CLOSE_ON_MAIN_AFTER_PROMOTE.search(line)
-        # Skip correct prohibitions: "do not /lsi:close on main"
-        prohibits_close_on_main = bool(
+        close_before_hit = CLOSE_BEFORE_PROMOTE.search(line)
+        # Skip correct prohibitions / mistake-table fixes that mention the stale path
+        prohibits_stale_close = bool(
             re.search(
-                r"(?:do\s+\*\*not\*\*|do\s+not|don't|never).{0,40}/lsi:close",
+                r"(?:do\s+\*\*not\*\*|do\s+not|don't|never).{0,80}/lsi:close",
                 line,
                 re.IGNORECASE,
             )
+        ) or (
+            "Close only on" in line and "main" in line.lower()
         )
         if OPSX_ARCHIVE_AFTER_MERGE.search(line) or (
-            close_on_main_hit and not prohibits_close_on_main
+            close_before_hit and not prohibits_stale_close
         ):
             findings.append(
                 Finding(
@@ -134,7 +138,7 @@ def scan_file(
                     "openspec_archive_timing",
                     line.strip()[:120],
                     loc,
-                    "Use /lsi:close on the ticket branch after staging QA, before /lsi:promote",
+                    "Use /lsi:close on main only after the promotion PR merges",
                 )
             )
 

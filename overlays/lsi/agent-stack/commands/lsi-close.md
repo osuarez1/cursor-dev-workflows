@@ -101,7 +101,7 @@ git commit -m "docs(openspec): close <slug> after promotion"
 **Guardrails**
 
 - **`main` only** after promotion merge — refuse ticket branches and `staging`
-- Do **not** close before `/lsi:promote` merges
+- Do **not** run this command until the promotion PR has merged to `main`
 - Prefer `/lsi:close` over manual sync+archive
 - When multiple active changes exist, always prompt for slug — never auto-select
 - Do **not** auto-commit; do **not** emit a Next footer
