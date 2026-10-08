@@ -32,12 +32,14 @@ Two draft files (an `lsi-pr-bot.md` command and a `bin/pr-comment` Bitbucket hel
 ### D1. Three commands, one shared session skeleton
 
 ```
-/lsi:pr-bot-docs <PR> [--fix]   Mode A PR  →  readiness ⇄ address-readiness (≤3) → senior ⇄ address-senior (≤3) + plan-gap
-/lsi:apply-bot   <slug>         post Mode A merge → apply → verify/readiness/review loops → Mode B PR
-/lsi:pr-bot      <PR> [--fix]   Mode B or C PR  →  verify/readiness/review loops → summary → QA plan
+/lsi:pr-bot-docs <PR>|--local [--fix]   Mode A  →  readiness ⇄ address-readiness (≤3) → senior ⇄ address-senior (≤3) + plan-gap
+/lsi:apply-bot   <slug>                 post Mode A merge → apply → verify/readiness/review loops → Mode B PR
+/lsi:pr-bot      <PR>|--local [--fix]   Mode B or C  →  verify/readiness/review loops → summary → QA plan
 ```
 
 `/lsi:readiness` is required on every Mode **A**, **B**, and **C** review (docs session and implementation/tiny session alike).
+
+**`--local`:** run the same gates on the current ticket branch without a Bitbucket PR — write each step under `.reviews/<ts>_local_<kind>_<slug>/` and print full bodies in chat. No `post` / `whoami` / push. Not available on apply-bot.
 
 Shared skeleton (Setup → numbered steps → Close) is documented once in `overlays/lsi/agent-stack/bot-sessions.md`; each command references it and declares its nested commands as its deliverable (satisfies `slash-command-single-purpose`). Separate commands rather than one mode-detecting command because step tables, refusals, and permissions differ materially; mode mismatch is a refusal, not a branch.
 
@@ -58,14 +60,21 @@ readiness ⇄ address-readiness (≤3) → senior ⇄ address-senior (≤3) → 
 
 Verify first on B/C because spec gaps drive the most code movement; review last because it is the most expensive and `/lsi:review` requires readiness `Ready` (if readiness is not Ready after its budget, later gates run with the documented skip reason "bot session: readiness NEEDS HUMAN"). `/lsi:review` already auto-chains `/lsi:address-prowler`; no separate Prowler step. Pass conditions: verify `Aligned`; readiness `Ready`; review `Approve` or `Approve with nits` (nits still addressed under `--fix`); senior `Sound`, or `Acceptable with follow-ups` when every follow-up is captured in `tasks.md`; plan-gap `Plan ready`. Exhausted budget → session verdict **NEEDS HUMAN**, continue to summary / close.
 
-### D3. `--fix` semantics
+### D3. `--fix` and `--local` semantics
 
 | | default | `--fix` |
 |---|---|---|
-| gates | one run each, posted | loops per D2 |
-| `address-*` | posted `Skipped — --fix not set` | run; their edits committed |
-| commit / push | never | bot identity via helper |
-| requires access token | no (posts as token owner, warns if not bot) | **yes** |
+| gates | one run each | loops per D2 |
+| `address-*` | `Skipped — --fix not set` | run; their edits committed |
+| commit / push (remote) | never | bot identity via helper + push |
+| commit / push (`--local`) | never | local commit only; **never push** |
+| requires access token | remote: no (warn if not bot); `--local`: no | remote: **yes**; `--local`: no |
+
+| | remote | `--local` |
+|---|--------|-----------|
+| PR arg | required | omitted |
+| Bitbucket | post + optional whoami | none |
+| outputs | PR comments + session log | step files + chat + session log |
 
 `/lsi:apply-bot` always fixes (it is an implementation session) and therefore always requires the access token.
 

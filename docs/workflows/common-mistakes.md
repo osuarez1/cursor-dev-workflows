@@ -62,6 +62,8 @@ Anti-patterns to avoid when using [cursor-dev-workflows](../../README.md) in a t
 | Running `/lsi:close` on a ticket branch or before promote | Close only on **`main`** after the promotion PR merges |
 | Running release-train (or version/changelog/release) off `main` | Those commands are **`main`-only**; never nest them in readiness/review/PR/promote/close |
 | Putting close/promote/release/`/lsi:update` items in `tasks.md` | Keep checkboxes purpose-only; `/lsi:readiness` fails administrative apply tasks |
+| Passing both a PR and `--local` to pr-bot / pr-bot-docs | Use `<PR>` for Bitbucket posting or `--local` for files+chat — not both |
+| Expecting `--local` to push or post | Local mode never posts or pushes; use remote `<PR>` when you need Bitbucket |
 
 ## Routing
 

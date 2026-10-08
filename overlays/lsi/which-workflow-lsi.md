@@ -14,7 +14,7 @@ Merge these rows into the decision table when adopting with `--overlay lsi`.
 | branch from existing Trello card | [git-trello.md](docs/sdlc/git-trello.md) | `/lsi:trello-branch` | OpenSpec required; sync card + `git tb` |
 | production promotion PR (staging → main) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:promote` | Promotion PR to `main` |
 | close after promotion merge | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:close` | Sync + archive + CLOSED.md on **`main`** only after `/lsi:promote` merges |
-| unattended PR bot / apply-bot | [integrations.md](integrations.md) · bot-sessions.md | `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot` | Posted session + Close |
+| unattended PR bot / apply-bot | [integrations.md](integrations.md) · bot-sessions.md | `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot` | Posted session + Close; or `--local` files+chat |
 | merge extended description (Bitbucket) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:merge-desc` | Extended merge body |
 | version bump, changelog, release tag | [versioning-and-releases.md](versioning-and-releases.md) | `/lsi:release-train`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release` | **`main` only** after close; never nest in other workflows |
 | re-sync bundle / adopt update | [adopt-and-update.md](adopt-and-update.md) | `/lsi:update` | Re-sync adopted workflows from bundle |

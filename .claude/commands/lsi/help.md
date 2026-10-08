@@ -157,13 +157,15 @@ Bot sessions detail: `/lsi:help bot-sessions`.
 
 When topic is `bot-sessions`, emit this entire block in the chat response (substitute `{ref}`).
 
-Unattended Bitbucket sessions (require `PR_HOST` = Bitbucket, `.lsi/bin/lsi-bitbucket`, `BB_*` secrets):
+Unattended review/apply sessions (remote needs `PR_HOST` = Bitbucket, `.lsi/bin/lsi-bitbucket`, `BB_*` secrets):
 
 | Command | When |
 |---------|------|
-| `/lsi:pr-bot-docs <PR> [--fix]` | Mode A (`openspec/`-only) PR — senior Deep + plan-gap |
+| `/lsi:pr-bot-docs <PR> [--fix]` | Mode A PR — readiness + senior Deep + plan-gap |
+| `/lsi:pr-bot-docs --local [--fix]` | Mode A on ticket branch — same gates; files + chat only (no Bitbucket) |
 | `/lsi:apply-bot <slug>` | After Mode A merge — apply + gates + Mode B PR |
-| `/lsi:pr-bot <PR> [--fix]` | Mode B PR — verify/readiness/review loops + QA plan |
+| `/lsi:pr-bot <PR> [--fix]` | Mode B/C PR — verify/readiness/review + QA plan |
+| `/lsi:pr-bot --local [--fix]` | Mode B/C on ticket branch — same gates; files + chat only |
 
 Skeleton: [bot-sessions.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/agent-stack/bot-sessions.md). Credentials + authorization: [integrations.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/docs/workflows/integrations.md).
 

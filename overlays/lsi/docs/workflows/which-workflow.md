@@ -23,7 +23,7 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 | close after promotion merge | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:close` | Sync + archive + CLOSED.md on **`main`** only after `/lsi:promote` merges |
 | ready for PR, production ready, ship checklist | [pr-production-readiness.md](pr-production-readiness.md) | `/lsi:readiness` | Checklist + verdict |
 | code review, review branch | [code-review.md](code-review.md) | `/lsi:review` | Summary + verdict |
-| unattended PR bot, Mode A/B bot session, apply-bot | [integrations.md](integrations.md) · [bot-sessions.md](bot-sessions.md) | `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot` | Posted session + Close verdict |
+| unattended PR bot, Mode A/B bot session, apply-bot | [integrations.md](integrations.md) · [bot-sessions.md](bot-sessions.md) | `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot` | Posted session + Close; or `--local` files+chat |
 | senior analysis, design alternatives | [senior-analysis.md](senior-analysis.md) | `/lsi:senior` | Full report + verdict |
 | merge extended description (Bitbucket) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:merge-desc` | Extended merge body |
 | commit plan, logical commits | [commits-logical-order.md](commits-logical-order.md) | `/lsi:commit` | Commit plan; commit only if asked |

@@ -77,6 +77,8 @@ Invoking **`/lsi:pr-bot <PR>`**, **`/lsi:pr-bot-docs <PR>`**, or **`/lsi:apply-b
 - Post comments to **that one PR** for **that session** (apply-bot: create and comment on one Mode B PR).
 - With `--fix` / apply-bot: commit under the bot identity and push (no force) to that PR's source branch via `.lsi/bin/lsi-bitbucket`.
 
+Invoking **`/lsi:pr-bot --local`** or **`/lsi:pr-bot-docs --local`** is the request to run the same review gates **without** a PR: write step bodies under `.reviews/<ts>_local_…/` and print them in chat. No Bitbucket post/push/`whoami`. With `--local --fix`, local commits are allowed; never push. Not available on apply-bot.
+
 Scope does **not** carry to other PRs or later standalone commands. Never authorized: approve, merge, decline, request-changes, force-push, history rewrite, protected-branch push, edit/delete/resolve comments.
 
 Shared skeleton: overlay `agent-stack/bot-sessions.md`. See also [common-mistakes.md](common-mistakes.md).

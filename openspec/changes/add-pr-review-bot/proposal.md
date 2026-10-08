@@ -4,8 +4,8 @@ Review and implementation gates (`/lsi:senior`, `/lsi:readiness`, `/lsi:review`,
 
 ## What Changes
 
-- **Add** `/lsi:pr-bot <PR> [--fix]` — unattended review session for a Mode B (implementation) PR: readiness, review (with Prowler), and verify gates, each looping with its `address-*` command (max 3 fix cycles per gate) when `--fix` is set; change summary; QA test plan; close report. Every step is posted to the PR and logged to `.reviews/`.
-- **Add** `/lsi:pr-bot-docs <PR> [--fix]` — unattended review session for a Mode A (`openspec/`-only) PR: `/lsi:readiness` ⇄ `/lsi:address-readiness` (max 3), then `/lsi:senior` (Deep) ⇄ `/lsi:address-senior` loop (max 3) plus a deterministic **plan-gap check** that the execution plan (proposal ↔ specs ↔ design ↔ tasks) has no gaps or discrepancies before apply. Posts the **full** senior report. Readiness runs on Mode A, B, and C reviews.
+- **Add** `/lsi:pr-bot <PR>|--local [--fix]` — unattended Mode B/C review: verify/readiness/review loops (max 3 fix cycles per gate with `--fix`); change summary; QA plan; close. Remote posts to the PR; `--local` writes `.reviews/` step files and prints full bodies in chat (no Bitbucket).
+- **Add** `/lsi:pr-bot-docs <PR>|--local [--fix]` — unattended Mode A review: readiness ⇄ address-readiness, senior Deep ⇄ address-senior, plan-gap check. Remote posts (full senior report); `--local` files + chat only.
 - **Add** `/lsi:apply-bot <slug>` — after the Mode A PR is merged to `PR_TARGET_BRANCH`: snapshot locked decisions, `/opsx:apply`, verify / readiness / review loops (max 3 each), drift check against locked decisions, then push and create the Mode B PR. Human-in-the-loop checkpoint whenever a revision or drift decision is needed; resumable. Primary target: OpenCode with a local model (also runs on Cursor and Claude Code).
 - **Add** `.lsi/bin/lsi-bitbucket` helper (Bitbucket Cloud API client): `info`, `list`, `post` (with multi-part split for long bodies), `create-pr`, `push`, `commit`, all with `--dry-run`. Auth precedence: repository/workspace **access token** (bot identity) → Atlassian API token → app password (deprecated, warns). No approve / merge / decline / edit / delete code paths exist.
 - **Add** bot identity: `--fix` commits are authored as the bot and pushed with the access token; `--fix` and `/lsi:apply-bot` refuse without an access token.
@@ -21,7 +21,7 @@ Review and implementation gates (`/lsi:senior`, `/lsi:readiness`, `/lsi:review`,
 ### New Capabilities
 
 - `pr-bot-bitbucket-helper`: `.lsi/bin/lsi-bitbucket` API client — subcommands, auth precedence, bot identity, dry-run/fixture mode, truncation/splitting, forbidden operations.
-- `pr-review-bot-sessions`: `/lsi:pr-bot` and `/lsi:pr-bot-docs` — session setup, step tables, `--fix` semantics, loop budgets, commit gate, posting, session log, close report, plan-gap check.
+- `pr-review-bot-sessions`: `/lsi:pr-bot` and `/lsi:pr-bot-docs` — session setup, `--local` vs remote, step tables, `--fix` semantics, loop budgets, commit gate, posting or file+chat, session log, close report, plan-gap check.
 - `apply-bot-session`: `/lsi:apply-bot` — preconditions, locked-decision snapshot, apply + gate loops, drift check, human-in-the-loop checkpoints, resume, Mode B PR creation.
 - `bot-posting-authorization`: scoped exception to the "never post / commit / push unless asked" rules for an explicit bot invocation; what is never authorized.
 - `adopt-local-artifacts-gitignore`: adopt-managed `.gitignore` marker block and the bot's ignore preconditions.
