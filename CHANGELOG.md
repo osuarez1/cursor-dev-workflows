@@ -7,6 +7,44 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-07
+
+### Adopters
+
+**Registered LSI adopters must run `/lsi:update` (or re-adopt) after pulling this MINOR release.** New bot-session commands, wipe-managed `.lsi/bin/lsi-bitbucket`, adopt-managed `.reviews/` gitignore block, Claude Code `/lsi:*` emit, scoped agent permissions, and OpenCode full command bodies (when opted in) land via adopt. Lifecycle **close timing flips again**: `/lsi:close` runs on **`main` only after** the promotion PR merges (not close-before-promote on the ticket branch). Update `BUNDLE_VERSION` in `PROJECT.md` to `2.1.0` (or the release tag). Create a Bitbucket bot access token and `~/.bitbucket_secrets` (`chmod 600`) before using remote bot sessions.
+
+**Adopter action**
+
+- Re-run adopt / `/lsi:update` so `lsi-pr-bot`, `lsi-pr-bot-docs`, `lsi-apply-bot`, `.lsi/bin/lsi-bitbucket`, the `lsi:local-artifacts` gitignore block, `.claude/commands/lsi/*`, and bot permission entries exist
+- **Do not store custom tools under `.lsi/bin/`** — every `/lsi:update` wipes and rewrites that directory
+- Switch close to **`/lsi:close` on `main` after promote**; align audit resolutions / `openspec_archive_timing` with close-after-promote-on-main
+- Prefer repository `BB_ACCESS_TOKEN_<WS>_<REPO>` (or workspace `BB_ACCESS_TOKEN`); allowlist `.lsi/bin/lsi-bitbucket` and hosts `api.bitbucket.org` / `bitbucket.org` in Cursor auto-run / agent sandbox
+- OpenCode opt-in adopters: expect full command bodies under `.opencode/commands/` (not pointer stubs) plus `opencode.json` permission merges
+
+### Added
+
+- **`/lsi:pr-bot` / `/lsi:pr-bot-docs` / `/lsi:apply-bot`** — unattended Mode A/B/C review and post–Mode-A apply sessions with bounded fix loops, shared `bot-sessions.md` skeleton, and optional `--local` (files under `.reviews/` + chat; no Bitbucket)
+- **`.lsi/bin/lsi-bitbucket`** — Bitbucket Cloud helper (`info` / `list` / `post` / `create-pr` / `push` / `commit` / `whoami`); bot identity; no approve/merge/decline paths
+- **Adopt wiring** — wipe-managed `.lsi/bin/`, managed `.reviews/` / `.senior-analyses/` gitignore block, Claude `/lsi:*` emit, scoped Claude/OpenCode permissions, OpenCode full bodies when opted in
+- **Bot-session authorization** — documenting the scoped exception for post/commit/push under an explicit bot invocation; `BB_*` credential scheme
+- **cs-chatbot** adopter patch registration
+- **Normative OpenSpec specs** for bot helper, sessions, apply-bot, posting authorization, adopt permissions/gitignore, and Claude emit (archived `add-pr-review-bot`)
+
+### Changed
+
+- **Close after promote on `main`** — supersedes 2.0.0 close-before-promote; `/lsi:promote` keeps the change active; `/lsi:close` refuses ticket/`staging` branches
+- **`/lsi:readiness`** — fails administrative `tasks.md` checkboxes (close/promote/release-train/adopt-update/meta); release-train files (`VERSION` / `CHANGELOG` / `BUNDLE_VERSION`) must stay clean on feature/promotion PRs
+- **Release-train family** — refuses to run off `main` or nested inside readiness/review/PR/promote/close/bot sessions
+- **OpenCode opt-in emit** — full command bodies instead of pointer stubs; maintainer bootstrap can emit local OpenCode commands
+- **Prowler / integrations** — address-prowler and docs use `BB_*` + helper `list` with bot-comment exclusion
+- Archived OpenSpec `add-pr-review-bot` (synced) and `genericize-adopt-cursor-claude` (archive without sync; already shipped)
+
+### Fixed
+
+- Audit / patch resolutions treat close-on-main after promote as expected policy
+- Local `--fix` bot commits must use `lsi-bitbucket commit` (no direct `git commit` fallback)
+- Adopt preserve markers and close-on-main audit prohibitions aligned with the lifecycle flip
+
 ## [2.0.0] - 2026-10-05
 
 ### Adopters
