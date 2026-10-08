@@ -11,3 +11,5 @@ Format:
 ## Entries
 
 - `2026-10-06` — `human-bot-lifecycle-v2` — Human/bot lifecycle, close-before-promote, address-*, CLOSED.md, OpenCode opt-in, adopt install/cleanup, infra host-log — archived `openspec/changes/archive/2026-10-06-human-bot-lifecycle-v2/` — [PR #14](https://github.com/osuarez1/cursor-dev-workflows/pull/14)
+- `2026-10-07` — `add-pr-review-bot` — Unattended PR review/apply bot sessions with Bitbucket helper and adopt wiring — archived `openspec/changes/archive/2026-10-07-add-pr-review-bot/` — [PR #17](https://github.com/osuarez1/cursor-dev-workflows/pull/17), [PR #18](https://github.com/osuarez1/cursor-dev-workflows/pull/18)
+- `2026-10-07` — `genericize-adopt-cursor-claude` — Genericize adopt for Cursor+Claude; opsx delegated; command/rule parity — archived `openspec/changes/archive/2026-10-07-genericize-adopt-cursor-claude/` **(without sync — already shipped on main; OpenCode policy superseded by later closes; delta specs not merged into `openspec/specs/`)**
