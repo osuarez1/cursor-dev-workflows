@@ -302,6 +302,42 @@ def check_agent_stack_parity(
             Finding(SEVERITY_WARN, "command_drift", ".cursor/commands/ missing", str(cmd_dir))
         )
 
+    # --- Claude Code commands (.claude/commands/lsi/) — flag surplus, never delete ---
+    claude_dir = repo_root / ".claude" / "commands" / "lsi"
+    exp_claude = _eas.expected_claude_command_names()
+    if claude_dir.is_dir():
+        present_claude = {p.stem for p in claude_dir.glob("*.md")}
+        for name in exp_claude:
+            if name not in present_claude:
+                findings.append(
+                    Finding(
+                        SEVERITY_WARN,
+                        "command_drift",
+                        f"Missing expected Claude command {name}.md",
+                        f".claude/commands/lsi/{name}.md",
+                        "Run /lsi:update to install",
+                    )
+                )
+        for name in sorted(present_claude - exp_claude):
+            findings.append(
+                Finding(
+                    SEVERITY_ERROR,
+                    "agent_stack_parity",
+                    f"Surplus Claude command {name}.md not in expected set",
+                    f".claude/commands/lsi/{name}.md",
+                    "Confirm with adopter (parity flags only; adopt never deletes)",
+                )
+            )
+    else:
+        findings.append(
+            Finding(
+                SEVERITY_WARN,
+                "command_drift",
+                ".claude/commands/lsi/ missing",
+                str(claude_dir),
+            )
+        )
+
     # --- Rules ---
     if rules_dir.is_dir():
         present_rules = {p.name for p in rules_dir.glob("*.mdc")}

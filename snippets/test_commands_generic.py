@@ -40,6 +40,12 @@ DENYLIST = [
     "--cov-fail-under=100",
 ]
 
+# Extra denylist applied only to the new bot session commands
+BOT_COMMAND_DENYLIST = [
+    "bitbucket.org/acme/",
+    "/acme/widgets",
+]
+
 # Worker scope references that should come from integration doc, not command sources
 DOMAIN_SCOPE_PHRASES = [
     "Worker listener",
@@ -67,6 +73,17 @@ class CommandsGenericTest(unittest.TestCase):
             for needle in DENYLIST:
                 if needle in text:
                     hits.append(f"{cmd.name}: contains denylist string {needle!r}")
+        self.assertEqual(hits, [], msg="\n".join(hits))
+
+    def test_bot_commands_stay_placeholder_generic(self) -> None:
+        hits: list[str] = []
+        for name in ("lsi-pr-bot.md", "lsi-pr-bot-docs.md", "lsi-apply-bot.md"):
+            cmd = COMMANDS_DIR / name
+            self.assertTrue(cmd.is_file(), msg=f"missing {name}")
+            text = cmd.read_text(encoding="utf-8")
+            for needle in BOT_COMMAND_DENYLIST:
+                if needle in text:
+                    hits.append(f"{name}: contains {needle!r}")
         self.assertEqual(hits, [], msg="\n".join(hits))
 
     def test_no_domain_scope_phrases_in_commands(self) -> None:
