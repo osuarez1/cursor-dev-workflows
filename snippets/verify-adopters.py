@@ -92,6 +92,41 @@ def check(repo: Path) -> list[str]:
         if not (cmds / f"{name}.md").is_file():
             errors.append(f"missing .cursor/commands/{name}.md")
 
+    claude_cmds = repo / ".claude" / "commands" / "lsi"
+    for name in _eas.expected_claude_command_names():
+        if not (claude_cmds / f"{name}.md").is_file():
+            errors.append(f"missing .claude/commands/lsi/{name}.md")
+
+    for helper in _eas.expected_lsi_bin():
+        path = repo / ".lsi" / "bin" / helper
+        if not path.is_file():
+            errors.append(f"missing .lsi/bin/{helper}")
+        elif not (path.stat().st_mode & 0o111):
+            errors.append(f".lsi/bin/{helper} is not executable")
+
+    gi = repo / ".gitignore"
+    if not gi.is_file() or "lsi:local-artifacts" not in gi.read_text(encoding="utf-8"):
+        errors.append("missing lsi:local-artifacts block in .gitignore")
+    else:
+        probe = subprocess.run(
+            ["git", "check-ignore", "-q", ".reviews/x"],
+            cwd=repo,
+            capture_output=True,
+        )
+        # check-ignore needs a git repo; skip soft if not a git checkout
+        if (repo / ".git").exists() and probe.returncode != 0:
+            errors.append(".reviews/ is not git-ignored (check-ignore failed)")
+
+    settings = repo / ".claude" / "settings.json"
+    if not settings.is_file():
+        errors.append("missing .claude/settings.json")
+    else:
+        text = settings.read_text(encoding="utf-8")
+        if "lsi-bitbucket" not in text:
+            errors.append(".claude/settings.json missing lsi-bitbucket permission")
+        if "api.bitbucket.org" not in text:
+            errors.append(".claude/settings.json missing sandbox network allowlist")
+
     agents = repo / "AGENTS.md"
     claude = repo / "CLAUDE.md"
     if not agents.is_file():
@@ -137,6 +172,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.skip_external:
         return 1 if errors else 0
 
+    # Workflow canonical links only. Claude command peer/template links are
+    # covered by existence checks above and snippets/test_adopt_links.py.
     link_code = run_script(
         VERIFY, "--repo-root", str(repo), "--canonical", ".lsi/workflows"
     )

@@ -13,7 +13,7 @@ Propose and apply the next version bump on `main` using the release script.
 
 **Steps**
 
-1. **Verify branch** — MUST be `main`. Stop on ticket branches or `staging`.
+1. **Verify branch** — MUST be `main`. On any other branch, emit Refuse and stop — do not write `version.txt` / `VERSION` / `BUNDLE_VERSION`.
 
 2. **Run inference**
 
@@ -40,10 +40,20 @@ Propose and apply the next version bump on `main` using the release script.
 
 ```
 
+**Output (refuse)**
+
+```
+## Refuse: /lsi-version
+
+**Reason:** Must run on main (release-train family).
+**Fix:** checkout main after promotion + close; use /lsi:release-train or re-run here
+```
+
 **Guardrails**
 
 - Worker product semver in `version.txt` — not separate from CHANGELOG version
 - Invoke `scripts/release/infer_version.py` — do not reimplement bump logic inline
-- **`main`-only** — refuse on `staging` and ticket branches
+- **`main`-only** — refuse on `staging` and ticket branches before any write
+- **Never nest** inside `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:close`, or bot sessions — release-train (or this command alone) owns version bumps
 - MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
 - No `Next:` footer (D11).

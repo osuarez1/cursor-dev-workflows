@@ -8,7 +8,7 @@ Run code review for the active OpenSpec change after readiness passes and before
 
 **Input:** Optionally specify change slug. Use **promotion mode** when invoked from `/lsi:promote` or when the PR target is **`main`**.
 
-**Prerequisite:** `/lsi:readiness` verdict must be `Ready` (or user explicitly skips with documented reason).
+**Prerequisite:** `/lsi:readiness` verdict must be `Ready` (or user explicitly skips with documented reason). Required before review for Mode **A**, **B**, and **C** (Mode A unattended path runs readiness inside `/lsi:pr-bot-docs` instead of this command).
 
 **Modes**
 

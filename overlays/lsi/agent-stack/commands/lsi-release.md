@@ -13,7 +13,7 @@ Create annotated git tag and push to Bitbucket after version and changelog are c
 
 **Steps**
 
-1. **Verify branch** — MUST be `main`.
+1. **Verify branch** — MUST be `main`. On any other branch, emit Refuse and stop — do not tag or push.
 
 2. **Verify artifacts**
 
@@ -55,11 +55,21 @@ Create annotated git tag and push to Bitbucket after version and changelog are c
 
 ```
 
+**Output (refuse)**
+
+```
+## Refuse: /lsi-release
+
+**Reason:** Must run on main (release-train family).
+**Fix:** checkout main; finish /lsi:version + /lsi:changelog (or /lsi:release-train); re-run
+```
+
 **Guardrails**
 
 - User MUST confirm tag push
 - Never force-push tags
-- **`main`-only**
+- **`main`-only** — refuse on `staging` and ticket branches before any tag
+- **Never nest** inside `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:close`, or bot sessions
 - Squash merge PRs use PR title for squash subject — this command is for merge-commit + annotated tags
 - MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
 - No `Next:` footer (D11).

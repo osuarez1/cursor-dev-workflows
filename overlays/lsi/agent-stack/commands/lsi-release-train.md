@@ -26,8 +26,9 @@ The changelog rewrite sits between Gate 1 and Gate 2: it is **reviewed as a diff
    git fetch --tags
    ```
 
-   - Branch MUST be `main`. On `staging` or a ticket branch, **stop immediately** — do not write `version.txt`, do not touch `CHANGELOG.md`, do not tag.
+   - Branch MUST be `main`. On `staging` or a ticket branch, emit Refuse and **stop immediately** — do not write `version.txt` / `VERSION`, do not touch `CHANGELOG.md`, do not tag, do not invoke nested release commands.
    - Report a dirty working tree and let the user decide before continuing.
+   - Do **not** start this train from readiness, review, PR, promote, close, or bot sessions — invoke `/lsi:release-train` (or its steps) only as a standalone human step on `main` after close.
 
 1. **Infer the version** (`/lsi:version` step)
 
@@ -100,9 +101,19 @@ Release summary (--mgmt) follows below.
 
 Then the full [`/lsi:release-summary`](lsi-release-summary.md) skeleton — meta table plus sections 1–10.
 
+**Output (refuse)**
+
+```
+## Refuse: /lsi-release-train
+
+**Reason:** Must run on main after promotion + close (not nested in other workflows).
+**Fix:** checkout main; finish /lsi:close if needed; re-run /lsi:release-train
+```
+
 **Guardrails**
 
 - **`main`-only** — refuse on `staging` and ticket branches **before** any write
+- **Never nest** this command or its composed steps (`/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:release-summary`) inside readiness, review, PR, promote, close, or bot sessions
 - **Three confirmations are mandatory** — version write, release commit, and push/tag each require an explicit user yes; never batch them into one approval
 - Stop at the failing step and report what is left in the working tree — never continue past a rejected gate or a failed command
 - Invoke `scripts/release/infer_version.py` and `scripts/release/generate_changelog.py` — do not duplicate bump or parser logic

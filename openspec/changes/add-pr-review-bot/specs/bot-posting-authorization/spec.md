@@ -2,7 +2,7 @@
 
 ### Requirement: Bot invocation is scoped explicit authorization
 
-Invoking `/lsi:pr-bot <PR>`, `/lsi:pr-bot-docs <PR>`, or `/lsi:apply-bot <slug>` SHALL count as the user's explicit request to post comments to that one PR (apply-bot: to create and comment on one PR) for that session. With `--fix` or `/lsi:apply-bot`, it SHALL also count as the explicit request to commit, under the bot identity, and push, without force, to that PR's source branch. `docs/workflows/integrations.md` SHALL document this as a "Bot sessions" exception, and `docs/workflows/common-mistakes.md` SHALL list extending it beyond that scope as a mistake.
+Invoking `/lsi:pr-bot <PR>`, `/lsi:pr-bot-docs <PR>`, or `/lsi:apply-bot <slug>` SHALL count as the user's explicit request to post comments to that one PR (apply-bot: to create and comment on one PR) for that session. With `--fix` or `/lsi:apply-bot`, it SHALL also count as the explicit request to commit, under the bot identity, and push, without force, to that PR's source branch. Invoking `/lsi:pr-bot --local` or `/lsi:pr-bot-docs --local` SHALL authorize writing step outputs under `.reviews/` and emitting them in chat only — it SHALL NOT authorize Bitbucket posts or pushes. `docs/workflows/integrations.md` SHALL document this as a "Bot sessions" exception, and `docs/workflows/common-mistakes.md` SHALL list extending it beyond that scope as a mistake.
 
 #### Scenario: Default rule unchanged elsewhere
 

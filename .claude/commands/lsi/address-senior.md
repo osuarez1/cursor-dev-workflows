@@ -49,3 +49,4 @@ Follow-up to `/lsi:senior`. Documentation-only changes under `openspec/`.
 - MUST emit the Output skeleton; MUST NOT invent alternate report shapes
 - No `Next:` footer or follow-up steering (D11)
 - Do not auto-push or open PRs
+- Bot session exception: when nested under `/lsi:pr-bot-docs` / `/lsi:apply-bot` with `--fix`/apply, that invocation satisfies "user asks" for commit/push within that session's scope — see [integrations.md](../../docs/workflows/integrations.md) Bot sessions; standalone defaults unchanged.

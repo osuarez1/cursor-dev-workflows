@@ -1,6 +1,6 @@
 # Bot lane playbook (steps 9–19)
 
-Coding-agent checklist for OpenSpec implementation after Mode A docs are on **`staging`**. Humans own steps 1–8 and 20–24 (close, promote, release) — see [openspec-git-integration.md](../docs/workflows/openspec-git-integration.md).
+Coding-agent checklist for OpenSpec implementation after Mode A docs are on **`staging`**. Humans own steps 1–8 and 20–24 (promote, close on `main`, release) — see [openspec-git-integration.md](../docs/workflows/openspec-git-integration.md).
 
 **Agents:** Cursor, Claude Code, OpenCode (when opted in). Load this playbook + `AGENTS.md`; invoke slash commands as listed. Do **not** emit `Next:` footers from individual commands — this file is the sequencer.
 
@@ -11,6 +11,10 @@ Coding-agent checklist for OpenSpec implementation after Mode A docs are on **`s
 - Mode A docs PR merged (unless Mode C opt-in)
 
 ## Checklist
+
+**Unattended path (preferred when Bitbucket + bot token):** **`/lsi:apply-bot <slug>`** covers steps 9–18 (apply by section, gate loops, Mode B PR) per [bot-sessions.md](bot-sessions.md). Mode A review: **`/lsi:pr-bot-docs <PR>`** (includes `/lsi:readiness`). Mode B/C review: **`/lsi:pr-bot <PR> [--fix]`** (includes `/lsi:readiness`).
+
+Manual step-by-step (same outcomes):
 
 9. **`/opsx:apply`** — implement `tasks.md`; mark checkboxes; do not sync/archive/close.
 10. **`/lsi:commit`** — when the human asks; Conventional Commits from `tasks.md` sections.

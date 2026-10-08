@@ -4,11 +4,24 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+_SNIPPETS = Path(__file__).resolve().parent
+if str(_SNIPPETS) not in sys.path:
+    sys.path.insert(0, str(_SNIPPETS))
+
+from agent_emit import (  # noqa: E402
+    claude_frontmatter,
+    claude_subdir,
+    deepen_relative_links,
+    opencode_bind_arguments,
+    opencode_frontmatter,
+)
 
 def _load_yaml_text(text: str):
   """Minimal YAML loader for patch files (stdlib only)."""
@@ -366,11 +379,9 @@ def install_agent_stack(target: Path, tokens: dict[str, str], config: dict) -> N
     # OpenSpec (`openspec init` / config profile); the bundle never installs or
     # removes them.
     for cmd in sorted((OVERLAY_ROOT / "agent-stack" / "commands").glob("lsi-*.md")):
-        content = substitute_tokens(cmd.read_text(encoding="utf-8"), tokens)
-        content = content.replace("docs/workflows/", ".lsi/workflows/")
-        content = content.replace("../../docs/sdlc/", "../../.lsi/workflows/sdlc/")
-        content = rewrite_links(content)
-        (cmds_dir / cmd.name).write_text(content, encoding="utf-8")
+        (cmds_dir / cmd.name).write_text(
+            _prepare_command_body(cmd, tokens), encoding="utf-8"
+        )
 
     cursor_rules = BUNDLE_ROOT / "snippets" / "cursor-rules"
     if cursor_rules.is_dir():
@@ -433,16 +444,119 @@ def _install_skill_overlays(target: Path, tokens: dict[str, str], config: dict) 
         copy_tree(src, dest, transform=_skill_transform)
 
 
+def _prepare_command_body(cmd: Path, tokens: dict[str, str]) -> str:
+    content = substitute_tokens(cmd.read_text(encoding="utf-8"), tokens)
+    content = content.replace("docs/workflows/", ".lsi/workflows/")
+    content = content.replace("../../docs/sdlc/", "../../.lsi/workflows/sdlc/")
+    # agent-stack siblings → adopted under .lsi/workflows/ (from .cursor/commands/)
+    content = content.replace("](../bot-sessions.md)", "](../../.lsi/workflows/bot-sessions.md)")
+    content = content.replace("](../bot-lane.md)", "](../../.lsi/workflows/bot-lane.md)")
+    return rewrite_links(content)
+
+
+def install_bot_session_docs(target: Path, tokens: dict[str, str]) -> None:
+    """Copy bot-sessions.md / bot-lane.md into `.lsi/workflows/` for command links."""
+    dest_dir = target / ".lsi" / "workflows"
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    for name in ("bot-sessions.md", "bot-lane.md"):
+        src = OVERLAY_ROOT / "agent-stack" / name
+        if src.is_file():
+            content = substitute_tokens(src.read_text(encoding="utf-8"), tokens)
+            # Collapse maintainer-relative workflow links to same-dir under .lsi/workflows/
+            content = content.replace("](../../docs/workflows/", "](")
+            content = content.replace("](../docs/workflows/", "](")
+            content = content.replace("](docs/workflows/", "](")
+            content = rewrite_links(content)
+            (dest_dir / name).write_text(content, encoding="utf-8")
+
+
+def install_lsi_bin(target: Path) -> None:
+    """Wipe and rewrite adopt-managed `.lsi/bin/` helpers (mode 0755)."""
+    src_dir = OVERLAY_ROOT / "snippets" / "bin"
+    dest_dir = target / ".lsi" / "bin"
+    if dest_dir.exists():
+        shutil.rmtree(dest_dir)
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    if not src_dir.is_dir():
+        return
+    for src in sorted(src_dir.iterdir()):
+        if not src.is_file():
+            continue
+        dest = dest_dir / src.name
+        shutil.copy2(src, dest)
+        dest.chmod(0o755)
+
+
+_GITIGNORE_START = "# >>> lsi:local-artifacts (managed by cursor-dev-workflows adopt) >>>"
+_GITIGNORE_END = "# <<< lsi:local-artifacts <<<"
+
+
+def merge_gitignore_local_artifacts(target: Path) -> None:
+    """Idempotent upsert of the lsi:local-artifacts marker block into `.gitignore`."""
+    snippet = BUNDLE_ROOT / "snippets" / "gitignore-local-artifacts.txt"
+    if not snippet.is_file():
+        return
+    block = snippet.read_text(encoding="utf-8").strip() + "\n"
+    gi = target / ".gitignore"
+    if gi.is_file():
+        text = gi.read_text(encoding="utf-8")
+        if _GITIGNORE_START in text and _GITIGNORE_END in text:
+            text = re.sub(
+                re.escape(_GITIGNORE_START) + r".*?" + re.escape(_GITIGNORE_END),
+                block.rstrip("\n"),
+                text,
+                count=1,
+                flags=re.DOTALL,
+            )
+        else:
+            if text and not text.endswith("\n"):
+                text += "\n"
+            text = text + "\n" + block
+        gi.write_text(text, encoding="utf-8")
+    else:
+        gi.write_text(block, encoding="utf-8")
+
+
+def _rewrite_claude_sibling_command_links(content: str) -> str:
+    """Map `lsi-foo.md` peer links to `foo.md` under `.claude/commands/lsi/`."""
+
+    def repl(match: re.Match[str]) -> str:
+        stem = match.group(1)
+        if stem.startswith("lsi-"):
+            return f"]({stem[len('lsi-'):]}.md)"
+        return match.group(0)
+
+    return re.sub(r"\]\((lsi-[a-z0-9-]+)\.md\)", repl, content)
+
+
+def install_claude_commands(target: Path, tokens: dict[str, str]) -> None:
+    """Emit `.claude/commands/lsi/<name>.md` for every LSI command."""
+    cmds_root = target / ".claude" / "commands"
+    for cmd in sorted((OVERLAY_ROOT / "agent-stack" / "commands").glob("lsi-*.md")):
+        content = _prepare_command_body(cmd, tokens)
+        content = deepen_relative_links(content, extra_levels=1)
+        content = _rewrite_claude_sibling_command_links(content)
+        content = claude_frontmatter(content)
+        subdir, name = claude_subdir(cmd.stem)
+        dst_dir = cmds_root / subdir if subdir else cmds_root
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        (dst_dir / f"{name}.md").write_text(content, encoding="utf-8")
+
+
 def install_opencode_stack(target: Path, tokens: dict[str, str], config: dict) -> None:
-    """Emit thin OpenCode instruction stubs when agents_opencode.enabled is true."""
+    """Emit full OpenCode command bodies when agents_opencode.enabled is true."""
     if not agents_opencode_enabled(config):
         return
     opencode_dir = target / ".opencode" / "commands"
     opencode_dir.mkdir(parents=True, exist_ok=True)
     playbook = OVERLAY_ROOT / "agent-stack" / "bot-lane.md"
+    sessions = OVERLAY_ROOT / "agent-stack" / "bot-sessions.md"
     playbook_body = ""
+    sessions_body = ""
     if playbook.is_file():
         playbook_body = substitute_tokens(playbook.read_text(encoding="utf-8"), tokens)
+    if sessions.is_file():
+        sessions_body = substitute_tokens(sessions.read_text(encoding="utf-8"), tokens)
     index = [
         "# OpenCode LSI entry points (opt-in)",
         "",
@@ -452,23 +566,115 @@ def install_opencode_stack(target: Path, tokens: dict[str, str], config: dict) -
         "",
         playbook_body or "(see overlays/lsi/agent-stack/bot-lane.md in the bundle)",
         "",
+        "## Bot sessions",
+        "",
+        sessions_body or "(see overlays/lsi/agent-stack/bot-sessions.md in the bundle)",
+        "",
         "## Commands",
         "",
-        "Mirror Cursor `/lsi:*` under `.cursor/commands/`. Core entry points:",
+        "Full command bodies under `.opencode/commands/`. Core entry points:",
         "",
     ]
     for cmd in sorted((OVERLAY_ROOT / "agent-stack" / "commands").glob("lsi-*.md")):
-        stub_name = cmd.stem.replace("lsi-", "") + ".md"
+        out_name = f"{cmd.stem}.md"
         slash = "/" + cmd.stem.replace("lsi-", "lsi:", 1)
-        stub = (
-            f"# {slash}\n\n"
-            f"Canonical instructions: `.cursor/commands/{cmd.name}` "
-            f"(installed by adopt). Follow that file's `**Output**` skeleton; "
-            f"no `Next:` footers.\n"
-        )
-        (opencode_dir / stub_name).write_text(stub, encoding="utf-8")
-        index.append(f"- `{slash}` → `.opencode/commands/{stub_name}`")
+        content = _prepare_command_body(cmd, tokens)
+        content = deepen_relative_links(content, extra_levels=1)
+        content = opencode_frontmatter(content)
+        content = opencode_bind_arguments(content)
+        (opencode_dir / out_name).write_text(content, encoding="utf-8")
+        index.append(f"- `{slash}` → `.opencode/commands/{out_name}`")
     (target / ".opencode" / "README.md").write_text("\n".join(index) + "\n", encoding="utf-8")
+
+
+def _load_bot_permissions() -> dict:
+    path = OVERLAY_ROOT / "agent-stack" / "bot-permissions.json"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _merge_json_file(path: Path, mutator) -> None:
+    data: dict = {}
+    if path.is_file():
+        try:
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                data = loaded
+        except json.JSONDecodeError:
+            data = {}
+    mutator(data)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def merge_claude_bot_permissions(target: Path) -> None:
+    """Idempotent merge of bot allowlist into `.claude/settings.json`."""
+    perms = _load_bot_permissions()
+    allow_entries: list[str] = list(perms["claude"]["permissions_allow"])
+    domains: list[str] = list(perms["claude"]["sandbox_network_allowed_domains"])
+
+    def mutate(data: dict) -> None:
+        permissions = data.setdefault("permissions", {})
+        if not isinstance(permissions, dict):
+            permissions = {}
+            data["permissions"] = permissions
+        allow = permissions.get("allow")
+        if not isinstance(allow, list):
+            allow = []
+            permissions["allow"] = allow
+        for entry in allow_entries:
+            if entry not in allow:
+                allow.append(entry)
+        sandbox = data.setdefault("sandbox", {})
+        if not isinstance(sandbox, dict):
+            sandbox = {}
+            data["sandbox"] = sandbox
+        network = sandbox.setdefault("network", {})
+        if not isinstance(network, dict):
+            network = {}
+            sandbox["network"] = network
+        allowed = network.get("allowedDomains")
+        if not isinstance(allowed, list):
+            allowed = []
+            network["allowedDomains"] = allowed
+        for domain in domains:
+            if domain not in allowed:
+                allowed.append(domain)
+
+    _merge_json_file(target / ".claude" / "settings.json", mutate)
+
+
+def merge_opencode_bot_permissions(target: Path, config: dict) -> None:
+    """Merge bot bash allows into `opencode.json` only when OpenCode is opted in."""
+    if not agents_opencode_enabled(config):
+        return
+    path = target / "opencode.json"
+    if not path.is_file():
+        # Spec: never create opencode.json when merging permissions alone —
+        # but opt-in OpenCode stack may already exist. Only merge when file exists
+        # OR create minimal permission object when opted in so verify can pass.
+        # Design 3.4: "never create it otherwise" — when opted in, create if missing
+        # so permissions land. Spec: "When OpenCode is not opted in, adopt SHALL NOT
+        # create or modify opencode.json." Creating when opted-in is allowed.
+        pass
+    perms = _load_bot_permissions()
+    bash_allows: dict[str, str] = dict(perms["opencode"]["permission_bash"])
+
+    def mutate(data: dict) -> None:
+        permission = data.setdefault("permission", {})
+        if not isinstance(permission, dict):
+            permission = {}
+            data["permission"] = permission
+        bash = permission.get("bash")
+        if bash is None or isinstance(bash, str):
+            bash = {} if bash is None else {"*": bash}
+            permission["bash"] = bash
+        if not isinstance(bash, dict):
+            bash = {}
+            permission["bash"] = bash
+        for pattern, effect in bash_allows.items():
+            bash[pattern] = effect
+
+    _merge_json_file(path, mutate)
 
 
 def merge_convention(target: Path) -> None:
@@ -716,7 +922,13 @@ def adopt(
     copy_overlay(target, tokens, config)
     merge_which_workflow_lsi(target)
     install_agent_stack(target, tokens, config)
+    install_bot_session_docs(target, tokens)
+    install_lsi_bin(target)
+    merge_gitignore_local_artifacts(target)
+    install_claude_commands(target, tokens)
     install_opencode_stack(target, tokens, config)
+    merge_claude_bot_permissions(target)
+    merge_opencode_bot_permissions(target, config)
     merge_convention(target)
     merge_agents_markers(target)
     merge_cursorrules(target)

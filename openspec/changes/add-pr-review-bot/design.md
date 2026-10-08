@@ -32,32 +32,49 @@ Two draft files (an `lsi-pr-bot.md` command and a `bin/pr-comment` Bitbucket hel
 ### D1. Three commands, one shared session skeleton
 
 ```
-/lsi:pr-bot-docs <PR> [--fix]   Mode A PR  →  senior ⇄ address-senior (≤3) + plan-gap check
-/lsi:apply-bot   <slug>         post Mode A merge → apply → verify/readiness/review loops → Mode B PR
-/lsi:pr-bot      <PR> [--fix]   Mode B PR  →  verify/readiness/review loops → summary → QA plan
+/lsi:pr-bot-docs <PR>|--local [--fix]   Mode A  →  readiness ⇄ address-readiness (≤3) → senior ⇄ address-senior (≤3) + plan-gap
+/lsi:apply-bot   <slug>                 post Mode A merge → apply → verify/readiness/review loops → Mode B PR
+/lsi:pr-bot      <PR>|--local [--fix]   Mode B or C  →  verify/readiness/review loops → summary → QA plan
 ```
+
+`/lsi:readiness` is required on every Mode **A**, **B**, and **C** review (docs session and implementation/tiny session alike).
+
+**`--local`:** run the same gates on the current ticket branch without a Bitbucket PR — write each step under `.reviews/<ts>_local_<kind>_<slug>/` and print full bodies in chat. No `post` / `whoami` / push. Not available on apply-bot.
 
 Shared skeleton (Setup → numbered steps → Close) is documented once in `overlays/lsi/agent-stack/bot-sessions.md`; each command references it and declares its nested commands as its deliverable (satisfies `slash-command-single-purpose`). Separate commands rather than one mode-detecting command because step tables, refusals, and permissions differ materially; mode mismatch is a refusal, not a branch.
 
 ### D2. Gate order and loop budget
 
-Per gate: run → if not passing and fixing is enabled, address → re-run; **max 3 address cycles** (≤ 4 runs). Order for pr-bot and apply-bot:
+Per gate: run → if not passing and fixing is enabled, address → re-run; **max 3 address cycles** (≤ 4 runs). Order for pr-bot and apply-bot (Mode B/C):
 
 ```
 verify ⇄ address-verify (≤3) → readiness ⇄ address-readiness (≤3) → review ⇄ address-review (≤3)
   → if review cycles changed files: one readiness re-check (no loop)
 ```
 
-Verify first because spec gaps drive the most code movement; review last because it is the most expensive and `/lsi:review` requires readiness `Ready` (if readiness is not Ready after its budget, review runs with the documented skip reason "bot session: readiness NEEDS HUMAN"). `/lsi:review` already auto-chains `/lsi:address-prowler`; no separate Prowler step. Pass conditions: verify `Aligned`; readiness `Ready`; review `Approve` or `Approve with nits` (nits still addressed under `--fix`); senior `Sound`, or `Acceptable with follow-ups` when every follow-up is captured in `tasks.md`. Exhausted budget → session verdict **NEEDS HUMAN**, continue to summary / close.
+Order for pr-bot-docs (Mode A):
 
-### D3. `--fix` semantics
+```
+readiness ⇄ address-readiness (≤3) → senior ⇄ address-senior (≤3) → plan-gap (shares senior budget)
+```
+
+Verify first on B/C because spec gaps drive the most code movement; review last because it is the most expensive and `/lsi:review` requires readiness `Ready` (if readiness is not Ready after its budget, later gates run with the documented skip reason "bot session: readiness NEEDS HUMAN"). `/lsi:review` already auto-chains `/lsi:address-prowler`; no separate Prowler step. Pass conditions: verify `Aligned`; readiness `Ready`; review `Approve` or `Approve with nits` (nits still addressed under `--fix`); senior `Sound`, or `Acceptable with follow-ups` when every follow-up is captured in `tasks.md`; plan-gap `Plan ready`. Exhausted budget → session verdict **NEEDS HUMAN**, continue to summary / close.
+
+### D3. `--fix` and `--local` semantics
 
 | | default | `--fix` |
 |---|---|---|
-| gates | one run each, posted | loops per D2 |
-| `address-*` | posted `Skipped — --fix not set` | run; their edits committed |
-| commit / push | never | bot identity via helper |
-| requires access token | no (posts as token owner, warns if not bot) | **yes** |
+| gates | one run each | loops per D2 |
+| `address-*` | `Skipped — --fix not set` | run; their edits committed |
+| commit / push (remote) | never | bot identity via helper + push |
+| commit / push (`--local`) | never | local commit only; **never push** |
+| requires access token | remote: no (warn if not bot); `--local`: no | remote: **yes**; `--local`: no |
+
+| | remote | `--local` |
+|---|--------|-----------|
+| PR arg | required | omitted |
+| Bitbucket | post + optional whoami | none |
+| outputs | PR comments + session log | step files + chat + session log |
 
 `/lsi:apply-bot` always fixes (it is an implementation session) and therefore always requires the access token.
 
@@ -101,7 +118,7 @@ Deterministic checklist emitted as a table, after the senior loop:
 3. Every `design.md` decision is reflected in specs or tasks; no task contradicts a decision.
 4. Every task names files / areas; no task depends on something undefined or later.
 5. Test work planned per `test-requirements.md` / `TEST_COMMAND`.
-6. No `/opsx:sync`, `/opsx:archive`, `/lsi:close` as apply deliverables.
+6. No administrative apply deliverables (close/sync/archive, promote, release-train family, `/lsi:update`, meta process) — `/lsi:readiness` also enforces purpose-only `tasks.md`.
 7. Proposal capabilities ↔ `specs/` folders match.
 
 Verdict **Plan ready** | **Plan gaps**. With `--fix`, plan-gap remediation SHALL call `/lsi:address-senior` against the **same single budget of 3 address cycles** already used by the senior loop — there is **no second budget** for plan-gap. Cycles spent fixing senior findings count toward the cap; if the budget is already exhausted when gaps remain, session verdict is **NEEDS HUMAN** (do not start a fresh loop). The full senior report from every iteration is posted (multi-part per D4) and saved to `.senior-analyses/` — the bot invocation is the "user asks" for both.
@@ -160,3 +177,8 @@ Rollback: revert adopter sync commit; helper and commands are additive.
 ## Open Questions
 
 - Exact Claude Code settings key for sandbox network allowlisting and OpenCode `permission` schema — confirm against current docs during implementation (tasks 3.1 / 3.2) and amend this design if keys differ from D10.
+
+### Confirmed settings keys (tasks 3.1 / 3.2)
+
+- **Claude Code** (project `.claude/settings.json`): `permissions.allow` (string patterns such as `Bash(.lsi/bin/lsi-bitbucket:*)`); sandbox network allowlist is `sandbox.network.allowedDomains` (not under `permissions`). Adopt merges both. `sandbox.network.strictAllowlist` is user/managed-scope only — not written by adopt.
+- **OpenCode** (current docs, v1 shape): `permission.bash` as a map of command patterns → `allow` | `ask` | `deny` (e.g. `".lsi/bin/lsi-bitbucket *": "allow"`). OpenCode v2 uses a `permissions` array with `action: "shell"`; this change targets the v1 `permission.bash` object still documented at opencode.ai/docs/permissions. Adopt only creates/modifies `opencode.json` when `agents_opencode.enabled`.

@@ -1,5 +1,6 @@
-# Append to the target application repository .gitignore
-# Local agent review archives — never commit
-
+# >>> lsi:local-artifacts (managed by cursor-dev-workflows adopt) >>>
+# Local agent review archives — never commit. Adopt upserts this block; do not
+# edit inside the markers (adopter lines outside the markers are preserved).
 .reviews/
 .senior-analyses/
+# <<< lsi:local-artifacts <<<

@@ -10,7 +10,7 @@ Update root `CHANGELOG.md` from merged PRs, OpenSpec archives, and conventional 
 
 **Steps**
 
-1. **Verify branch** — MUST be `main` for release prep.
+1. **Verify branch** — MUST be `main`. On any other branch, emit Refuse and stop — do not edit `CHANGELOG.md`.
 
 2. **Run generator** (path from versioning overlay / PROJECT — default below)
 
@@ -51,8 +51,8 @@ Update root `CHANGELOG.md` from merged PRs, OpenSpec archives, and conventional 
 ```
 ## Refuse: /lsi-changelog
 
-**Reason:** <not on main | generator failed>
-**Fix:** <one line>
+**Reason:** Must run on main (release-train family) | generator failed
+**Fix:** checkout main after promotion + close; re-run /lsi:changelog or /lsi:release-train
 ```
 
 **Guardrails**
@@ -60,7 +60,8 @@ Update root `CHANGELOG.md` from merged PRs, OpenSpec archives, and conventional 
 - Invoke `scripts/release/generate_changelog.py` (or the path from the versioning overlay / PROJECT) — do not duplicate parser logic
 - Source priority: PR Changes → merge desc → OpenSpec → grouped commits
 - Forward-only — no full git history replay; use `/lsi:bootstrap-release` for optional baseline tag only
-- **`main`-only**
+- **`main`-only** — refuse on `staging` and ticket branches before any write
+- **Never nest** inside `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:close`, or bot sessions
 - Never leave `type(scope):` commit subjects in `CHANGELOG.md`
 - MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
 - No `Next:` footer (D11).

@@ -43,6 +43,9 @@ LSI_COMMANDS = [
     "lsi-address-verify",
     "lsi-address-readiness",
     "lsi-address-prowler",
+    "lsi-pr-bot",
+    "lsi-pr-bot-docs",
+    "lsi-apply-bot",
     "lsi-version",
     "lsi-changelog",
     "lsi-release",
@@ -53,6 +56,11 @@ LSI_COMMANDS = [
     "lsi-update",
     "lsi-adopt-verify",
     "lsi-adopt-clean",
+]
+
+# Adopt-managed helper under .lsi/bin/ (not a top-level workflow bin wrapper).
+LSI_BIN_HELPERS = [
+    "lsi-bitbucket",
 ]
 
 # Command namespaces the bundle does NOT manage. Files with these prefixes are
@@ -93,6 +101,22 @@ def expected_commands() -> set[str]:
     OpenSpec and intentionally excluded.
     """
     return set(LSI_COMMANDS)
+
+
+def expected_claude_command_names() -> set[str]:
+    """Return expected Claude Code filenames under `.claude/commands/lsi/` (no .md)."""
+    names: set[str] = set()
+    for stem in LSI_COMMANDS:
+        if stem.startswith("lsi-"):
+            names.add(stem[len("lsi-") :])
+        else:
+            names.add(stem)
+    return names
+
+
+def expected_lsi_bin() -> set[str]:
+    """Return expected helper basenames under `.lsi/bin/`."""
+    return set(LSI_BIN_HELPERS)
 
 
 def expected_rules(extra_rules: list[str] | None = None) -> set[str]:

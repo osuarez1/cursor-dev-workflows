@@ -1,0 +1,847 @@
+#!/usr/bin/env bash
+# Bitbucket Cloud helper for LSI bot sessions.
+# Installed by adopt to .lsi/bin/lsi-bitbucket (wipe-managed).
+set -euo pipefail
+
+readonly API_BASE="https://api.bitbucket.org/2.0"
+readonly MAX_COMMENT_CHARS=30000
+readonly DEFAULT_BOT_HEADER="**LSI Bot Review**"
+readonly DEFAULT_BOT_NAME="LSI Review Bot"
+readonly DEFAULT_BOT_EMAIL="lsi-review-bot@users.noreply.invalid"
+
+DRY_RUN=0
+CMD=""
+declare -a CMD_ARGS=()
+declare -a REDACT_VALUES=()
+
+AUTH_METHOD=""          # access-token-repo | access-token | api-token | app-password
+AUTH_HEADER=""          # full "Authorization: …" value (without the header name prefix for curl -H)
+IS_BOT_IDENTITY=0
+WORKSPACE=""
+REPO_SLUG=""
+LOADED_SECRETS=0
+
+die() {
+  printf '%s\n' "$*" >&2
+  exit 1
+}
+
+usage() {
+  cat <<'EOF'
+Usage: lsi-bitbucket [--dry-run] <command> [args]
+
+Commands:
+  info <pr>
+  list <pr> [--match <regex>] [--exclude-bot]
+  post <pr> <file> [--step <label>] [--log <file>]
+  create-pr --source <b> --dest <b> --title <t> --body-file <f>
+  push [<branch>]
+  commit -m <subject> [-m <body>]
+  whoami
+
+Environment:
+  BB_SECRETS_FILE          Secrets file (default: ~/.bitbucket_secrets)
+  BB_WORKSPACE / BB_REPO_SLUG  Override git-remote parsing
+  LSI_BOT_HEADER           Comment header (default: **LSI Bot Review**)
+  LSI_BB_FIXTURE_DIR       Serve info/list from JSON fixtures (no network)
+  BB_BOT_NAME / BB_BOT_EMAIL   Commit identity defaults
+EOF
+}
+
+# --- redaction ---------------------------------------------------------------
+
+redact() {
+  local text="$1"
+  local v
+  for v in "${REDACT_VALUES[@]+"${REDACT_VALUES[@]}"}"; do
+    [[ -n "$v" ]] || continue
+    text="${text//"$v"/[REDACTED]}"
+  done
+  printf '%s' "$text"
+}
+
+log_msg() {
+  printf '%s\n' "$(redact "$*")"
+}
+
+err_msg() {
+  printf '%s\n' "$(redact "$*")" >&2
+}
+
+# --- secrets -----------------------------------------------------------------
+
+_secrets_path() {
+  if [[ -n "${BB_SECRETS_FILE:-}" ]]; then
+    printf '%s' "$BB_SECRETS_FILE"
+  else
+    printf '%s' "${HOME}/.bitbucket_secrets"
+  fi
+}
+
+_token_env_key() {
+  # BB_ACCESS_TOKEN_<WORKSPACE>_<REPO> — uppercased, non-alnum → _
+  local ws="$1" repo="$2"
+  local key
+  key=$(printf 'BB_ACCESS_TOKEN_%s_%s' "$ws" "$repo" | tr '[:lower:]' '[:upper:]' | tr -c 'A-Z0-9' '_')
+  # collapse runs of _ from tr -c
+  key=$(printf '%s' "$key" | sed -E 's/_+/_/g; s/^_//; s/_$//')
+  printf '%s' "$key"
+}
+
+load_secrets() {
+  LOADED_SECRETS=1
+  local path
+  path="$(_secrets_path)"
+  [[ -f "$path" ]] || die "Secrets file not found: $path (see docs/workflows/integrations.md)"
+
+  local mode
+  mode=$(stat -f '%Lp' "$path" 2>/dev/null || stat -c '%a' "$path" 2>/dev/null || echo "")
+  if [[ -n "$mode" ]]; then
+    # Refuse group/world readable (any of g+r or o+r)
+    local last=$((10#$mode % 10))
+    local mid=$(( (10#$mode / 10) % 10 ))
+    if (( (mid & 4) != 0 || (last & 4) != 0 )); then
+      die "Secrets file must not be group/world readable (chmod 600): $path"
+    fi
+  fi
+
+  local line key value
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    # strip CR, comments, blank
+    line="${line%$'\r'}"
+    [[ -z "${line//[[:space:]]/}" ]] && continue
+    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    # optional export
+    if [[ "$line" =~ ^[[:space:]]*export[[:space:]]+ ]]; then
+      line="${line#*export }"
+      line="${line#"${line%%[![:space:]]*}"}"
+    fi
+    if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
+      key="${BASH_REMATCH[1]}"
+      value="${BASH_REMATCH[2]}"
+      # strip matching quotes
+      if [[ "$value" =~ ^\"(.*)\"$ ]] || [[ "$value" =~ ^\'(.*)\'$ ]]; then
+        value="${BASH_REMATCH[1]}"
+      fi
+      case "$key" in
+        BB_*)
+          export "$key=$value"
+          if [[ -n "$value" ]]; then
+            REDACT_VALUES+=("$value")
+          fi
+          ;;
+        *)
+          # ignore non-BB_* lines; never execute
+          ;;
+      esac
+    fi
+    # non-assignment lines ignored
+  done <"$path"
+}
+
+resolve_auth() {
+  local repo_key
+  repo_key="$(_token_env_key "$WORKSPACE" "$REPO_SLUG")"
+
+  local repo_token=""
+  # indirect expansion for dynamic key
+  if [[ -n "${!repo_key:-}" ]]; then
+    repo_token="${!repo_key}"
+  fi
+
+  if [[ -n "$repo_token" ]]; then
+    AUTH_METHOD="access-token-repo"
+    AUTH_HEADER="Authorization: Bearer ${repo_token}"
+    IS_BOT_IDENTITY=1
+    REDACT_VALUES+=("$repo_token")
+    return 0
+  fi
+  if [[ -n "${BB_ACCESS_TOKEN:-}" ]]; then
+    AUTH_METHOD="access-token"
+    AUTH_HEADER="Authorization: Bearer ${BB_ACCESS_TOKEN}"
+    IS_BOT_IDENTITY=1
+    REDACT_VALUES+=("$BB_ACCESS_TOKEN")
+    return 0
+  fi
+  if [[ -n "${BB_USERNAME:-}" && -n "${BB_API_TOKEN:-}" ]]; then
+    AUTH_METHOD="api-token"
+    local b64
+    b64=$(printf '%s:%s' "$BB_USERNAME" "$BB_API_TOKEN" | base64 | tr -d '\n')
+    AUTH_HEADER="Authorization: Basic ${b64}"
+    IS_BOT_IDENTITY=0
+    REDACT_VALUES+=("$BB_API_TOKEN")
+    return 0
+  fi
+  if [[ -n "${BB_USERNAME:-}" && -n "${BB_APP_PASSWORD:-}" ]]; then
+    AUTH_METHOD="app-password"
+    err_msg "WARNING: BB_APP_PASSWORD is deprecated; prefer a repository or workspace access token (BB_ACCESS_TOKEN)."
+    local b64
+    b64=$(printf '%s:%s' "$BB_USERNAME" "$BB_APP_PASSWORD" | base64 | tr -d '\n')
+    AUTH_HEADER="Authorization: Basic ${b64}"
+    IS_BOT_IDENTITY=0
+    REDACT_VALUES+=("$BB_APP_PASSWORD")
+    return 0
+  fi
+  die "No Bitbucket credentials found. Set BB_ACCESS_TOKEN_<WS>_<REPO> or BB_ACCESS_TOKEN (see docs/workflows/integrations.md)."
+}
+
+ensure_auth() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    return 0
+  fi
+  if [[ -n "${LSI_BB_FIXTURE_DIR:-}" ]]; then
+    # fixtures may still want secrets for whoami/post; only skip for info/list
+    return 0
+  fi
+  if [[ "$LOADED_SECRETS" -eq 0 ]]; then
+    load_secrets
+  fi
+  resolve_auth
+}
+
+# --- repo from remote --------------------------------------------------------
+
+parse_remote_url() {
+  local url="$1"
+  # SSH: git@bitbucket.org:ws/repo.git
+  # HTTPS: https://bitbucket.org/ws/repo.git
+  # HTTPS with user: https://x-token-auth@bitbucket.org/ws/repo.git
+  local host path
+  if [[ "$url" =~ ^git@([^:]+):(.+)$ ]]; then
+    host="${BASH_REMATCH[1]}"
+    path="${BASH_REMATCH[2]}"
+  elif [[ "$url" =~ ^https?://([^@/]+@)?([^/]+)/(.+)$ ]]; then
+    host="${BASH_REMATCH[2]}"
+    path="${BASH_REMATCH[3]}"
+  else
+    die "Unrecognized git remote URL: $url"
+  fi
+  host="${host%%:*}" # strip accidental port
+  if [[ "$host" != "bitbucket.org" ]]; then
+    die "Only Bitbucket Cloud is supported (host was '$host'). Set BB_WORKSPACE/BB_REPO_SLUG only as override for bitbucket.org remotes."
+  fi
+  path="${path%.git}"
+  path="${path%/}"
+  WORKSPACE="${path%%/*}"
+  REPO_SLUG="${path#*/}"
+  if [[ -z "$WORKSPACE" || -z "$REPO_SLUG" || "$WORKSPACE" == "$REPO_SLUG" && "$path" != *"/"* ]]; then
+    die "Could not parse workspace/repo from remote: $url"
+  fi
+}
+
+resolve_repo() {
+  if [[ -n "${BB_WORKSPACE:-}" && -n "${BB_REPO_SLUG:-}" ]]; then
+    WORKSPACE="$BB_WORKSPACE"
+    REPO_SLUG="$BB_REPO_SLUG"
+    return 0
+  fi
+  local url
+  url=$(git remote get-url origin 2>/dev/null) || die "Cannot read git remote 'origin'"
+  parse_remote_url "$url"
+  if [[ -n "${BB_WORKSPACE:-}" ]]; then
+    WORKSPACE="$BB_WORKSPACE"
+  fi
+  if [[ -n "${BB_REPO_SLUG:-}" ]]; then
+    REPO_SLUG="$BB_REPO_SLUG"
+  fi
+}
+
+# --- PR id -------------------------------------------------------------------
+
+parse_pr_id() {
+  local arg="$1"
+  if [[ "$arg" =~ ^[0-9]+$ ]]; then
+    printf '%s' "$arg"
+    return 0
+  fi
+  # https://bitbucket.org/<ws>/<repo>/pull-requests/123
+  if [[ "$arg" =~ /pull-requests/([0-9]+) ]]; then
+    printf '%s' "${BASH_REMATCH[1]}"
+    return 0
+  fi
+  die "Invalid PR reference: $arg (expected number or Bitbucket PR URL)"
+}
+
+# --- HTTP --------------------------------------------------------------------
+
+api_get() {
+  local url="$1"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    err_msg "[dry-run] GET $url"
+    printf '%s' '{"dry_run":true}'
+    return 0
+  fi
+  local resp http_code
+  resp=$(curl -sS -w '\n%{http_code}' -H "$AUTH_HEADER" -H "Accept: application/json" "$url") || die "curl GET failed"
+  http_code="${resp##*$'\n'}"
+  resp="${resp%$'\n'*}"
+  if [[ "$http_code" -lt 200 || "$http_code" -ge 300 ]]; then
+    die "GET failed ($http_code): $(redact "$resp")"
+  fi
+  printf '%s' "$resp"
+}
+
+api_post_json() {
+  local url="$1"
+  local body_file="$2"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    err_msg "[dry-run] POST $url"
+    cat "$body_file" >&2
+    printf '%s' '{"dry_run":true,"links":{"html":{"href":"dry-run"}}}'
+    return 0
+  fi
+  local resp http_code
+  resp=$(curl -sS -w '\n%{http_code}' \
+    -H "$AUTH_HEADER" \
+    -H "Accept: application/json" \
+    -H "Content-Type: application/json" \
+    -X POST \
+    --data-binary @"$body_file" \
+    "$url") || die "curl POST failed"
+  http_code="${resp##*$'\n'}"
+  resp="${resp%$'\n'*}"
+  if [[ "$http_code" -lt 200 || "$http_code" -ge 300 ]]; then
+    die "POST failed ($http_code): $(redact "$resp")"
+  fi
+  printf '%s' "$resp"
+}
+
+repo_api() {
+  printf '%s/repositories/%s/%s' "$API_BASE" "$WORKSPACE" "$REPO_SLUG"
+}
+
+# --- char length (UTF-8) -----------------------------------------------------
+
+utf8_len() {
+  LC_ALL=C.UTF-8 python3 -c 'import sys; print(len(sys.stdin.read()))' <<<"$1"
+}
+
+# --- split body at ## boundaries ---------------------------------------------
+
+# Writes parts as files named part_001, part_002, … under $1; echoes count.
+split_body_parts() {
+  local out_dir="$1"
+  local body="$2"
+  mkdir -p "$out_dir"
+  local len
+  len=$(utf8_len "$body")
+  if (( len <= MAX_COMMENT_CHARS )); then
+    printf '%s' "$body" >"$out_dir/part_001"
+    echo 1
+    return 0
+  fi
+
+  # Split into chunks at ## headings without exceeding MAX_COMMENT_CHARS.
+  local -a chunks=()
+  local current=""
+  local line
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" =~ ^##[[:space:]] ]] && [[ -n "$current" ]]; then
+      local trial="${current}"$'\n'"${line}"
+      if (( $(utf8_len "$trial") > MAX_COMMENT_CHARS )); then
+        chunks+=("$current")
+        current="$line"
+      else
+        current="$trial"
+      fi
+    else
+      if [[ -z "$current" ]]; then
+        current="$line"
+      else
+        current+=$'\n'"$line"
+      fi
+      if (( $(utf8_len "$current") > MAX_COMMENT_CHARS )); then
+        # Hard-split oversized chunk without a heading
+        while (( $(utf8_len "$current") > MAX_COMMENT_CHARS )); do
+          # take prefix by byte-safe python cut on chars
+          local head rest
+          head=$(LC_ALL=C.UTF-8 python3 -c "import sys; s=sys.stdin.read(); print(s[:$MAX_COMMENT_CHARS], end='')" <<<"$current")
+          rest=$(LC_ALL=C.UTF-8 python3 -c "import sys; s=sys.stdin.read(); print(s[$MAX_COMMENT_CHARS:], end='')" <<<"$current")
+          chunks+=("$head")
+          current="$rest"
+        done
+      fi
+    fi
+  done <<<"$body"
+  [[ -n "$current" ]] && chunks+=("$current")
+
+  local i=1
+  local c
+  for c in "${chunks[@]}"; do
+    printf '%s' "$c" >"$out_dir/$(printf 'part_%03d' "$i")"
+    i=$((i + 1))
+  done
+  echo $((i - 1))
+}
+
+bot_header() {
+  printf '%s' "${LSI_BOT_HEADER:-$DEFAULT_BOT_HEADER}"
+}
+
+# --- fixtures ----------------------------------------------------------------
+
+fixture_info() {
+  local pr="$1"
+  local f="${LSI_BB_FIXTURE_DIR}/pr_${pr}_info.json"
+  [[ -f "$f" ]] || f="${LSI_BB_FIXTURE_DIR}/info.json"
+  [[ -f "$f" ]] || die "Fixture not found for info: $f"
+  cat "$f"
+}
+
+fixture_list_values() {
+  # Print one JSON object per comment value across all fixture pages.
+  local pr="$1"
+  local dir="$LSI_BB_FIXTURE_DIR"
+  local -a files=()
+  if compgen -G "${dir}/pr_${pr}_comments_page_*.json" >/dev/null 2>&1; then
+    files=("${dir}"/pr_"${pr}"_comments_page_*.json)
+  elif [[ -f "${dir}/comments_page_1.json" ]]; then
+    files=("${dir}"/comments_page_*.json)
+  elif [[ -f "${dir}/comments.json" ]]; then
+    files=("${dir}/comments.json")
+  else
+    die "Fixture not found for list in $dir"
+  fi
+  local f
+  for f in "${files[@]}"; do
+    jq -c '.values[]?' "$f"
+  done
+}
+
+# --- subcommands -------------------------------------------------------------
+
+cmd_info() {
+  local pr
+  pr=$(parse_pr_id "${1:-}")
+  resolve_repo
+  local raw
+  if [[ -n "${LSI_BB_FIXTURE_DIR:-}" ]]; then
+    raw=$(fixture_info "$pr")
+  else
+    ensure_auth
+    raw=$(api_get "$(repo_api)/pullrequests/${pr}")
+  fi
+  if [[ "$DRY_RUN" -eq 1 && -z "${LSI_BB_FIXTURE_DIR:-}" ]]; then
+    log_msg "{\"id\":${pr},\"dry_run\":true,\"workspace\":\"${WORKSPACE}\",\"repo\":\"${REPO_SLUG}\"}"
+    return 0
+  fi
+  printf '%s\n' "$(redact "$(jq -c '{
+    id: .id,
+    title: .title,
+    state: .state,
+    source: .source.branch.name,
+    destination: .destination.branch.name,
+    author: (.author.display_name // .author.nickname // .author.uuid),
+    url: (.links.html.href // "")
+  }' <<<"$raw")")"
+}
+
+cmd_list() {
+  local pr="" match="" exclude_bot=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --match) match="${2:-}"; shift 2 ;;
+      --exclude-bot) exclude_bot=1; shift ;;
+      *)
+        if [[ -z "$pr" ]]; then pr=$(parse_pr_id "$1"); shift
+        else die "Unexpected argument: $1"
+        fi
+        ;;
+    esac
+  done
+  [[ -n "$pr" ]] || die "list requires <pr>"
+  resolve_repo
+
+  local header
+  header="$(bot_header)"
+
+  local -a values_json=()
+  if [[ -n "${LSI_BB_FIXTURE_DIR:-}" ]]; then
+    local v
+    while IFS= read -r v; do
+      [[ -n "$v" ]] && values_json+=("$v")
+    done < <(fixture_list_values "$pr")
+  else
+    ensure_auth
+    local url
+    url="$(repo_api)/pullrequests/${pr}/comments?pagelen=100"
+    while [[ -n "$url" ]]; do
+      if [[ "$DRY_RUN" -eq 1 ]]; then
+        err_msg "[dry-run] GET $url"
+        break
+      fi
+      local page
+      page=$(api_get "$url")
+      local vals
+      vals=$(jq -c '.values[]?' <<<"$page")
+      while IFS= read -r v; do
+        [[ -n "$v" ]] && values_json+=("$v")
+      done <<<"$vals"
+      url=$(jq -r '.next // empty' <<<"$page")
+    done
+  fi
+
+  local v body deleted
+  for v in "${values_json[@]+"${values_json[@]}"}"; do
+    deleted=$(jq -r '.deleted // false' <<<"$v")
+    [[ "$deleted" == "true" ]] && continue
+    # Skip resolved comments
+    if jq -e '.resolution != null and .resolution != {}' <<<"$v" >/dev/null 2>&1; then
+      continue
+    fi
+    body=$(jq -r '.content.raw // .content.html // ""' <<<"$v")
+    if [[ "$exclude_bot" -eq 1 ]]; then
+      if [[ "$body" == "$header"* ]]; then
+        continue
+      fi
+    fi
+    if [[ -n "$match" ]]; then
+      if ! printf '%s' "$body" | grep -E -q -- "$match"; then
+        continue
+      fi
+    fi
+    printf '%s\n' "$(redact "$(jq -c '{
+      id: .id,
+      body: (.content.raw // ""),
+      user: (.user.display_name // .user.nickname // .user.uuid // ""),
+      created_on: .created_on,
+      inline: (if .inline then {path: .inline.path, to: .inline.to} else null end)
+    }' <<<"$v")")"
+  done
+}
+
+cmd_post() {
+  local pr="" file="" step="" log_file=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --step) step="${2:-}"; shift 2 ;;
+      --log) log_file="${2:-}"; shift 2 ;;
+      *)
+        if [[ -z "$pr" ]]; then pr=$(parse_pr_id "$1"); shift
+        elif [[ -z "$file" ]]; then file="$1"; shift
+        else die "Unexpected argument: $1"
+        fi
+        ;;
+    esac
+  done
+  [[ -n "$pr" && -n "$file" ]] || die "post requires <pr> <file>"
+  [[ -f "$file" ]] || die "Body file not found: $file"
+  resolve_repo
+  if [[ "$DRY_RUN" -eq 0 ]]; then
+    ensure_auth
+  fi
+
+  local raw_body
+  raw_body=$(cat "$file")
+  raw_body=$(redact "$raw_body")
+
+  local header step_line prefix
+  header="$(bot_header)"
+  step_line=""
+  if [[ -n "$step" ]]; then
+    step_line="_${step}_"
+  fi
+
+  local parts_dir
+  parts_dir=$(mktemp -d)
+  trap 'rm -rf "$parts_dir"' RETURN
+  local n
+  n=$(split_body_parts "$parts_dir" "$raw_body")
+
+  local i=1
+  local -a urls=()
+  while (( i <= n )); do
+    local part_file part_body comment_body
+    part_file="$parts_dir/$(printf 'part_%03d' "$i")"
+    part_body=$(cat "$part_file")
+    if (( n > 1 )); then
+      prefix="${header}"$'\n\n'
+      [[ -n "$step_line" ]] && prefix+="${step_line} — part ${i}/${n}"$'\n\n' || prefix+="_part ${i}/${n}_"$'\n\n'
+    else
+      prefix="${header}"$'\n\n'
+      [[ -n "$step_line" ]] && prefix+="${step_line}"$'\n\n'
+    fi
+    comment_body="${prefix}${part_body}"
+
+    local payload
+    payload=$(mktemp)
+    jq -n --arg raw "$comment_body" '{content: {raw: $raw}}' >"$payload"
+
+    local resp url
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      err_msg "[dry-run] POST comment part ${i}/${n} to PR ${pr}"
+      printf '%s\n' "$(redact "$comment_body")"
+      url="dry-run"
+      urls+=("$url")
+    else
+      resp=$(api_post_json "$(repo_api)/pullrequests/${pr}/comments" "$payload")
+      url=$(jq -r '.links.html.href // .links.self.href // empty' <<<"$resp")
+      urls+=("$url")
+      log_msg "$url"
+    fi
+    rm -f "$payload"
+    i=$((i + 1))
+  done
+
+  if [[ -n "$log_file" ]]; then
+    mkdir -p "$(dirname "$log_file")"
+    {
+      printf '## %s\n' "${step:-post}"
+      printf 'timestamp: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      printf 'urls:\n'
+      local u
+      for u in "${urls[@]}"; do
+        printf '  - %s\n' "$(redact "$u")"
+      done
+      printf '\n'
+      printf '%s\n\n' "$(redact "$raw_body")"
+    } >>"$log_file"
+  fi
+}
+
+cmd_create_pr() {
+  local source="" dest="" title="" body_file=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --source) source="${2:-}"; shift 2 ;;
+      --dest) dest="${2:-}"; shift 2 ;;
+      --title) title="${2:-}"; shift 2 ;;
+      --body-file) body_file="${2:-}"; shift 2 ;;
+      *) die "Unexpected argument: $1" ;;
+    esac
+  done
+  [[ -n "$source" && -n "$dest" && -n "$title" && -n "$body_file" ]] || \
+    die "create-pr requires --source --dest --title --body-file"
+  [[ -f "$body_file" ]] || die "Body file not found: $body_file"
+  resolve_repo
+  if [[ "$DRY_RUN" -eq 0 ]]; then
+    ensure_auth
+  fi
+  local body
+  body=$(redact "$(cat "$body_file")")
+  local payload
+  payload=$(mktemp)
+  jq -n \
+    --arg title "$title" \
+    --arg body "$body" \
+    --arg src "$source" \
+    --arg dst "$dest" \
+    '{
+      title: $title,
+      description: $body,
+      source: {branch: {name: $src}},
+      destination: {branch: {name: $dst}},
+      close_source_branch: false
+    }' >"$payload"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    err_msg "[dry-run] POST $(repo_api)/pullrequests"
+    cat "$payload"
+    rm -f "$payload"
+    return 0
+  fi
+  local resp url
+  resp=$(api_post_json "$(repo_api)/pullrequests" "$payload")
+  rm -f "$payload"
+  url=$(jq -r '.links.html.href // empty' <<<"$resp")
+  log_msg "$url"
+}
+
+_protected_branches() {
+  # Parse PROTECTED_BRANCHES from PROJECT.md — backtick or plain list cells
+  local pm="PROJECT.md"
+  [[ -f "$pm" ]] || { echo ""; return 0; }
+  local line
+  # shellcheck disable=SC2016
+  line=$(grep -E '^\|[[:space:]]*`?PROTECTED_BRANCHES`?[[:space:]]*\|' "$pm" | head -1 || true)
+  if [[ -z "$line" ]]; then
+    echo ""
+    return 0
+  fi
+  # third column value
+  local val
+  # shellcheck disable=SC2016
+  val=$(printf '%s' "$line" | awk -F'|' '{print $3}' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/^`//;s/`$//')
+  printf '%s' "$val"
+}
+
+cmd_push() {
+  local branch=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --force|--force-with-lease|-f)
+        die "Force push is not allowed"
+        ;;
+      *)
+        if [[ -z "$branch" ]]; then branch="$1"; shift
+        else die "Unexpected argument: $1"
+        fi
+        ;;
+    esac
+  done
+
+  resolve_repo
+  if [[ "$DRY_RUN" -eq 0 ]]; then
+    load_secrets
+    resolve_auth
+  else
+    # dry-run still resolves identity class for messaging
+    if [[ -f "$(_secrets_path)" ]]; then
+      load_secrets || true
+      resolve_auth || true
+    fi
+  fi
+
+  if [[ "$DRY_RUN" -eq 0 && "$IS_BOT_IDENTITY" -ne 1 ]]; then
+    die "push requires a bot access token (BB_ACCESS_TOKEN_<WS>_<REPO> or BB_ACCESS_TOKEN). See docs/workflows/integrations.md."
+  fi
+
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    die "Not a git repository"
+  fi
+  if ! git symbolic-ref -q HEAD >/dev/null; then
+    die "Detached HEAD — refuse push"
+  fi
+  local current
+  current=$(git rev-parse --abbrev-ref HEAD)
+  branch="${branch:-$current}"
+
+  local protected
+  protected="$(_protected_branches)"
+  if [[ -n "$protected" ]]; then
+    local p
+    IFS=', ' read -r -a plist <<<"$protected"
+    for p in "${plist[@]}"; do
+      p="${p//\"/}"
+      p="${p//\'/}"
+      p="${p#"${p%%[![:space:]]*}"}"
+      p="${p%"${p##*[![:space:]]}"}"
+      [[ -z "$p" ]] && continue
+      if [[ "$branch" == "$p" ]]; then
+        die "Refuse push to protected branch: $branch"
+      fi
+    done
+  fi
+
+  local remote_url="https://bitbucket.org/${WORKSPACE}/${REPO_SLUG}.git"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    err_msg "[dry-run] git push ${remote_url} ${branch}"
+    return 0
+  fi
+
+  # Token via git config env — never argv / .git/config / remote URL
+  local token=""
+  if [[ "$AUTH_METHOD" == "access-token-repo" ]]; then
+    local repo_key
+    repo_key="$(_token_env_key "$WORKSPACE" "$REPO_SLUG")"
+    token="${!repo_key}"
+  else
+    token="${BB_ACCESS_TOKEN}"
+  fi
+  [[ -n "$token" ]] || die "push requires access token"
+
+  export GIT_CONFIG_COUNT=1
+  export GIT_CONFIG_KEY_0="http.extraHeader"
+  export GIT_CONFIG_VALUE_0="Authorization: Bearer ${token}"
+  # Ensure redaction covers token in any error output
+  REDACT_VALUES+=("$token")
+
+  if ! git push "$remote_url" "refs/heads/${branch}:refs/heads/${branch}"; then
+    die "Push failed (non-fast-forward or remote rejection). Not retrying with force."
+  fi
+}
+
+cmd_commit() {
+  local subject="" body=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -m)
+        if [[ -z "$subject" ]]; then subject="${2:-}"; else body="${2:-}"; fi
+        shift 2
+        ;;
+      *) die "Unexpected argument: $1" ;;
+    esac
+  done
+  [[ -n "$subject" ]] || die "commit requires -m <subject>"
+
+  if [[ "$DRY_RUN" -eq 0 ]]; then
+    # load secrets for bot name/email if present
+    if [[ -f "$(_secrets_path)" ]]; then
+      load_secrets || true
+    fi
+  fi
+
+  local name email
+  name="${BB_BOT_NAME:-$DEFAULT_BOT_NAME}"
+  email="${BB_BOT_EMAIL:-$DEFAULT_BOT_EMAIL}"
+
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    err_msg "[dry-run] git commit as ${name} <${email}>: ${subject}"
+    return 0
+  fi
+
+  if git diff --cached --quiet; then
+    die "Nothing staged — refuse commit"
+  fi
+
+  export GIT_AUTHOR_NAME="$name"
+  export GIT_AUTHOR_EMAIL="$email"
+  export GIT_COMMITTER_NAME="$name"
+  export GIT_COMMITTER_EMAIL="$email"
+
+  if [[ -n "$body" ]]; then
+    git commit -m "$subject" -m "$body"
+  else
+    git commit -m "$subject"
+  fi
+}
+
+cmd_whoami() {
+  resolve_repo
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    log_msg '{"method":"dry-run","bot":false,"workspace":"'"$WORKSPACE"'","repo":"'"$REPO_SLUG"'"}'
+    return 0
+  fi
+  load_secrets
+  resolve_auth
+  local bot_json="false"
+  [[ "$IS_BOT_IDENTITY" -eq 1 ]] && bot_json="true"
+  log_msg "$(jq -nc \
+    --arg m "$AUTH_METHOD" \
+    --argjson b "$bot_json" \
+    --arg w "$WORKSPACE" \
+    --arg r "$REPO_SLUG" \
+    '{method:$m, bot:$b, workspace:$w, repo:$r}')"
+}
+
+# --- main --------------------------------------------------------------------
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) DRY_RUN=1; shift ;;
+    -h|--help) usage; exit 0 ;;
+    info|list|post|create-pr|push|commit|whoami)
+      CMD="$1"; shift
+      CMD_ARGS=("$@")
+      break
+      ;;
+    *)
+      die "Unknown option or command: $1 (try --help)"
+      ;;
+  esac
+done
+
+[[ -n "$CMD" ]] || { usage; exit 2; }
+
+# Dependencies
+command -v curl >/dev/null || die "curl is required"
+command -v jq >/dev/null || die "jq is required"
+
+case "$CMD" in
+  info) cmd_info "${CMD_ARGS[@]+"${CMD_ARGS[@]}"}" ;;
+  list) cmd_list "${CMD_ARGS[@]+"${CMD_ARGS[@]}"}" ;;
+  post) cmd_post "${CMD_ARGS[@]+"${CMD_ARGS[@]}"}" ;;
+  create-pr) cmd_create_pr "${CMD_ARGS[@]+"${CMD_ARGS[@]}"}" ;;
+  push) cmd_push "${CMD_ARGS[@]+"${CMD_ARGS[@]}"}" ;;
+  commit) cmd_commit "${CMD_ARGS[@]+"${CMD_ARGS[@]}"}" ;;
+  whoami) cmd_whoami "${CMD_ARGS[@]+"${CMD_ARGS[@]}"}" ;;
+esac

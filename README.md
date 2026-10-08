@@ -53,6 +53,7 @@ Not sure which doc to use? See [which-workflow.md](which-workflow.md).
 | PR title / description / merge commit text | [pull-requests.md](docs/workflows/pull-requests.md) |
 | Ready for PR or production? | [pr-production-readiness.md](docs/workflows/pr-production-readiness.md) |
 | Merge-gate review | [code-review.md](docs/workflows/code-review.md) |
+| Unattended Bitbucket bot sessions | [integrations.md](docs/workflows/integrations.md) · `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot` |
 | Design / alternatives | [senior-analysis.md](docs/workflows/senior-analysis.md) |
 | Commit plan / messages | [commits-logical-order.md](docs/workflows/commits-logical-order.md) |
 | When tests are required | [test-requirements.md](docs/workflows/test-requirements.md) |

@@ -2,12 +2,23 @@
 
 ### Requirement: PR review bot commands
 
-The LSI agent stack SHALL provide `/lsi:pr-bot <PR> [--fix]` for Mode B (implementation) PRs and `/lsi:pr-bot-docs <PR> [--fix]` for Mode A (`openspec/`-only) PRs. Both SHALL follow the shared session skeleton in `overlays/lsi/agent-stack/bot-sessions.md` (Setup → numbered steps → Close) and SHALL declare the nested commands they run as their documented deliverable.
+The LSI agent stack SHALL provide `/lsi:pr-bot <PR> [--fix]` and `/lsi:pr-bot --local [--fix]` for Mode B (implementation) / Mode C reviews, and `/lsi:pr-bot-docs <PR> [--fix]` and `/lsi:pr-bot-docs --local [--fix]` for Mode A (`openspec/`-only) reviews. Both SHALL follow the shared session skeleton in `overlays/lsi/agent-stack/bot-sessions.md` (Setup → numbered steps → Close) and SHALL declare the nested commands they run as their documented deliverable.
 
-#### Scenario: Missing PR reference
+#### Scenario: Missing PR reference without --local
 
-- **WHEN** either command is invoked without a PR number or URL
+- **WHEN** either command is invoked without a PR number or URL and without `--local`
 - **THEN** it emits the refuse Output and posts nothing
+
+#### Scenario: Local mode without PR
+
+- **WHEN** `/lsi:pr-bot --local` or `/lsi:pr-bot-docs --local` runs on a clean ticket branch
+- **THEN** the session does not call `lsi-bitbucket post`, `whoami`, or `push`
+- **AND** each step body is written under `.reviews/<ts>_local_<kind>_<slug>/` and emitted in full in chat
+
+#### Scenario: PR and --local together refused
+
+- **WHEN** either command is invoked with both a PR reference and `--local`
+- **THEN** it emits the refuse Output
 
 #### Scenario: Wrong PR host
 
@@ -21,7 +32,7 @@ The LSI agent stack SHALL provide `/lsi:pr-bot <PR> [--fix]` for Mode B (impleme
 
 ### Requirement: Session setup preconditions
 
-Setup SHALL: resolve the PR via `lsi-bitbucket info`; stop unless state is `OPEN`; fetch and check out the PR source branch with fast-forward only; resolve exactly one active OpenSpec change from the branch name; require a clean working tree; require `.reviews/` to be git-ignored; create `SESSION_LOG=.reviews/<YYYYMMDD-HHMMSS>_<review|review-docs>_<change>.md`. The bot SHALL NOT edit `.gitignore`.
+Remote Setup SHALL: resolve the PR via `lsi-bitbucket info`; stop unless state is `OPEN`; fetch and check out the PR source branch with fast-forward only; resolve exactly one active OpenSpec change from the branch name; require a clean working tree; require `.reviews/` to be git-ignored; create `SESSION_LOG=.reviews/<YYYYMMDD-HHMMSS>_<review|review-docs>_<change>.md`. Local Setup SHALL: stay on the current ticket branch; resolve the change from the branch suffix; require a clean tree and ignored `.reviews/`; create `SESSION_DIR=.reviews/<YYYYMMDD-HHMMSS>_local_<review|review-docs>_<change>/` and `SESSION_LOG` inside it; skip Bitbucket entirely. The bot SHALL NOT edit `.gitignore`.
 
 #### Scenario: Dirty tree stops session
 
@@ -83,9 +94,25 @@ After the gates, `/lsi:pr-bot` SHALL post `/lsi:change-summary` output and a QA 
 - **WHEN** the QA plan lists N numbered test cases
 - **THEN** the QA checklist contains at least N `- [ ]` items plus setup and regression items
 
+### Requirement: Readiness on Mode A, B, and C reviews
+
+Every PR review session for Mode **A**, **B**, or **C** SHALL run `/lsi:readiness` (with `/lsi:address-readiness` under `--fix`, at most **3** address cycles). Mode A sessions use `/lsi:pr-bot-docs`; Mode B and Mode C sessions use `/lsi:pr-bot`. Session `PASS` SHALL require readiness verdict `Ready`. If readiness is not `Ready` after its budget, later gates MAY still run with skip reason `bot session: readiness NEEDS HUMAN`.
+
+#### Scenario: Mode A docs session runs readiness
+
+- **WHEN** `/lsi:pr-bot-docs` runs on an `openspec/`-only PR
+- **THEN** the session runs `/lsi:readiness` before senior and plan-gap
+- **AND** `PASS` requires readiness `Ready`
+
+#### Scenario: Mode C uses implementation review session
+
+- **WHEN** a Mode C (docs+impl under size gates) PR is reviewed unattended
+- **THEN** `/lsi:pr-bot` runs (not `/lsi:pr-bot-docs`)
+- **AND** the session includes the readiness gate
+
 ### Requirement: Mode A senior loop and plan-gap check
 
-`/lsi:pr-bot-docs` SHALL run `/lsi:senior` at the Deep tier, post the **full** senior report each iteration (multi-part when long), save it under `.senior-analyses/`, and with `--fix` loop `/lsi:address-senior` up to **3** cycles until the verdict is `Sound`, or `Acceptable with follow-ups` with every follow-up captured in `tasks.md`. It SHALL then run the plan-gap check: `openspec validate <slug> --strict`; requirement/scenario → task coverage; design decision → spec/task reflection without contradiction; every task names files or areas and has no undefined or forward dependency; test work planned; no sync/archive/close apply deliverables; proposal capabilities match `specs/` folders. The verdict SHALL be `Plan ready` or `Plan gaps`.
+`/lsi:pr-bot-docs` SHALL run readiness first (see above), then `/lsi:senior` at the Deep tier, post the **full** senior report each iteration (multi-part when long), save it under `.senior-analyses/`, and with `--fix` loop `/lsi:address-senior` up to **3** cycles until the verdict is `Sound`, or `Acceptable with follow-ups` with every follow-up captured in `tasks.md`. It SHALL then run the plan-gap check: `openspec validate <slug> --strict`; requirement/scenario → task coverage; design decision → spec/task reflection without contradiction; every task names files or areas and has no undefined or forward dependency; test work planned; no administrative apply deliverables (close/sync/archive, promote, release-train family, `/lsi:update`, meta process); proposal capabilities match `specs/` folders. The verdict SHALL be `Plan ready` or `Plan gaps`.
 
 With `--fix`, remediating **Plan gaps** SHALL use `/lsi:address-senior` against the **same single budget of 3 address cycles** as the senior loop. There SHALL be no second or separate budget for plan-gap. Address cycles already spent on senior findings count toward the cap. If gaps remain after the budget is exhausted, the session verdict SHALL be `NEEDS HUMAN` and no further address cycle SHALL run.
 
@@ -126,10 +153,10 @@ Under `--fix`, before each step the session SHALL snapshot `git status`. After t
 
 ### Requirement: Posting, logging, and close
 
-Every step, including skipped steps, SHALL be posted through `lsi-bitbucket post --step <label> --log $SESSION_LOG`. The session log SHALL also record commands run, decisions taken, and their one-line outcomes, with secrets redacted. Close SHALL post the final verdict (`READY`, `NEEDS HUMAN`, or `STOPPED — <reason>`), a step table (ran or skipped, outcome), commits since `START_SHA`, remaining open items, duration, and the log filename, and SHALL run after any STOP.
+Remote sessions: every step, including skipped steps, SHALL be posted through `lsi-bitbucket post --step <label> --log $SESSION_LOG`. Local sessions: every step SHALL be written to `$SESSION_DIR/NN_<label>.md` and emitted in full in chat, with outcomes appended to `$SESSION_LOG`, and SHALL NOT call `lsi-bitbucket post`. The session log SHALL also record commands run, decisions taken, and their one-line outcomes, with secrets redacted. Close SHALL emit the final verdict (`PASS`, `NEEDS HUMAN`, or `STOPPED — <reason>`), a step table (ran or skipped, outcome), commits since `START_SHA`, remaining open items, duration, and the log path (remote: post Close; local: Close file + chat), and SHALL run after any STOP.
 
 #### Scenario: Stop still closes
 
 - **WHEN** a STOP condition occurs at any step
 - **THEN** the Close comment is posted with `STOPPED — <reason>`
-- **AND** `.reviews/.tmp/` is removed and the log path is printed in chat
+- **AND** the log path is printed in chat

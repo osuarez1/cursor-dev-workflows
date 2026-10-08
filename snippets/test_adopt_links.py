@@ -65,6 +65,7 @@ LINK_TARGET_STUBS = (
     "docs/deployment/secrets.md",
     "docs/ai/openspec-sync.md",
     "openspec/config.yaml",
+    "openspec/CLOSED.md",
     "openspec/specs/.gitkeep",
     "snippets/user-rule-only-commit-when-asked.md",
     "snippets/gitignore-local-artifacts.txt",
@@ -104,6 +105,8 @@ class AdoptLinksRegressionTests(unittest.TestCase):
         adopt.copy_overlay(self.target, tokens, config)
         adopt.merge_which_workflow_lsi(self.target)
         adopt.install_agent_stack(self.target, tokens, config)
+        adopt.install_bot_session_docs(self.target, tokens)
+        adopt.install_claude_commands(self.target, tokens)
         adopt.merge_convention(self.target)
         adopt.merge_agents_markers(self.target)
         adopt.update_project_md(self.target, config, bundle_version)
@@ -119,6 +122,19 @@ class AdoptLinksRegressionTests(unittest.TestCase):
         broken, patterns, _ = verify(self.target.resolve(), canonical)
         self.assertEqual(broken, [], msg="\n".join(broken))
         self.assertEqual(patterns, [], msg="\n".join(patterns))
+
+    def test_bot_claude_command_links_resolve(self) -> None:
+        """Claude emit of bot commands must resolve bot-sessions / integrations links."""
+        self.run_adopt()
+        root = self.target.resolve()
+        for name in ("pr-bot.md", "pr-bot-docs.md", "apply-bot.md"):
+            md = root / ".claude" / "commands" / "lsi" / name
+            self.assertTrue(md.is_file(), msg=f"missing {md}")
+            text = md.read_text(encoding="utf-8")
+            for href in verify_mod.extract_links(text):
+                if "bot-sessions" in href or "integrations" in href or "bot-lane" in href:
+                    err = verify_mod.check_resolve(root, md, href)
+                    self.assertIsNone(err, msg=err)
 
     def test_docs_ai_cross_tree_links(self) -> None:
         self.run_adopt()

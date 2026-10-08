@@ -165,6 +165,7 @@ class SupportedAgentsOnlyTests(unittest.TestCase):
         adopt.copy_core_bundle(target, tokens)
         adopt.copy_overlay(target, tokens, config)
         adopt.install_agent_stack(target, tokens, config)
+        adopt.install_lsi_bin(target)
         adopt.install_opencode_stack(target, tokens, config)
         return target
 
@@ -182,6 +183,8 @@ class SupportedAgentsOnlyTests(unittest.TestCase):
         for glob in FORBIDDEN_GLOBS:
             hits = list(target.glob(glob))
             self.assertEqual(hits, [], msg=f"adopt wrote forbidden files: {hits}")
+        # .lsi/bin is allowed (not a top-level workflow bin wrapper)
+        self.assertTrue((target / ".lsi" / "bin" / "lsi-bitbucket").is_file())
 
     def test_opencode_opt_in_emits_opencode_only(self) -> None:
         target = self._run_partial_adopt(OPENCODE_OPT_IN_CONFIG)
@@ -197,6 +200,7 @@ class SupportedAgentsOnlyTests(unittest.TestCase):
         for glob in FORBIDDEN_GLOBS:
             hits = list(target.glob(glob))
             self.assertEqual(hits, [], msg=f"opt-in adopt wrote forbidden files: {hits}")
+        self.assertTrue((target / ".lsi" / "bin" / "lsi-bitbucket").is_file())
 
 
 if __name__ == "__main__":

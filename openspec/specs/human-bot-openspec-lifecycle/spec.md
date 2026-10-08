@@ -10,39 +10,37 @@ The OpenSpec + Git overlay SHALL define three lanes: human shaping (steps 1–8)
 #### Scenario: Documented lane split
 
 - **WHEN** an agent or human reads `openspec-git-integration.md` lifecycle
-- **THEN** the document SHALL list human steps through mode-A docs PR and merge-desc, bot steps from `/opsx:apply` through mode-B staging PR and merge-desc, and human steps for staging QA, `/lsi:close`, `/lsi:promote`, merge-desc, and optional release-train
+- **THEN** the document SHALL list human steps through mode-A docs PR and merge-desc, bot steps from `/opsx:apply` through mode-B staging PR and merge-desc, and human steps for staging QA, `/lsi:promote`, merge-desc, `/lsi:close` on `main`, and optional release-train
 - **AND** the document SHALL state that coding agents execute the bot lane using the shared bot playbook
 
-### Requirement: Close before promote
+### Requirement: Close after promote on main
 
-After staging QA and CI pass, a human SHALL run `/lsi:close` before `/lsi:promote`. Promote SHALL merge already-closed work so main requires no sync/archive for that change.
+After staging QA and CI pass, a human SHALL run `/lsi:promote` while the change is still active. After the promotion PR merges to `main`, a human SHALL run `/lsi:close` on **`main` only** (sync + archive + CLOSED.md). `/lsi:promote` SHALL NOT require close beforehand.
 
-#### Scenario: Close precedes promote
+#### Scenario: Promote precedes close
 
 - **WHEN** staging QA and CI have passed for a change
-- **THEN** `/lsi:close` is the next lifecycle step before `/lsi:promote`
-- **AND** `/lsi:promote` output SHALL NOT instruct `/lsi:close` on `main` after merge
+- **THEN** `/lsi:promote` is the next lifecycle step
+- **AND** `/lsi:close` runs on `main` after the promotion merge
 
-#### Scenario: Staging issues after close are follow-ups
+#### Scenario: Staging issues after promote are follow-ups
 
-- **WHEN** a defect is found on staging after the change was closed
+- **WHEN** a defect is found on staging after promotion (before or after close)
 - **THEN** the defect SHALL be tracked as a new OpenSpec change (follow-up), not by reopening the archived folder as the primary workflow
 
-### Requirement: Close allowed off main
+### Requirement: Close requires main
 
-`/lsi:close` SHALL run on the ticket-linked development branch (with staging validation confirmed), not exclusively on `main`. When promoting work that accumulated on `staging`, the human SHALL merge staging into the ticket branch before `/lsi:close` (not close while checked out on bare `staging`).
+`/lsi:close` SHALL refuse unless the current branch is `main` and the user confirms the promotion PR for the change has merged. It SHALL refuse ticket branches and bare `staging`.
 
-#### Scenario: Close on ticket branch
+#### Scenario: Close on main after promotion
 
-- **WHEN** a user invokes `/lsi:close` on a ticket branch after confirming staging QA passed
+- **WHEN** a user invokes `/lsi:close` on `main` after confirming the promotion merge and prior staging QA
 - **THEN** the command proceeds with sync (if needed), archive, CLOSED.md update, and commit handoff
-- **AND** the command does not refuse solely because the branch is not `main`
 
-#### Scenario: Accumulated staging uses ticket branch with merge
+#### Scenario: Close refused off main
 
-- **WHEN** promote will carry multiple staging-validated commits for the change
-- **THEN** `/lsi:close` runs on the ticket branch after staging is merged into that branch
-- **AND** the lifecycle docs do not require closing while checked out on `staging`
+- **WHEN** a user invokes `/lsi:close` on a ticket branch or `staging`
+- **THEN** the command refuses with a fix to merge the promotion PR and re-run on `main`
 
 ### Requirement: PR modes A B and C
 
