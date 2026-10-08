@@ -49,3 +49,4 @@ Follow-up to `/lsi:review`. Resolves structured findings (blocker / major / mino
 - MUST emit the Output skeleton; MUST NOT invent alternate report shapes
 - No `Next:` footer or follow-up steering (D11)
 - Do not draft PR title/body — `/lsi:pr` owns that
+- Bot session exception: when nested under `/lsi:pr-bot` / `/lsi:apply-bot` with `--fix`/apply, that invocation satisfies "user asks" for commit/push within that session's scope — see [integrations.md](../../docs/workflows/integrations.md) Bot sessions; standalone defaults unchanged.

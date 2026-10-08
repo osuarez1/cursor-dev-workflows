@@ -28,15 +28,19 @@ Anti-patterns to avoid when using [cursor-dev-workflows](../../README.md) in a t
 | Using code review verdict `Ready` in senior analysis | Senior analysis: `Sound` / `Acceptable with follow-ups` / `Rethink` |
 | Posting full senior analysis to PR comments | Short summary only unless asked; see [integrations.md](integrations.md) |
 | Skipping tests for `SOURCE_ROOT` changes | [test-requirements.md](test-requirements.md) |
+| Bumping `VERSION` / `version.txt` or editing `CHANGELOG.md` on a feature PR | Leave version and changelog to `/lsi:release-train` on `main`; `/lsi:readiness` fails when those files change |
 | Vague acceptance criteria (“works correctly”) | Testable checkboxes in [ticket-card-info.md](ticket-card-info.md) |
 
 ## Artifacts
 
 | Mistake | Correct behavior |
 |---------|------------------|
-| Committing `.reviews/` or `.senior-analyses/` | Gitignore via [snippets/gitignore-local-artifacts.txt](../../snippets/gitignore-local-artifacts.txt) |
+| Committing `.reviews/` or `.senior-analyses/` | Gitignore via adopt-managed `lsi:local-artifacts` block ([snippets/gitignore-local-artifacts.txt](../../snippets/gitignore-local-artifacts.txt)) |
 | Creating `docs/reviews/` in the repo | Local archives only when user asks to save locally |
-| Auto-posting review to Bitbucket/Trello | Only when user asks to log remotely |
+| Auto-posting review to Bitbucket/Trello | Only when user asks to log remotely, or via an explicit bot session ([integrations.md](integrations.md) Bot sessions) |
+| Extending bot authorization beyond that PR/session | Bot scope is one PR (or one apply-bot change) for that invocation only |
+| Calling `git push` / `git commit` directly inside a bot session | Use `.lsi/bin/lsi-bitbucket` only |
+| Committing untracked files outside the step's snapshot | Commit gate stages only paths changed since the pre-step snapshot; never stage `.reviews/`, `.env*`, agent dirs |
 
 ## Ticket cards
 
@@ -54,6 +58,12 @@ Anti-patterns to avoid when using [cursor-dev-workflows](../../README.md) in a t
 | PR title `Fixed stuff` or vague body (“looks good”) | [pull-requests.md](pull-requests.md) — Conventional Commits title; runnable Testing steps — [examples/pr-description-good-vs-weak.md](../../examples/pr-description-good-vs-weak.md) |
 | Merge extended description is only PR title or full PR markdown | [pull-requests.md](pull-requests.md) — Summary, `Changes:`, `Commits merged:`, `Post-merge:` — [examples/pr-merge-commit-good-vs-weak.md](../../examples/pr-merge-commit-good-vs-weak.md) |
 | Confusing PR conventions with readiness checklist | Conventions → `pull-requests.md`; verdict checklist → `pr-production-readiness.md` |
+| Skipping `/lsi:readiness` on Mode A or Mode C review | Run readiness for Mode A/B/C — nested in `/lsi:pr-bot-docs` (A) and `/lsi:pr-bot` (B/C) |
+| Running `/lsi:close` on a ticket branch or before promote | Close only on **`main`** after the promotion PR merges |
+| Running release-train (or version/changelog/release) off `main` | Those commands are **`main`-only**; never nest them in readiness/review/PR/promote/close |
+| Putting close/promote/release/`/lsi:update` items in `tasks.md` | Keep checkboxes purpose-only; `/lsi:readiness` fails administrative apply tasks |
+| Passing both a PR and `--local` to pr-bot / pr-bot-docs | Use `<PR>` for Bitbucket posting or `--local` for files+chat — not both |
+| Expecting `--local` to push or post | Local mode never posts or pushes; use remote `<PR>` when you need Bitbucket |
 
 ## Routing
 

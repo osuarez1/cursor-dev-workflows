@@ -4,14 +4,26 @@ AGENTS-LOCAL.md
 maintainer-adopters.local.yaml
 .git-trello/
 
+# >>> lsi:local-artifacts (managed by cursor-dev-workflows adopt) >>>
+# Local agent review archives — never commit. Adopt upserts this block; do not
+# edit inside the markers (adopter lines outside the markers are preserved).
+.reviews/
+.senior-analyses/
+# <<< lsi:local-artifacts <<<
+
 # Local Cursor install (see gitignored MAINTAINER.md)
 .cursor/
 
-# Unsupported agent tool dirs (Cursor + Claude only)
+# OpenCode: gitignored local install (bundle bootstrap emits LSI commands here;
+# adopters opt in via agents_opencode). Root opencode.json is local-only too.
 .opencode/
+opencode.json
 .aiassistant/
 .junie/
 bin/
+# Tracked adopt source for the Bitbucket helper (not a top-level workflow bin/)
+!overlays/lsi/snippets/bin/
+!overlays/lsi/snippets/bin/**
 
 # Python
 __pycache__/

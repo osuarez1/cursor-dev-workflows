@@ -34,9 +34,9 @@ Documentation sprint seeds `openspec/` manually; `openspec init` is optional if 
 | Implement | `/opsx:apply` | Ticket branch only |
 | PR to staging | `/lsi:pr` | Default target `staging` |
 | Promote to main | `/lsi:promote` | After staging QA |
-| Close (before promote) | `/lsi:close` | On **ticket branch** after staging QA — sync + archive + `CLOSED.md` |
+| Close (after promote) | `/lsi:close` | On **`main`** only after promotion merges — sync + archive + `CLOSED.md` |
 | Sync specs | `/opsx:sync` | Delta → `openspec/specs/` — as part of `/lsi:close` |
-| Archive | `/opsx:archive` | As part of `/lsi:close` before `/lsi:promote` |
+| Archive | `/opsx:archive` | As part of `/lsi:close` on **`main`** after promote |
 
 Manual equivalent: create `openspec/changes/<id>/proposal.md`, spec deltas, `design.md`, `tasks.md`.
 
@@ -62,7 +62,7 @@ Planned (folders not created yet): `v2-workflows-dashboard`, `v3-cloud-scale`.
 
 - **OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive`
 - **Git / delivery:** `/lsi:*` commands — see [openspec-git-integration.md](../../.lsi/workflows/openspec-git-integration.md)
-- **Archive timing:** keep change folders active through staging QA; run `/lsi:close` (sync + archive + `CLOSED.md`) on the **ticket branch** after QA, **before** `/lsi:promote`
+- **Archive timing:** keep change folders active through staging QA and promotion; run `/lsi:close` (sync + archive + `CLOSED.md`) on **`main`** after the promotion PR merges
 - **`tasks.md` scope:** never add `/opsx:sync`, `/opsx:archive`, or `/lsi:close` as tasks — close is separate from `/opsx:apply`
 - **Human sync policy:** [openspec-sync.md](openspec-sync.md)
 - **Project context for artifact generation:** [config.yaml](../../openspec/config.yaml)

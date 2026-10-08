@@ -48,3 +48,4 @@ Address implementation gaps, bugs, or missing acceptance criteria from `/opsx:ve
 
 - MUST emit the Output skeleton; MUST NOT invent alternate report shapes
 - No `Next:` footer or follow-up steering (D11)
+- Bot session exception: when nested under `/lsi:pr-bot` / `/lsi:apply-bot` with `--fix`/apply, that invocation satisfies "user asks" for commit/push within that session's scope — see [integrations.md](../../docs/workflows/integrations.md) Bot sessions; standalone defaults unchanged.

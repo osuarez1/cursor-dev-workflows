@@ -63,7 +63,9 @@ Use **`/lsi:update`** (includes link verify) or, from the bundle repo:
 python3 snippets/verify-adopters.py --repo-root ../my-repo
 ```
 
-Checks: `.lsi/workflows/`, 3 always-on rules, `/lsi:*` slash commands, `CLAUDE.md` symlink, `PROJECT.md`, `scripts/check_version.py`, link verify, audit.
+Checks: `.lsi/workflows/`, always-on rules, `/lsi:*` slash commands (Cursor + `.claude/commands/lsi/`), `.lsi/bin/lsi-bitbucket` executable, adopt-managed `.gitignore` `lsi:local-artifacts` block, `.claude/settings.json` bot permissions, `CLAUDE.md` symlink, `PROJECT.md`, `scripts/check_version.py`, link verify, audit. OpenCode full bodies + `opencode.json` permissions when opted in.
+
+**Bot secrets (machine-local):** Bitbucket access token (repo-scoped preferred → `BB_ACCESS_TOKEN_<WS>_<REPO>`; else workspace → `BB_ACCESS_TOKEN`) in `~/.bitbucket_secrets` (`chmod 600`); `bash`/`curl`/`jq`; allowlist `.lsi/bin/lsi-bitbucket` and hosts `api.bitbucket.org` / `bitbucket.org`. See `integrations.md`. **`.lsi/bin/` is wipe-managed** on `/lsi:update`.
 
 ## CI: version gate
 

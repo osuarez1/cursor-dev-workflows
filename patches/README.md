@@ -51,7 +51,7 @@ Paths for this workspace:
 
 ## Supported agents
 
-This bundle emits artifacts for **Cursor** (`.cursor/commands/`, `.cursor/rules/`) and **Claude** (`.claude/commands/`) only. OpenCode, Junie, JetBrains AI, and workflow shell wrappers (`bin/lsi-*`, `bin/opsx-*`) are not supported. Legacy keys `agents_opencode`, `agents_junie`, `agents_jetbrains`, and `bin` cause adopt to exit with an error.
+This bundle emits artifacts for **Cursor** (`.cursor/commands/`, `.cursor/rules/`) and **Claude Code** (`.claude/commands/lsi/` for every `/lsi:*` command). **OpenCode** is opt-in via `agents_opencode: { enabled: true }` and receives full command bodies under `.opencode/commands/` (not pointer stubs). Adopt also installs the wipe-managed helper directory **`.lsi/bin/`** (e.g. `lsi-bitbucket`) — not a place for custom tools. Top-level workflow wrappers (`bin/lsi-*`, `bin/opsx-*`), Junie, and JetBrains AI are not supported. Legacy keys `agents_junie`, `agents_jetbrains`, and `bin` cause adopt to exit with an error.
 
 The bundle installs **LSI** (`lsi-*`) slash commands only. **OpenSpec** (`opsx-*`) commands are owned by OpenSpec (`openspec init` / config profile): adopt never installs or removes them, and the parity gate ignores the `opsx-*` namespace.
 

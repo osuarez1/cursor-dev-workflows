@@ -9,6 +9,7 @@ For PR title and body **conventions**, use [pull-requests.md](pull-requests.md).
 - prepare for PR, draft PR, PR description
 - production ready, merge readiness, ship checklist
 - ready for `BASE_BRANCH` / staging / production
+- any Mode **A**, **B**, or **C** PR review (LSI: `/lsi:readiness` inside `/lsi:pr-bot-docs` for A; `/lsi:pr-bot` for B/C; human path before `/lsi:pr`)
 
 ## Before you branch
 
@@ -53,6 +54,8 @@ Use markdown checkboxes; adapt to project.
 
 - [ ] PR is reviewable size; large diffs called out in Overview
 - [ ] No unrelated drive-by changes
+- [ ] **No release-train file changes** on feature/promotion PRs — `VERSION` and/or `version.txt`, `CHANGELOG.md`, and `PROJECT.md` `BUNDLE_VERSION` belong to `/lsi:release-train` on `main` (LSI). If present in the diff: verdict **Needs fixes**; revert and leave for the release train
+- [ ] **`tasks.md` purpose-only** (LSI/OpenSpec) — every checkbox item implements this change’s purpose; no administrative lifecycle items (`/opsx:sync` / `/opsx:archive` / `/lsi:close`, `/lsi:promote`, release-train family, `/lsi:update`/adopter re-sync, meta “run readiness/PR/tag” work). If present: verdict **Needs fixes**; remove from `tasks.md`
 
 ### Quality gates
 

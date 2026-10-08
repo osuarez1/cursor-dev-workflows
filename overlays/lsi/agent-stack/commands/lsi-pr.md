@@ -38,7 +38,7 @@ Draft (and optionally push) a pull request for the active OpenSpec change. **PR-
    | **Overview** | `proposal.md` → Why (+ mode A/B/C note) |
    | **Changes** | What Changes + `design.md` |
    | **Potential risks** | BREAKING in proposal + design risks |
-   | **Testing** | tasks.md + `{{TEST_COMMAND}}` when applicable; docs-only N/A for Mode A |
+   | **Testing** | tasks.md + `TEST_COMMAND` when applicable; docs-only N/A for Mode A |
    | **Related** | `openspec/changes/<slug>/proposal.md` + Trello card id/URL |
 
 5. **Draft PR**
@@ -99,3 +99,4 @@ Then **Title (copy below)** (`text` fence) and **Body (copy below)** (`markdown`
 - Do **not** auto-push without user confirmation
 - Default PR target is **`staging`**, not `main`
 - Do **not** emit a Next footer; agents MUST emit the Output skeleton
+- Bot session exception: when nested under `/lsi:apply-bot`, that invocation satisfies "user asks" for push/`create-pr` within that session's scope — see [integrations.md](../../docs/workflows/integrations.md) Bot sessions; standalone defaults unchanged.
