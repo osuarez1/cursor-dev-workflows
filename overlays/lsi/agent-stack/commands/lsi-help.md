@@ -114,8 +114,8 @@ flowchart TD
   review["/lsi:review"]
   prB["/lsi:pr mode B"]
   stagingQA["Staging QA"]
-  closeTicket["/lsi:close on ticket branch"]
   promote["/lsi:promote → main"]
+  closeMain["/lsi:close on main"]
   release["release-train optional"]
   explore --> propose
   propose --> card
@@ -128,12 +128,12 @@ flowchart TD
   readiness --> review
   review --> prB
   prB --> stagingQA
-  stagingQA --> closeTicket
-  closeTicket --> promote
-  promote -.-> release
+  stagingQA --> promote
+  promote --> closeMain
+  closeMain -.-> release
 ```
 
-Legend: human lane through Mode A; bot lane apply→Mode B; close **before** promote on ticket branch; dashed = optional release on `main`.
+Legend: human lane through Mode A; bot lane apply→Mode B; promote then **`/lsi:close` on `main`**; dashed = optional release on `main`.
 
 Link to [which-workflow.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/which-workflow.md) for **routing** flowchart (ambiguous requests — different from this SDLC diagram).
 
@@ -147,7 +147,8 @@ Human / bot / promote lanes (GitHub links inline) — full detail in [openspec-g
 
 **Human 1–8:** explore → propose → card/branch → initial docs commit → senior → Mode **A** PR (`openspec/` only) → optional **`/lsi:pr-bot-docs`** → merge-desc  
 **Bot 9–19:** **`/lsi:apply-bot`** (or manual apply → gates → Mode **B** PR) → optional **`/lsi:pr-bot`** → merge-desc  
-**Human 20–24:** staging QA → **`/lsi:close` on ticket branch** (before promote) → `/lsi:promote` → merge-desc → optional release  
+**Human 20–24:** staging QA → `/lsi:promote` → merge-desc → **`/lsi:close` on `main`** → optional release-train on **`main`**  
+
 
 PR modes: **A** = `openspec/` only; **B** = implementation; **C** = tiny single PR (opt-in, `PR_WARN_*` / `PR_MAX_*`).
 
@@ -201,9 +202,9 @@ Extract `{id}` and `{change-slug}` from ticket branch. Compare `{change-slug}` t
 | Ticket | Apply complete; pre-PR | Readiness | `/lsi:readiness` |
 | Ticket | After readiness pass | Review | `/lsi:review` |
 | Ticket | After review; Mode A or B ready | PR to staging | `/lsi:pr` (mode A or B) |
-| Ticket | After staging QA; change still active | Close before promote | `/lsi:close` on ticket branch |
-| Ticket | After close; ready to promote | Promotion | `/lsi:promote` — only when staging QA + close done |
-| Protected `main` | After promotion merge | Merge desc only | `/lsi:merge-desc` only (close already ran on the ticket branch) |
+| Ticket / `staging` | After staging QA; change still active | Promotion | `/lsi:promote` — staging QA confirmed; do not close yet |
+| Protected `main` | After promotion merge | Close + merge desc | `/lsi:merge-desc` then `/lsi:close` on **`main`** |
+| Protected `main` | After close | Optional release | `/lsi:release-train` (or version → changelog → release) |
 
 **Ambiguity:** prefer earlier lifecycle step; when staging merge / promotion / close cannot be inferred, say **phase unclear** and suggest **`/lsi:help lifecycle`** or **`/lsi:branch`** — do not guess.
 
@@ -242,13 +243,13 @@ When topic is `commands`, emit this entire block in the chat response (substitut
 | PR | `/lsi:pr` | [pull-requests.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/docs/workflows/pull-requests.md) |
 | Merge desc | `/lsi:merge-desc` | [openspec-git-integration.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/openspec-git-integration.md) |
 | Promote | `/lsi:promote` | [pull-requests.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/docs/workflows/pull-requests.md) |
-| Close (before promote) | `/lsi:close` | [openspec-git-integration.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/openspec-git-integration.md) |
+| Close (after promote, on main) | `/lsi:close` | [openspec-git-integration.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/openspec-git-integration.md) |
 | Address findings | `/lsi:address-senior`, `/lsi:address-review`, `/lsi:address-verify`, `/lsi:address-readiness`, `/lsi:address-prowler` | bot-lane / prompt library |
 | Release | `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:release-train` | [versioning-and-releases.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/versioning-and-releases.md) |
 | Re-sync bundle | `/lsi:update` | [adopt-and-update.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/docs/adopt-and-update.md) |
 | Workflow help | `/lsi:help` | [lsi-help.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/agent-stack/commands/lsi-help.md) |
 
-**OpenSpec:** `/opsx:sync`, `/opsx:archive` — via `/lsi:close` on the **ticket branch** after staging QA (before promote).
+**OpenSpec:** `/opsx:sync`, `/opsx:archive` — via `/lsi:close` on **`main`** after the promotion PR merges.
 
 ---
 
@@ -259,7 +260,7 @@ When topic is `policies`, emit this entire block in the chat response (substitut
 - **Protected branches** — no task work on `main`/`staging` except card-setup commands — [branch-workflow.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/branch-workflow.md)
 - **Ticket branch pattern** — `feature|bugfix|hotfix|chore/{24-char-id}-<change-slug>` — [openspec-git-integration.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/docs/workflows/openspec-git-integration.md)
 - **Staging-first PRs** — feature PRs target **`staging`**; promotion targets **`main`**
-- **No sync/archive on staging merge** — keep change active until `/lsi:close` on the **ticket branch** after staging QA (**before** `/lsi:promote`)
+- **No sync/archive on staging merge** — keep change active through promote; `/lsi:close` on **`main`** after the promotion PR merges
 - **PR modes A/B/C** — A = `openspec/` only; B = implementation; C = tiny opt-in with `PR_WARN_*` / `PR_MAX_*`
 - **No Next footers** on slash commands — sequencing in lifecycle / [bot-lane.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/agent-stack/bot-lane.md)
 - **Commit only when asked** — show plan first — [commits-logical-order.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/docs/workflows/commits-logical-order.md)
@@ -281,7 +282,7 @@ Summarize overlay [which-workflow.md](https://github.com/osuarez1/cursor-dev-wor
 4. **Ticket card vs implementation** — card drafting does not authorize coding on protected branches.
 5. **`/lsi:card` vs `/lsi:card-link` vs trello commands** — new card (`git ts`) vs link existing vs picker → `git tb`.
 6. **Commit plan vs commit execution** — plan first; `git commit` only when user asks (bot: helper).
-7. **`tasks.md` vs close** — `/opsx:apply` completes tasks only; `/lsi:close` on the **ticket branch** after staging QA (before promote).
+7. **`tasks.md` vs close** — `/opsx:apply` completes tasks only; `/lsi:close` on **`main`** after the promotion PR merges.
 8. **`/lsi:help` vs implementation commands** — read-only reference output (one response per invocation); may suggest the next command but does **not** run `/lsi:*`, `/opsx:*`, `git ts`/`git tb`, Trello API, `adopt.py`, or commits. When the user wants to **do** work, use the implementation command. Detail: [lsi-help.md](https://github.com/osuarez1/cursor-dev-workflows/blob/{ref}/overlays/lsi/agent-stack/commands/lsi-help.md).
 
 ---

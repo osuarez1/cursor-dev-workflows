@@ -17,10 +17,10 @@ Prepare and open a **production promotion** pull request after staging QA passes
    Ask user to confirm:
    - Feature PR(s) merged to **`staging`**
    - Staging QA passed
-   - **`/lsi:close` already completed** for the change (archived + CLOSED.md) — promote carries already-closed work
+   - Change is still **active** (do **not** require `/lsi:close` yet — close runs on **`main`** after this promotion merges)
    - Code on current branch includes staging-validated commits
 
-   Refuse if user reports QA failed, feature was cut from release, or close has not run yet.
+   Refuse if user reports QA failed or feature was cut from release.
 
 3. **Verify branch**
 
@@ -34,11 +34,11 @@ Prepare and open a **production promotion** pull request after staging QA passes
 
    | Section | Source |
    |---------|--------|
-   | **Overview** | `proposal.md` → Why + note "promotion after staging QA and close" |
+   | **Overview** | `proposal.md` → Why + note "promotion after staging QA; close on main after merge" |
    | **Changes** | What Changes + `design.md` |
    | **Potential risks** | BREAKING in proposal + design risks |
    | **Testing** | Staging QA results + tasks.md test tasks |
-   | **Related** | archived path / CLOSED.md entry + Trello card id/URL |
+   | **Related** | active `openspec/changes/<slug>/` + Trello card id/URL |
 
 5. **Draft PR**
 
@@ -79,7 +79,7 @@ Prepare and open a **production promotion** pull request after staging QA passes
 
 **Target:** main (production)
 **URL:** <bitbucket pr url or "not created — awaiting confirmation">
-**Close:** already done before promote ✓
+**Close:** after this PR merges — `/lsi:close` on **main**
 **CI:** Test suite ✓/✗ / N/A
 ```
 
@@ -89,5 +89,5 @@ Prepare and open a **production promotion** pull request after staging QA passes
 - Do **not** auto-push without user confirmation.
 - Target is **`main`**, not `staging`.
 - Do **not** run readiness/review/verify inside promote; do **not** emit a Next footer
-- Refuse if `/lsi:close` has not been completed for the change
+- Do **not** run `/lsi:close` or release-train inside promote — close is on **`main`** after merge
 - Agents MUST emit the Output skeleton

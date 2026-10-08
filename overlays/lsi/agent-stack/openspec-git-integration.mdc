@@ -30,16 +30,16 @@ OpenSpec changes under `openspec/changes/<change-slug>/` define **what to build*
 | Commit | `/lsi:commit` (when asked) |
 | Pre-PR | `/lsi:readiness` then `/lsi:review` for Mode A/B/C (separate; not inside `/lsi:pr`; bots nest readiness) |
 | Mode B PR | `/lsi:pr` mode B → `staging` |
-| Close before promote | `/lsi:close` on **ticket branch** after staging QA |
-| Promote to main | `/lsi:promote` (already-closed work) |
+| Promote to main | `/lsi:promote` (change still active) |
+| Close after promote | `/lsi:close` on **`main`** only after promotion merges |
 | Merge desc | `/lsi:merge-desc` |
-| Release | `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:release-train`, `/lsi:bootstrap-release` |
+| Release | `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:release-train`, `/lsi:bootstrap-release` — **`main` only**; never nest in other commands |
 
 ## Before implementation
 
 1. Confirm ticket branch with Trello id + OpenSpec slug suffix.
 2. Read `proposal.md`, `design.md`, delta specs for active change.
-3. **`tasks.md` must not** list `/opsx:sync`, `/opsx:archive`, or `/lsi:close` — close is a human post-QA step on the ticket branch, not an `/opsx:apply` deliverable.
+3. **`tasks.md` must not** list `/opsx:sync`, `/opsx:archive`, or `/lsi:close` — close is a human post-promotion step on **`main`**, not an `/opsx:apply` deliverable.
 
 ## Commits and PRs
 

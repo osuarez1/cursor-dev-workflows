@@ -1,6 +1,6 @@
 # Bot lane playbook (steps 9–19)
 
-Coding-agent checklist for OpenSpec implementation after Mode A docs are on **`staging`**. Humans own steps 1–8 and 20–24 (close, promote, release) — see [openspec-git-integration.md](../docs/workflows/openspec-git-integration.md).
+Coding-agent checklist for OpenSpec implementation after Mode A docs are on **`staging`**. Humans own steps 1–8 and 20–24 (promote, close on `main`, release) — see [openspec-git-integration.md](../docs/workflows/openspec-git-integration.md).
 
 **Agents:** Cursor, Claude Code, OpenCode (when opted in). Load this playbook + `AGENTS.md`; invoke slash commands as listed. Do **not** emit `Next:` footers from individual commands — this file is the sequencer.
 

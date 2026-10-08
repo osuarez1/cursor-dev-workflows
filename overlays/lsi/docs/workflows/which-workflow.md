@@ -20,7 +20,7 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 | create branch, wrong branch, on main | [branch-workflow.md](branch-workflow.md) | `/lsi:branch` | Refuse or redirect to ticket branch |
 | draft PR title, PR description, PR copy | [pull-requests.md](pull-requests.md) | `/lsi:pr` | Title + markdown body |
 | production promotion PR (staging → main) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:promote` | Promotion PR to `main` |
-| close after staging QA (before promote) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:close` | Sync + archive + CLOSED.md on ticket branch before `/lsi:promote` |
+| close after promotion merge | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:close` | Sync + archive + CLOSED.md on **`main`** only after `/lsi:promote` merges |
 | ready for PR, production ready, ship checklist | [pr-production-readiness.md](pr-production-readiness.md) | `/lsi:readiness` | Checklist + verdict |
 | code review, review branch | [code-review.md](code-review.md) | `/lsi:review` | Summary + verdict |
 | unattended PR bot, Mode A/B bot session, apply-bot | [integrations.md](integrations.md) · [bot-sessions.md](bot-sessions.md) | `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot` | Posted session + Close verdict |
@@ -30,7 +30,7 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 | version bump, changelog, release tag | [versioning-and-releases.md](versioning-and-releases.md) | `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release` | Release train on `main` |
 | re-sync bundle, adopt update, workflow update | [adopt-and-update.md](adopt-and-update.md) | `/lsi:update` | Re-sync adopted workflows from bundle |
 | when are tests required | [test-requirements.md](test-requirements.md) | — | Policy |
-| OpenSpec apply / archive | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:apply`, `/opsx:archive` | Archive via `/lsi:close` after staging QA, before promote — see overlay |
+| OpenSpec apply / archive | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:apply`, `/opsx:archive` | Archive via `/lsi:close` on **`main`** after promote merges — see overlay |
 
 ## Overlap rules
 
@@ -40,7 +40,7 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 4. **Ticket card vs implementation** — Card drafting does not authorize coding on a protected branch. Use **`/lsi:card`** when the user wants card + branch from `main`/`staging`; use **`/lsi:card-link`** when work already exists on a branch without a Trello id; draft-only blocks when they want copy-paste fields only.
 5. **`/lsi:card` vs `/lsi:card-link` vs trello commands vs `git ts`** — `/lsi:card` runs `git ts` (new branch). `/lsi:card-link` and trello flows require OpenSpec and redact card copy before Trello API. `/lsi:trello-list` is interactive picker → confirm → optional `git tb`. Never run raw `git ts` when linking an existing card.
 6. **Commit plan vs commit execution** — Always show a plan before the first commit on a branch when multiple logical changes exist. Run `git commit` only when the user explicitly asks (bot sessions: via `.lsi/bin/lsi-bitbucket`).
-7. **`tasks.md` vs close** — `/opsx:apply` completes `tasks.md` deliverables only. Do **not** add `/opsx:sync`, `/opsx:archive`, or `/lsi:close` as tasks; run `/lsi:close` on the **ticket branch** after staging QA, **before** `/lsi:promote`.
+7. **`tasks.md` vs close** — `/opsx:apply` completes `tasks.md` deliverables only. Do **not** add `/opsx:sync`, `/opsx:archive`, or `/lsi:close` as tasks; run `/lsi:close` on **`main`** after the promotion PR merges.
 8. **`/lsi:help` vs implementation commands** — `/lsi:help` is read-only reference output (one response per invocation); it may suggest the next command but does **not** run `/lsi:*`, `/opsx:*`, `git ts`/`git tb`, Trello API, `adopt.py`, or commits. When the user wants to **do** work (card, apply, PR, close), use the implementation command. Session detail: [lsi-help.md](../../.cursor/commands/lsi-help.md).
 
 ## Flowchart
@@ -83,8 +83,8 @@ flowchart TD
 11. After Mode A merge — `/lsi:merge-desc`; keep change active
 12. `/opsx:apply` → commits → readiness → review → `/lsi:pr` mode **B** to **`staging`**
 13. After Mode B merge — `/lsi:merge-desc`; **do not** sync or archive yet
-14. Staging QA → `/lsi:close` on **ticket branch** (staging merged in if needed)
-15. `/lsi:promote` — target **`main`** (already closed); after main merge → `/lsi:merge-desc` only
+14. Staging QA → `/lsi:promote` — target **`main`** (change still active)
+15. After main merge → `/lsi:merge-desc` then `/lsi:close` on **`main`** only; optional release-train on **`main`**
 
 ## Related
 

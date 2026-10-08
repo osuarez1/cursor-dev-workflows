@@ -59,6 +59,8 @@ Anti-patterns to avoid when using [cursor-dev-workflows](../../README.md) in a t
 | Merge extended description is only PR title or full PR markdown | [pull-requests.md](pull-requests.md) — Summary, `Changes:`, `Commits merged:`, `Post-merge:` — [examples/pr-merge-commit-good-vs-weak.md](../../examples/pr-merge-commit-good-vs-weak.md) |
 | Confusing PR conventions with readiness checklist | Conventions → `pull-requests.md`; verdict checklist → `pr-production-readiness.md` |
 | Skipping `/lsi:readiness` on Mode A or Mode C review | Run readiness for Mode A/B/C — nested in `/lsi:pr-bot-docs` (A) and `/lsi:pr-bot` (B/C) |
+| Running `/lsi:close` on a ticket branch or before promote | Close only on **`main`** after the promotion PR merges |
+| Running release-train (or version/changelog/release) off `main` | Those commands are **`main`-only**; never nest them in readiness/review/PR/promote/close |
 
 ## Routing
 

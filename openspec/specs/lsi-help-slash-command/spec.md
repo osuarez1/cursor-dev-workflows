@@ -46,7 +46,7 @@ The help command SHALL provide a dedicated SDLC diagram section separate from th
 #### Scenario: SDLC topic shows diagram
 
 - **WHEN** the user invokes `/lsi:help sdlc`
-- **THEN** the agent emits a mermaid flowchart of the feature delivery path (human docs PR → bot impl PR → staging QA → close before promote → promote to main → optional release)
+- **THEN** the agent emits a mermaid flowchart of the feature delivery path (human docs PR → bot impl PR → staging QA → promote to main → close on main → optional release)
 - **AND** the diagram does not show `/lsi:close` exclusively on `main` after promote as the happy path
 - **AND** the agent does not include the numbered lifecycle list in the same response
 

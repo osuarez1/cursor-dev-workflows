@@ -1,24 +1,24 @@
 ---
-description: Close OpenSpec change after staging QA — sync, archive, CLOSED.md (before promote)
+description: Close OpenSpec change on main after promotion merge — sync, archive, CLOSED.md
 ---
 
-Orchestrate **close before promote** after staging QA: sync delta specs (if any), archive the change, append `openspec/CLOSED.md`, emit pasteable commits.
+Orchestrate **close after promotion** on **`main`**: sync delta specs (if any), archive the change, append `openspec/CLOSED.md`, emit pasteable commits.
 
-**Canonical source:** [`overlays/lsi/docs/workflows/openspec-git-integration.md` § Close before promote](../../overlays/lsi/docs/workflows/openspec-git-integration.md#close-before-promote)
+**Canonical source:** [`overlays/lsi/docs/workflows/openspec-git-integration.md` § Close after promote](../../overlays/lsi/docs/workflows/openspec-git-integration.md#close-after-promote)
 
-**Input:** Optionally specify change slug. If omitted, infer from branch suffix or `openspec list`.
+**Input:** Optionally specify change slug. If omitted, infer from `openspec list` or recent promotion context.
 
 **Steps**
 
-1. **Branch gate (ticket branch)**
+1. **Branch gate (`main` only)**
 
    ```bash
    git branch --show-current
    ```
 
-   - **Require** ticket pattern `feature|bugfix|hotfix|chore/{24-char-id}-<change-slug>`
-   - **Refuse** `main` (close is not a post-main-merge step)
-   - **Refuse** bare `staging` checkout — merge `staging` into the ticket branch first when promoting accumulated staging work, then re-run on the ticket branch
+   - **Require** `main`
+   - **Refuse** ticket branches, `staging`, and any other branch
+   - Confirm the promotion PR for this change is **merged** into `main` (user confirmation + `git log` / Bitbucket as needed)
 
 2. **Resolve change slug**
 
@@ -26,12 +26,16 @@ Orchestrate **close before promote** after staging QA: sync delta specs (if any)
    openspec list --json
    ```
 
-   - Prefer user input; else branch suffix must match `openspec/changes/<slug>/`
+   - Prefer user input; else match an active `openspec/changes/<slug>/` that landed via the promotion
    - If multiple active changes, use **AskQuestion** — do not guess
 
-3. **Confirm staging QA**
+3. **Confirm promotion + staging QA**
 
-   Ask user to confirm staging QA / CI passed for this change. Do not close without that confirmation.
+   Ask user to confirm:
+   - Staging QA / CI passed before promote
+   - Promotion to **`main`** has merged
+
+   Do not close without both confirmations.
 
 4. **Verify task completion**
 
@@ -70,7 +74,8 @@ Orchestrate **close before promote** after staging QA: sync delta specs (if any)
 ```
 ## Close: <slug>
 
-**Branch:** <ticket-branch> ✓
+**Branch:** main ✓
+**Promotion merge:** confirmed
 **Staging QA:** confirmed
 **Synced:** yes / skipped (no delta specs)
 **Archived to:** openspec/changes/archive/YYYY-MM-DD-<slug>/
@@ -78,7 +83,7 @@ Orchestrate **close before promote** after staging QA: sync delta specs (if any)
 
 ### Commit handoff
 git add openspec/changes/archive/YYYY-MM-DD-<slug>/ openspec/CLOSED.md openspec/specs/
-git commit -m "docs(openspec): close <slug> after staging QA"
+git commit -m "docs(openspec): close <slug> after promotion"
 ```
 
 **Output (refuse)**
@@ -86,14 +91,14 @@ git commit -m "docs(openspec): close <slug> after staging QA"
 ```
 ## Refuse: /lsi:close
 
-**Reason:** Must run on ticket branch after staging QA (not on main or bare staging).
-**Fix:** checkout ticket branch; merge staging into it if needed; re-run /lsi:close
+**Reason:** Must run on main after the promotion PR is merged (not on ticket branch or staging).
+**Fix:** merge the promotion PR to main, checkout main, pull, re-run /lsi:close
 ```
 
 **Guardrails**
 
-- Ticket branch only after staging QA — never require `main`; never close on bare `staging`
-- Do **not** skip archive if user only merged Mode A/B to staging without QA
+- **`main` only** after promotion merge — refuse ticket branches and `staging`
+- Do **not** close before `/lsi:promote` merges
 - Prefer `/lsi:close` over manual sync+archive
 - When multiple active changes exist, always prompt for slug — never auto-select
 - Do **not** auto-commit; do **not** emit a Next footer
