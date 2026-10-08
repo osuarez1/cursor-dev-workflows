@@ -1,0 +1,28 @@
+{
+  "values": [
+    {
+      "id": 1004,
+      "deleted": true,
+      "resolution": null,
+      "created_on": "2026-10-01T12:15:00Z",
+      "user": {"display_name": "Someone"},
+      "content": {"raw": "deleted comment"}
+    },
+    {
+      "id": 1005,
+      "deleted": false,
+      "resolution": {"type": "resolved"},
+      "created_on": "2026-10-01T12:16:00Z",
+      "user": {"display_name": "Someone"},
+      "content": {"raw": "resolved comment"}
+    },
+    {
+      "id": 1006,
+      "deleted": false,
+      "resolution": null,
+      "created_on": "2026-10-01T12:20:00Z",
+      "user": {"display_name": "Prowler Runner"},
+      "content": {"raw": "inline note (overview Q1) about path"}
+    }
+  ]
+}

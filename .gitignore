@@ -12,6 +12,9 @@ maintainer-adopters.local.yaml
 .aiassistant/
 .junie/
 bin/
+# Tracked adopt source for the Bitbucket helper (not a top-level workflow bin/)
+!overlays/lsi/snippets/bin/
+!overlays/lsi/snippets/bin/**
 
 # Python
 __pycache__/

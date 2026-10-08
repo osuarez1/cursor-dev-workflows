@@ -1,0 +1,9 @@
+{
+  "id": 42,
+  "title": "feat(widgets): add sprocket",
+  "state": "OPEN",
+  "source": {"branch": {"name": "feature/abc123abc123abc123abcd-add-sprocket"}},
+  "destination": {"branch": {"name": "staging"}},
+  "author": {"display_name": "Dev Example", "nickname": "dev"},
+  "links": {"html": {"href": "https://bitbucket.org/acme/widgets/pull-requests/42"}}
+}
