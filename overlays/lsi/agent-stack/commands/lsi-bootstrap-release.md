@@ -11,6 +11,8 @@ Optionally tag the current `version.txt` baseline when no `v*` tag exists yet. D
 
 **Steps**
 
+0. **Verify branch** — MUST be `main`. On any other branch, emit Refuse and stop.
+
 1. **Verify state**
 
    ```bash
@@ -51,12 +53,22 @@ Optionally tag the current `version.txt` baseline when no `v*` tag exists yet. D
 Optional: tag v0.4.0 @ <sha> if no tag existed
 ```
 
+**Output (refuse)**
+
+```
+## Refuse: /lsi-bootstrap-release
+
+**Reason:** Must run on main (release-train family).
+**Fix:** checkout main; re-run
+```
+
 **Guardrails**
 
 - Do **not** replay semver across full git history
 - Do **not** bump `version.txt` during bootstrap
 - Do **not** run `npm run release:changelog -- --mode bootstrap` — forward-only policy
 - User confirms tag push; no `gh release create`
-- **`main`-only**
+- **`main`-only** — refuse on `staging` and ticket branches
+- **Never nest** inside `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:close`, or bot sessions
 - MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
 - No `Next:` footer (D11).

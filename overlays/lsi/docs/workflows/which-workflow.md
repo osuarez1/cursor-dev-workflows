@@ -27,7 +27,7 @@ Full OpenSpec + Git lifecycle: [openspec-git-integration.md](openspec-git-integr
 | senior analysis, design alternatives | [senior-analysis.md](senior-analysis.md) | `/lsi:senior` | Full report + verdict |
 | merge extended description (Bitbucket) | [openspec-git-integration.md](openspec-git-integration.md) | `/lsi:merge-desc` | Extended merge body |
 | commit plan, logical commits | [commits-logical-order.md](commits-logical-order.md) | `/lsi:commit` | Commit plan; commit only if asked |
-| version bump, changelog, release tag | [versioning-and-releases.md](versioning-and-releases.md) | `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release` | Release train on `main` |
+| version bump, changelog, release tag | [versioning-and-releases.md](versioning-and-releases.md) | `/lsi:release-train`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release` | **`main` only** after close; never nest in other workflows |
 | re-sync bundle, adopt update, workflow update | [adopt-and-update.md](adopt-and-update.md) | `/lsi:update` | Re-sync adopted workflows from bundle |
 | when are tests required | [test-requirements.md](test-requirements.md) | — | Policy |
 | OpenSpec apply / archive | [openspec-git-integration.md](openspec-git-integration.md) | `/opsx:apply`, `/opsx:archive` | Archive via `/lsi:close` on **`main`** after promote merges — see overlay |

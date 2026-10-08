@@ -100,10 +100,11 @@ Thin wrappers over release scripts plus git steps (user confirms tag push):
 ```text
 Feature: explore → propose → card setup (`/lsi:card`, `/lsi:card-link`, or `/lsi:trello-list` + branch) → apply → commit → readiness → review → PR → merge (staging)
 Promotion: /lsi:promote → merge (main) → /lsi:close on main
-Release (optional, on main): /lsi:version → /lsi:changelog → /lsi:release
+Release (optional, on main only): /lsi:release-train
+  (or /lsi:version → /lsi:changelog → /lsi:release)
 ```
 
-Release is **orthogonal** to ticket close. Batch multiple merged changes into one release train.
+Release is **orthogonal** to ticket close and **must not** run on ticket/`staging` branches or nest inside readiness, review, PR, promote, close, or bot sessions. Batch multiple closed changes into one release train on **`main`**.
 
 ---
 

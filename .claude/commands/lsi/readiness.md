@@ -117,6 +117,7 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 
 - Do not report `Ready` if test gate failed locally (unless documented N/A).
 - Do not report `Ready` if release-train files (`VERSION` / `version.txt`, `CHANGELOG.md`, `BUNDLE_VERSION`) changed on a feature or promotion PR.
+- Do **not** invoke `/lsi:release-train`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, or `/lsi:bootstrap-release` from readiness — those are **`main`-only** after close.
 - Never post readiness report to Bitbucket unless user asks.
 - Never draft PR title/body — name `/lsi:pr` instead.
 - Feature mode: refuse on `main` or `staging`.
