@@ -11,8 +11,10 @@ maintainer-adopters.local.yaml
 .senior-analyses/
 # <<< lsi:local-artifacts <<<
 
-# Local Cursor install (see gitignored MAINTAINER.md)
+# Local agent installs (see gitignored MAINTAINER.md / bootstrap). Source of
+# truth for commands remains overlays/lsi/agent-stack/; regenerate locally.
 .cursor/
+.claude/
 
 # OpenCode: gitignored local install (bundle bootstrap emits LSI commands here;
 # adopters opt in via agents_opencode). Root opencode.json is local-only too.

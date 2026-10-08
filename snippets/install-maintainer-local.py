@@ -5,7 +5,7 @@ Copies slash commands from overlays/lsi/agent-stack/commands/ with path rewrites
 for the bundle repo layout into:
 
 - `.cursor/commands/` (gitignored)
-- `.claude/commands/` (tracked dogfood)
+- `.claude/commands/` (gitignored; regenerate via bootstrap)
 - `.opencode/commands/lsi-*.md` (gitignored) — **bundle special case**
 
 Adopters enable OpenCode via patch `agents_opencode: { enabled: true }`. This
@@ -106,7 +106,7 @@ def install_commands() -> int:
 
 
 def install_claude_commands() -> int:
-    """Generate .claude/commands/lsi/ from LSI overlay sources (tracked in bundle git).
+    """Generate .claude/commands/lsi/ from LSI overlay sources (gitignored locally).
 
     OpenSpec (`opsx-*`) commands are owned by OpenSpec and not generated here.
     """

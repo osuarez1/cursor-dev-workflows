@@ -29,7 +29,9 @@ Produce a chat-only executive brief for one released version, sourced from `CHAN
 3. **Gather facts (read-only)**
 
    ```bash
-   cat version.txt
+   # REPO_NAME from PROJECT.md (fallback: git remote basename)
+   git branch --show-current
+   cat version.txt   # or VERSION when that is the repo canonical file
    sed -n "/^## \[${VERSION}\]/,/^## \[/p" CHANGELOG.md
    git tag --list "v${VERSION}"
    ```
@@ -37,16 +39,26 @@ Produce a chat-only executive brief for one released version, sourced from `CHAN
    - Read deploy-gate docs **only when the changelog entry references them**.
    - Every claim MUST trace to the changelog section, a referenced doc, or git tag state. **Never invent** scope, dates, PR numbers, or risks.
 
-4. **Emit the shared skeleton in chat** — meta table then sections 1–10, in order.
+4. **Emit the shared skeleton in chat** — H1 header (repo **before** branch), then meta table, then sections 1–10, in order.
 
 ---
 
 ## Shared summary skeleton
 
-**Meta table** (always first):
+**H1 header** (required shape — repo name before branch):
+
+```markdown
+## Release summary — <REPO_NAME> / <branch> — v0.21.0
+```
+
+Example: `## Release summary — cursor-dev-workflows / main — v2.1.0`
+
+**Meta table** (always first after the H1; **Repo** before **Branch**):
 
 | Field | Value |
 |-------|-------|
+| Repo | `cursor-dev-workflows` (`REPO_NAME` from PROJECT.md) |
+| Branch | `main` (`git branch --show-current`) |
 | Subject | `v0.21.0` |
 | Type | Release |
 | Date | 2026-08-20 (changelog section date) |
@@ -78,6 +90,8 @@ Produce a chat-only executive brief for one released version, sourced from `CHAN
 
 **Skeleton rules**
 
+- H1 MUST be `## Release summary — <REPO_NAME> / <branch> — vX.Y.Z` (repo before branch; never omit either).
+- Meta table MUST list **Repo** then **Branch** before Subject.
 - Sections 1–10 always appear, in order, even when the content is `N/A`.
 - Sections 2–4 and 6–10 are **identical** regardless of audience flag; only section 5 changes.
 - Section 7 emits mermaid when the subject has multiple paths, stages, or actors; otherwise it states `No diagram — linear change.` — never an empty section.
@@ -86,10 +100,12 @@ Produce a chat-only executive brief for one released version, sourced from `CHAN
 **Output**
 
 ```markdown
-## Release summary — v0.21.0
+## Release summary — cursor-dev-workflows / main — v0.21.0
 
 | Field | Value |
 |-------|-------|
+| Repo | `cursor-dev-workflows` |
+| Branch | `main` |
 | Subject | `v0.21.0` |
 | Type | Release |
 | Date | 2026-08-20 |
