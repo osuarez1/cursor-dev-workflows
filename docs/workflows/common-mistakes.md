@@ -61,6 +61,7 @@ Anti-patterns to avoid when using [cursor-dev-workflows](../../README.md) in a t
 | Skipping `/lsi:readiness` on Mode A or Mode C review | Run readiness for Mode A/B/C — nested in `/lsi:pr-bot-docs` (A) and `/lsi:pr-bot` (B/C) |
 | Running `/lsi:close` on a ticket branch or before promote | Close only on **`main`** after the promotion PR merges |
 | Running release-train (or version/changelog/release) off `main` | Those commands are **`main`-only**; never nest them in readiness/review/PR/promote/close |
+| Putting close/promote/release/`/lsi:update` items in `tasks.md` | Keep checkboxes purpose-only; `/lsi:readiness` fails administrative apply tasks |
 
 ## Routing
 

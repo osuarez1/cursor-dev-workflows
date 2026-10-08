@@ -59,9 +59,6 @@
 - [x] 6.7 Command-text test: each bot command has Output, refuse Output, never-authorized Guardrails, loop budget 3, no `Next:` footer
 - [x] 6.8 Run full gate: all `snippets/test_*.py`, `check-workflow-link-sources.py`, `adoption-verify-links.py` on a fixture adopter, `openspec validate add-pr-review-bot --strict`
 
-## 7. Release
-
-- [ ] 7.1 `CHANGELOG.md` `[Unreleased]` → Added / Changed entries and **Adopter action**: run `/lsi:update`; create bot access token (repo-scoped preferred, else workspace as `BB_ACCESS_TOKEN`) + `~/.bitbucket_secrets` (`chmod 600`); install `jq` / `curl`; Cursor auto-run allowlist for `.lsi/bin/lsi-bitbucket`; sandbox network `api.bitbucket.org`, `bitbucket.org`; review new `.gitignore` block and `.claude/settings.json` entries; warn that `.lsi/bin/` is wipe-managed on update (do not store custom tools there); app passwords deprecated — **deferred to `/lsi:release-train`** (not an apply deliverable)
-- [ ] 7.2 `VERSION` → `2.1.0` (MINOR) and `PROJECT.md` `BUNDLE_VERSION` at release time — **deferred to `/lsi:release-train`**
-- [ ] 7.3 Re-sync registered adopters via maintainer adopt loop; `verify-adopters.py` passes each
-- [ ] 7.4 Smoke test on one adopter: `whoami`, `/lsi:pr-bot <PR>` read-only, `/lsi:pr-bot-docs <PR>` on a Mode A PR, `/lsi:apply-bot` with `--dry-run` posting on a throwaway change
+<!-- Release notes, VERSION bump, adopter re-sync, and live BB smoke are human/maintainer
+     lifecycle work — not apply checkboxes. Use /lsi:release-train on main after close;
+     maintainer adopt loop + live smoke outside this change's tasks.md. -->

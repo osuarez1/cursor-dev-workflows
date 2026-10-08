@@ -36,7 +36,7 @@ Re-read this file and [bot-sessions.md](../bot-sessions.md) at the start of ever
    | 3 | Every `design.md` decision reflected in specs/tasks; no contradiction | … |
    | 4 | Every task names files/areas; no undefined/forward deps | … |
    | 5 | Test work planned per `test-requirements.md` / `TEST_COMMAND` | … |
-   | 6 | No `/opsx:sync`, `/opsx:archive`, `/lsi:close` as apply deliverables | … |
+   | 6 | No administrative apply deliverables (close/sync/archive, promote, release-train family, `/lsi:update`, meta process) | … |
    | 7 | Proposal capabilities ↔ `specs/` folders | … |
 
    Verdict: **Plan ready** | **Plan gaps**.

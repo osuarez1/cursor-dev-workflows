@@ -77,7 +77,25 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
    - **Fail:** list the paths; verdict at most **`Needs fixes`** (not `Ready`). Fix: revert those files; leave version/changelog to `/lsi:release-train`.
    - Do **not** treat release-script or tag work on a ticket branch as in-scope for this PR.
 
-6. **Verdict only** — do **not** draft PR title or body (that is `/lsi:pr`).
+6. **`tasks.md` purpose-only (required)**
+
+   Read `openspec/changes/<slug>/tasks.md`. Every checkbox item (`- [ ]` / `- [x]`) MUST be work that **implements this change’s purpose** (proposal Why / capabilities / design decisions / specs). Fail when any item is **administrative lifecycle** work that belongs outside `/opsx:apply`.
+
+   **Fail the check** when a task item (title or body) is primarily about any of:
+
+   | Category | Examples (non-exhaustive) |
+   |----------|---------------------------|
+   | Close / sync / archive | `/opsx:sync`, `/opsx:archive`, `/lsi:close`, append `CLOSED.md` |
+   | Promote / merge-desc | `/lsi:promote`, `/lsi:merge-desc`, “open promotion PR” |
+   | Release train | `/lsi:release-train`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`, bump `VERSION` / `version.txt` / `BUNDLE_VERSION`, finalize `CHANGELOG.md` |
+   | Bundle adopt/update | `/lsi:update`, re-sync adopters, maintainer adopt loop as a task |
+   | Meta process | “run readiness/review/PR”, “move Trello card”, “tag release”, post-merge maintainer smoke framed as apply work |
+
+   - **Pass:** all checkbox items are delivery work for this change (code, docs, tests, specs, adopt wiring for *this* change, etc.). Plain prose notes without checkboxes are OK.
+   - **Fail:** list offending task ids/lines; verdict at most **`Needs fixes`**. Fix: delete or rewrite those items out of `tasks.md` (put release/close/promote notes in lifecycle docs or chat, not as apply checkboxes).
+   - Incomplete purpose tasks (`- [ ]` that are in-scope) do **not** fail this check by themselves — they may still block `Ready` only when they contradict an otherwise ship-ready claim; prefer reporting them under Issues without inventing a second verdict vocabulary.
+
+7. **Verdict only** — do **not** draft PR title or body (that is `/lsi:pr`).
 
    Output exactly one of: **`Ready`** | **`Needs fixes`** | **`Blocked`**
 
@@ -99,6 +117,7 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 | TEST_COMMAND | ✓/✗/N/A |
 | Secrets scan | ✓/✗ |
 | Release-train files clean | ✓/✗ |
+| tasks.md purpose-only | ✓/✗ |
 
 ### Issues
 - (none)
@@ -117,6 +136,7 @@ In **promotion mode**, substitute `main` for `staging` in all diff/log commands 
 
 - Do not report `Ready` if test gate failed locally (unless documented N/A).
 - Do not report `Ready` if release-train files (`VERSION` / `version.txt`, `CHANGELOG.md`, `BUNDLE_VERSION`) changed on a feature or promotion PR.
+- Do not report `Ready` if `tasks.md` checkbox items include administrative lifecycle work (close/sync/archive, promote, release-train, adopt/update, meta process).
 - Do **not** invoke `/lsi:release-train`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, or `/lsi:bootstrap-release` from readiness — those are **`main`-only** after close.
 - Never post readiness report to Bitbucket unless user asks.
 - Never draft PR title/body — name `/lsi:pr` instead.

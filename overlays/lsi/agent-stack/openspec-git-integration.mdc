@@ -39,7 +39,7 @@ OpenSpec changes under `openspec/changes/<change-slug>/` define **what to build*
 
 1. Confirm ticket branch with Trello id + OpenSpec slug suffix.
 2. Read `proposal.md`, `design.md`, delta specs for active change.
-3. **`tasks.md` must not** list `/opsx:sync`, `/opsx:archive`, or `/lsi:close` — close is a human post-promotion step on **`main`**, not an `/opsx:apply` deliverable.
+3. **`tasks.md` must not** list administrative lifecycle work (close/sync/archive, promote, release-train family, `/lsi:update`, meta process) — only purpose-fulfilling apply work. `/lsi:readiness` enforces this.
 
 ## Commits and PRs
 

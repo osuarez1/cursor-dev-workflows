@@ -14,8 +14,8 @@ Follow-up to `/lsi:readiness` when verdict is `Needs fixes` or `Blocked`.
 **Steps**
 
 1. **Resolve change** and verify ticket branch (feature mode) or allowed promotion branch.
-2. **Read** readiness Issues table (branch, ticket, Trello id, tests, secrets).
-3. **Fix** local CI / `TEST_COMMAND` failures, branch validation, ticket match, and secret-scan alerts. Re-run the test gate from PROJECT.md before claiming ready.
+2. **Read** readiness Issues table (branch, ticket, Trello id, tests, secrets, release-train files, `tasks.md` purpose-only).
+3. **Fix** local CI / `TEST_COMMAND` failures, branch validation, ticket match, secret-scan alerts, release-train file drift, and administrative `tasks.md` checkbox items (remove/rewrite — do not “complete” close/release/promote as apply work). Re-run the test gate from PROJECT.md before claiming ready.
 4. **Optional commit** — when user asks, run `/lsi:commit`. Do not auto-commit.
 5. **Do not** draft PR title/body — `/lsi:pr` owns that.
 

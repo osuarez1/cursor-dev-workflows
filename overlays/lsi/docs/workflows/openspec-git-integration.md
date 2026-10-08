@@ -203,6 +203,7 @@ In **promotion mode**, substitute `main` for `staging` in diff/log commands. On 
 | Trello id | 24-char id in branch name | Same on ticket branch; N/A on **`staging`** |
 | Tests | `{{TEST_COMMAND}}` when `{{SOURCE_ROOT}}` touched | Same |
 | Release-train files | No changes to `VERSION` / `version.txt`, `CHANGELOG.md`, or `PROJECT.md` `BUNDLE_VERSION` — those belong to `/lsi:release-train` on **`main`** | Same |
+| `tasks.md` purpose-only | Checkbox items implement this change only — no close/sync/archive, promote, release-train, adopt/update, or meta process as apply tasks | Same |
 | Version CI | `scripts/check_version.py` only when a version file is intentionally bumped on a release path | Same |
 | Secrets | None in diff | Same |
 

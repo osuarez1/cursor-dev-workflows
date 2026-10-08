@@ -109,7 +109,7 @@ Deterministic checklist emitted as a table, after the senior loop:
 3. Every `design.md` decision is reflected in specs or tasks; no task contradicts a decision.
 4. Every task names files / areas; no task depends on something undefined or later.
 5. Test work planned per `test-requirements.md` / `TEST_COMMAND`.
-6. No `/opsx:sync`, `/opsx:archive`, `/lsi:close` as apply deliverables.
+6. No administrative apply deliverables (close/sync/archive, promote, release-train family, `/lsi:update`, meta process) — `/lsi:readiness` also enforces purpose-only `tasks.md`.
 7. Proposal capabilities ↔ `specs/` folders match.
 
 Verdict **Plan ready** | **Plan gaps**. With `--fix`, plan-gap remediation SHALL call `/lsi:address-senior` against the **same single budget of 3 address cycles** already used by the senior loop — there is **no second budget** for plan-gap. Cycles spent fixing senior findings count toward the cap; if the budget is already exhausted when gaps remain, session verdict is **NEEDS HUMAN** (do not start a fresh loop). The full senior report from every iteration is posted (multi-part per D4) and saved to `.senior-analyses/` — the bot invocation is the "user asks" for both.
