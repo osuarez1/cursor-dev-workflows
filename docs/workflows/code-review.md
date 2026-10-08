@@ -146,6 +146,10 @@ Emit a log-ready block in a separate `text` fenced code block:
 
 See [integrations.md](integrations.md) for PR/ticket posting tools.
 
+## Remote / automated review
+
+For an unattended Bitbucket Mode B session (verify → readiness → review loops, posted under bot identity), use **`/lsi:pr-bot <PR> [--fix]`**. Authorization exception and credentials: [integrations.md](integrations.md) Bot sessions. Mode A (`openspec/`-only) PRs use **`/lsi:pr-bot-docs`**. Standalone `/lsi:review` still does not post unless the user asks.
+
 ## Local review archive
 
 Only when user asks to **save locally**:

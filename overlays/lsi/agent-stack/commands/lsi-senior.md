@@ -88,5 +88,4 @@ Fill [senior-analysis-report.template.md](../../templates/senior-analysis-report
 - Refuse on `main` or `staging`.
 - MUST emit the template-shaped Output; MUST NOT invent alternate report shapes or append follow-up questions.
 - No `Next:` footer (D11).
-- MUST emit the Output skeleton; MUST NOT invent alternate report shapes or append follow-up questions.
-- No `Next:` footer (D11).
+- Bot session exception: when nested under `/lsi:pr-bot-docs` (or another bot session), that invocation satisfies "user asks" for posting/saving the full report within that session's scope — see [integrations.md](../../docs/workflows/integrations.md) Bot sessions; standalone defaults unchanged.

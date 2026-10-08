@@ -83,9 +83,25 @@ After the gates, `/lsi:pr-bot` SHALL post `/lsi:change-summary` output and a QA 
 - **WHEN** the QA plan lists N numbered test cases
 - **THEN** the QA checklist contains at least N `- [ ]` items plus setup and regression items
 
+### Requirement: Readiness on Mode A, B, and C reviews
+
+Every PR review session for Mode **A**, **B**, or **C** SHALL run `/lsi:readiness` (with `/lsi:address-readiness` under `--fix`, at most **3** address cycles). Mode A sessions use `/lsi:pr-bot-docs`; Mode B and Mode C sessions use `/lsi:pr-bot`. Session `PASS` SHALL require readiness verdict `Ready`. If readiness is not `Ready` after its budget, later gates MAY still run with skip reason `bot session: readiness NEEDS HUMAN`.
+
+#### Scenario: Mode A docs session runs readiness
+
+- **WHEN** `/lsi:pr-bot-docs` runs on an `openspec/`-only PR
+- **THEN** the session runs `/lsi:readiness` before senior and plan-gap
+- **AND** `PASS` requires readiness `Ready`
+
+#### Scenario: Mode C uses implementation review session
+
+- **WHEN** a Mode C (docs+impl under size gates) PR is reviewed unattended
+- **THEN** `/lsi:pr-bot` runs (not `/lsi:pr-bot-docs`)
+- **AND** the session includes the readiness gate
+
 ### Requirement: Mode A senior loop and plan-gap check
 
-`/lsi:pr-bot-docs` SHALL run `/lsi:senior` at the Deep tier, post the **full** senior report each iteration (multi-part when long), save it under `.senior-analyses/`, and with `--fix` loop `/lsi:address-senior` up to **3** cycles until the verdict is `Sound`, or `Acceptable with follow-ups` with every follow-up captured in `tasks.md`. It SHALL then run the plan-gap check: `openspec validate <slug> --strict`; requirement/scenario → task coverage; design decision → spec/task reflection without contradiction; every task names files or areas and has no undefined or forward dependency; test work planned; no sync/archive/close apply deliverables; proposal capabilities match `specs/` folders. The verdict SHALL be `Plan ready` or `Plan gaps`.
+`/lsi:pr-bot-docs` SHALL run readiness first (see above), then `/lsi:senior` at the Deep tier, post the **full** senior report each iteration (multi-part when long), save it under `.senior-analyses/`, and with `--fix` loop `/lsi:address-senior` up to **3** cycles until the verdict is `Sound`, or `Acceptable with follow-ups` with every follow-up captured in `tasks.md`. It SHALL then run the plan-gap check: `openspec validate <slug> --strict`; requirement/scenario → task coverage; design decision → spec/task reflection without contradiction; every task names files or areas and has no undefined or forward dependency; test work planned; no sync/archive/close apply deliverables; proposal capabilities match `specs/` folders. The verdict SHALL be `Plan ready` or `Plan gaps`.
 
 With `--fix`, remediating **Plan gaps** SHALL use `/lsi:address-senior` against the **same single budget of 3 address cycles** as the senior loop. There SHALL be no second or separate budget for plan-gap. Address cycles already spent on senior findings count toward the cap. If gaps remain after the budget is exhausted, the session verdict SHALL be `NEEDS HUMAN` and no further address cycle SHALL run.
 

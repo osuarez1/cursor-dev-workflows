@@ -47,3 +47,4 @@ Follow-up to `/lsi:readiness` when verdict is `Needs fixes` or `Blocked`.
 - MUST emit the Output skeleton; MUST NOT invent alternate report shapes
 - No `Next:` footer or follow-up steering (D11)
 - Never emit a PR title or body draft
+- Bot session exception: when nested under `/lsi:pr-bot` / `/lsi:apply-bot` with `--fix`/apply, that invocation satisfies "user asks" for commit/push within that session's scope — see [integrations.md](../../docs/workflows/integrations.md) Bot sessions; standalone defaults unchanged.

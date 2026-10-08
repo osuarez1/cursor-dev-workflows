@@ -28,7 +28,7 @@ OpenSpec changes under `openspec/changes/<change-slug>/` define **what to build*
 | Mode A PR | `/lsi:pr` mode A (`openspec/` only) |
 | Implement | `/opsx:apply` (bot lane) |
 | Commit | `/lsi:commit` (when asked) |
-| Pre-PR | `/lsi:readiness` then `/lsi:review` (separate; not inside `/lsi:pr`) |
+| Pre-PR | `/lsi:readiness` then `/lsi:review` for Mode A/B/C (separate; not inside `/lsi:pr`; bots nest readiness) |
 | Mode B PR | `/lsi:pr` mode B → `staging` |
 | Close before promote | `/lsi:close` on **ticket branch** after staging QA |
 | Promote to main | `/lsi:promote` (already-closed work) |

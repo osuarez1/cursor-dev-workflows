@@ -47,19 +47,19 @@ Both align on the same **`<change-slug>`** (OpenSpec folder name). Card commands
 
 **OpenSpec:** `/opsx:explore`, `/opsx:propose`, `/opsx:apply`, `/opsx:sync`, `/opsx:archive` — provided by OpenSpec (`openspec init` / config profile); this bundle does not install or manage OpenSpec slash commands.
 
-**LSI (git):** `/lsi:help`, `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`, `/lsi:update`, plus address-*, adopt-*, and release-train family when installed.
+**LSI (git):** `/lsi:help`, `/lsi:card`, `/lsi:card-link`, `/lsi:trello-list`, `/lsi:trello-branch`, `/lsi:branch`, `/lsi:senior`, `/lsi:commit`, `/lsi:readiness`, `/lsi:review`, `/lsi:pr`, `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot`, `/lsi:promote`, `/lsi:merge-desc`, `/lsi:close`, `/lsi:version`, `/lsi:changelog`, `/lsi:release`, `/lsi:bootstrap-release`, `/lsi:update`, plus address-*, adopt-*, and release-train family when installed.
 
-**Bot playbook:** [bot-lane.md](../../agent-stack/bot-lane.md) — coding-agent steps only (no promote/close/release).
+**Bot playbook:** [bot-lane.md](bot-lane.md) — coding-agent steps only (no promote/close/release).
 
 **Release scripts:** `scripts/check_version.py` (version bump, changelog, and tag via `/lsi:version`, `/lsi:changelog`, `/lsi:release`)
 
-**Command Output (verify-shaped):** Every maintained `/lsi:*` command (and adopter `/opsx:*` copies) documents a stable `**Output**` / path-specific Output fence. Agents MUST fill that skeleton; MUST NOT invent alternate report shapes or append follow-up questions. Required empty lists use `(none)`. Refuse paths use `## Refuse:` + `**Reason:**`. Do **not** emit `Next:` footers; sequencing lives in this lifecycle + [bot-lane.md](../../agent-stack/bot-lane.md). Nested commands only when the command’s deliverable documents them (e.g. review→Prowler, release-train composition). OpenSpec-owned `/opsx:verify` is the stop-after-verdict model — the bundle does not install `opsx-*` files.
+**Command Output (verify-shaped):** Every maintained `/lsi:*` command (and adopter `/opsx:*` copies) documents a stable `**Output**` / path-specific Output fence. Agents MUST fill that skeleton; MUST NOT invent alternate report shapes or append follow-up questions. Required empty lists use `(none)`. Refuse paths use `## Refuse:` + `**Reason:**`. Do **not** emit `Next:` footers; sequencing lives in this lifecycle + [bot-lane.md](bot-lane.md). Nested commands only when the command’s deliverable documents them (e.g. review→Prowler, release-train composition). OpenSpec-owned `/opsx:verify` is the stop-after-verdict model — the bundle does not install `opsx-*` files.
 
 ---
 
 ## Lifecycle
 
-Three lanes. Humans own shaping and close/promote; coding agents own the bot lane via the [bot playbook](../../agent-stack/bot-lane.md). Slash commands do not chain via Next footers.
+Three lanes. Humans own shaping and close/promote; coding agents own the bot lane via the [bot playbook](bot-lane.md). Slash commands do not chain via Next footers.
 
 ### Human lane (1–8) — shape and Mode A docs PR
 
@@ -73,15 +73,15 @@ Three lanes. Humans own shaping and close/promote; coding agents own the bot lan
 4. **Initial docs commit** — `/lsi:commit` baseline OpenSpec artifacts before senior edits.
 5. **Senior analysis** (large / multi-capability / BREAKING) — `/lsi:senior` after `design.md` (Deep/Light; do not Skip OpenSpec lifecycle work as “docs-only”).
 6. **Address senior** (when needed) — `/lsi:address-senior` then commit.
-7. **Mode A PR** — `/lsi:pr` mode **A** (`openspec/` only) to **`staging`**. Modes: **A** = OpenSpec docs only; **B** = implementation (+ OpenSpec OK); **C** = tiny single PR (opt-in; `PR_WARN_*` / `PR_MAX_*` gates).
+7. **Readiness + Mode A PR** — `/lsi:readiness` (required for Mode **A**, **B**, and **C**), then `/lsi:pr` mode **A** (`openspec/` only) to **`staging`**. Modes: **A** = OpenSpec docs only; **B** = implementation (+ OpenSpec OK); **C** = tiny single PR (opt-in; `PR_WARN_*` / `PR_MAX_*` gates). Unattended Mode A review (after open): **`/lsi:pr-bot-docs <PR> [--fix]`** (includes readiness). Mode **C** review: **`/lsi:pr-bot <PR> [--fix]`**.
 8. **After Mode A merge** — `/lsi:merge-desc`; keep change **active**.
 
 ### Bot lane (9–19) — implement and Mode B staging PR
 
-See [bot-lane.md](../../agent-stack/bot-lane.md). Summary:
+See [bot-lane.md](bot-lane.md) and [bot-sessions.md](bot-sessions.md). Unattended: **`/lsi:apply-bot <slug>`** (apply + gates + Mode B PR). After Mode B or Mode C opens: **`/lsi:pr-bot <PR> [--fix]`** (always includes `/lsi:readiness`). Manual summary:
 
-9. **Apply** — `/opsx:apply`; complete `tasks.md`.
-10. **Commit** (when asked) — `/lsi:commit`.
+9. **Apply** — `/opsx:apply` (or via `/lsi:apply-bot`); complete `tasks.md`.
+10. **Commit** (when asked) — `/lsi:commit` (bot sessions: helper commit).
 11. **Verify** (when asked) — `/opsx:verify`; address with `/lsi:address-verify` if needed.
 12. **Readiness** (when asked) — `/lsi:readiness`; address with `/lsi:address-readiness` if needed.
 13. **Review** (when asked) — `/lsi:review` (auto-chains `/lsi:address-prowler` when a matching Prowler · Grok comment exists).
@@ -95,7 +95,7 @@ See [bot-lane.md](../../agent-stack/bot-lane.md). Summary:
 20. **Staging QA** — validate on staging environment / CI.
 21. **Close before promote** — on the **ticket branch** (merge `staging` into it when promoting accumulated staging work): **`/lsi:close`** → `/opsx:sync` if needed → `/opsx:archive` → append `openspec/CLOSED.md` → pasteable commit handoff. Do **not** require `main`. Do **not** append long archive lists to `AGENTS.md` (pointer only).
 22. **Promotion PR** — `/lsi:promote` to **`main`** (already-closed work; main needs no sync/archive for that change).
-23. **After main merge** — `/lsi:merge-desc` only (no `/lsi:close` on `main` for this change).
+23. **After main merge** — `/lsi:merge-desc` only (close already ran on the ticket branch; do not re-close after promotion).
 24. **Release** (optional) — `/lsi:release-train` or `/lsi:version` → `/lsi:changelog` → `/lsi:release` on **`main`**.
 
 **Rule:** Do **not** run `/opsx:sync` or `/opsx:archive` when a feature PR merges to **`staging`** only. Close runs **after staging QA, before promote**.
@@ -202,7 +202,8 @@ In **promotion mode**, substitute `main` for `staging` in diff/log commands. On 
 | Ticket match | Suffix matches `openspec/changes/<slug>/` | Same on ticket branch; N/A on **`staging`** |
 | Trello id | 24-char id in branch name | Same on ticket branch; N/A on **`staging`** |
 | Tests | `{{TEST_COMMAND}}` when `{{SOURCE_ROOT}}` touched | Same |
-| Version | `scripts/check_version.py` when version file bumped | Same |
+| Release-train files | No changes to `VERSION` / `version.txt`, `CHANGELOG.md`, or `PROJECT.md` `BUNDLE_VERSION` — those belong to `/lsi:release-train` on **`main`** | Same |
+| Version CI | `scripts/check_version.py` only when a version file is intentionally bumped on a release path | Same |
 | Secrets | None in diff | Same |
 
 **Verdict:** `Ready` | `Needs fixes` | `Blocked`
@@ -310,7 +311,9 @@ See [versioning-and-releases.md](versioning-and-releases.md). Forward-only from 
 
 ## Command syntax
 
-Cursor stores slash commands as files under `.cursor/commands/` with **hyphen** names (e.g. `lsi-card.md`, `lsi-commit.md`). In chat, invoke with **colon** syntax: `/lsi:card`, `/lsi:commit`. The mapping is one-to-one: `/lsi:card` → `lsi-card.md`. OpenSpec commands (`opsx-*`) follow the same pattern but are provided by OpenSpec, not this bundle.
+Cursor stores slash commands as files under `.cursor/commands/` with **hyphen** names (e.g. `lsi-card.md`, `lsi-commit.md`). In chat, invoke with **colon** syntax: `/lsi:card`, `/lsi:commit`. The mapping is one-to-one: `/lsi:card` → `lsi-card.md`. Claude Code adopters get the same commands under `.claude/commands/lsi/<name>.md` (`/lsi:<name>`). OpenSpec commands (`opsx-*`) follow the same pattern but are provided by OpenSpec, not this bundle.
+
+Bot sessions: `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot` — see [bot-sessions.md](bot-sessions.md) and [integrations.md](integrations.md) Bot sessions.
 
 ---
 

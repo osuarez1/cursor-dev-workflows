@@ -82,12 +82,18 @@ Per gate, at most **3** address cycles (≤ 4 runs of the gate itself) when fixi
 gate → (if not pass && fixing) address → gate …  (≤ 3 address cycles)
 ```
 
-Order for pr-bot / apply-bot:
+Order for pr-bot / apply-bot (Mode **B** / **C**):
 
 1. verify ⇄ `/lsi:address-verify`
 2. readiness ⇄ `/lsi:address-readiness`
 3. review ⇄ `/lsi:address-review` (Prowler via `/lsi:review` auto-chain; exclude bot comments)
 4. If review cycles changed files: one readiness re-check (no loop)
+
+Order for pr-bot-docs (Mode **A**):
+
+1. readiness ⇄ `/lsi:address-readiness`
+2. senior ⇄ `/lsi:address-senior` (Deep; full report)
+3. plan-gap check (remediation shares the senior address budget)
 
 **Pass conditions**
 
@@ -97,10 +103,11 @@ Order for pr-bot / apply-bot:
 | readiness | `Ready` |
 | review | `Approve` or `Approve with nits` (nits still addressed under `--fix`) |
 | senior | `Sound`, or `Acceptable with follow-ups` with every follow-up in `tasks.md` |
+| plan-gap | `Plan ready` |
 
 Exhausted budget → session verdict **NEEDS HUMAN**; continue to summary / close (do not abort the rest of the session unless STOP).
 
-If readiness is not `Ready` after its budget, review may still run with skip reason `bot session: readiness NEEDS HUMAN`.
+`/lsi:readiness` runs on **every** Mode A, B, and C review session. If readiness is not `Ready` after its budget, later gates may still run with skip reason `bot session: readiness NEEDS HUMAN` (review for B/C; senior for A).
 
 ---
 
@@ -120,7 +127,7 @@ Every session ends with a Close comment + Output:
 **Session verdict:** <PASS | NEEDS HUMAN | STOPPED | PAUSED — awaiting decision>
 **START_SHA → HEAD:** <sha> → <sha>
 **Steps posted:** <n>
-**Address cycles:** verify a/3 · readiness b/3 · review c/3 (or senior a/3)
+**Address cycles:** verify a/3 · readiness b/3 · review c/3 (or readiness a/3 · senior b/3 for docs)
 **Human starter:** <git user.name>
 **Log:** `.reviews/<file>`
 **Reason (if not PASS):** <one line>

@@ -12,6 +12,10 @@ Coding-agent checklist for OpenSpec implementation after Mode A docs are on **`s
 
 ## Checklist
 
+**Unattended path (preferred when Bitbucket + bot token):** **`/lsi:apply-bot <slug>`** covers steps 9–18 (apply by section, gate loops, Mode B PR) per [bot-sessions.md](bot-sessions.md). Mode A review: **`/lsi:pr-bot-docs <PR>`** (includes `/lsi:readiness`). Mode B/C review: **`/lsi:pr-bot <PR> [--fix]`** (includes `/lsi:readiness`).
+
+Manual step-by-step (same outcomes):
+
 9. **`/opsx:apply`** — implement `tasks.md`; mark checkboxes; do not sync/archive/close.
 10. **`/lsi:commit`** — when the human asks; Conventional Commits from `tasks.md` sections.
 11. **`/opsx:verify`** — report Aligned / Partial / Discrepancy; stop (no Next).

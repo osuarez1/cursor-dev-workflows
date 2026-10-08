@@ -5,7 +5,7 @@ category: Workflow
 description: Unattended Mode B PR review session (verify/readiness/review loops)
 ---
 
-Unattended review session for a **Mode B** (implementation) Bitbucket PR. Nested gates are this command's deliverable.
+Unattended review session for a **Mode B** (implementation) or **Mode C** (tiny docs+impl) Bitbucket PR. Nested gates are this command's deliverable. `/lsi:readiness` is required for Mode **A**, **B**, and **C** reviews (Mode A → `/lsi:pr-bot-docs`).
 
 **Canonical source:** [bot-sessions.md](../bot-sessions.md) · [integrations.md](../../docs/workflows/integrations.md) · [openspec-git-integration.md](../../docs/workflows/openspec-git-integration.md)
 
@@ -21,7 +21,7 @@ Unattended review session for a **Mode B** (implementation) Bitbucket PR. Nested
 
 Re-read this file and [bot-sessions.md](../bot-sessions.md) at the start of every step.
 
-1. **Setup** — follow bot-sessions Setup (`kind=review`). Refuse if PR diff touches **only** `openspec/` (Mode A → use `/lsi:pr-bot-docs`).
+1. **Setup** — follow bot-sessions Setup (`kind=review`). Refuse if PR diff touches **only** `openspec/` (Mode A → use `/lsi:pr-bot-docs`). Mode **C** (mixed docs+impl under size gates) uses this command.
 2. **Verify loop** — `/opsx:verify` ⇄ `/lsi:address-verify` (budget 3 when `--fix`).
 3. **Readiness loop** — `/lsi:readiness` ⇄ `/lsi:address-readiness` (budget 3 when `--fix`).
 4. **Review loop** — `/lsi:review` ⇄ `/lsi:address-review` (budget 3 when `--fix`). Prowler is handled inside `/lsi:review` (exclude bot comments via helper `list --exclude-bot`).

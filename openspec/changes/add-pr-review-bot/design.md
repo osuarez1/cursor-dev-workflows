@@ -32,23 +32,31 @@ Two draft files (an `lsi-pr-bot.md` command and a `bin/pr-comment` Bitbucket hel
 ### D1. Three commands, one shared session skeleton
 
 ```
-/lsi:pr-bot-docs <PR> [--fix]   Mode A PR  →  senior ⇄ address-senior (≤3) + plan-gap check
+/lsi:pr-bot-docs <PR> [--fix]   Mode A PR  →  readiness ⇄ address-readiness (≤3) → senior ⇄ address-senior (≤3) + plan-gap
 /lsi:apply-bot   <slug>         post Mode A merge → apply → verify/readiness/review loops → Mode B PR
-/lsi:pr-bot      <PR> [--fix]   Mode B PR  →  verify/readiness/review loops → summary → QA plan
+/lsi:pr-bot      <PR> [--fix]   Mode B or C PR  →  verify/readiness/review loops → summary → QA plan
 ```
+
+`/lsi:readiness` is required on every Mode **A**, **B**, and **C** review (docs session and implementation/tiny session alike).
 
 Shared skeleton (Setup → numbered steps → Close) is documented once in `overlays/lsi/agent-stack/bot-sessions.md`; each command references it and declares its nested commands as its deliverable (satisfies `slash-command-single-purpose`). Separate commands rather than one mode-detecting command because step tables, refusals, and permissions differ materially; mode mismatch is a refusal, not a branch.
 
 ### D2. Gate order and loop budget
 
-Per gate: run → if not passing and fixing is enabled, address → re-run; **max 3 address cycles** (≤ 4 runs). Order for pr-bot and apply-bot:
+Per gate: run → if not passing and fixing is enabled, address → re-run; **max 3 address cycles** (≤ 4 runs). Order for pr-bot and apply-bot (Mode B/C):
 
 ```
 verify ⇄ address-verify (≤3) → readiness ⇄ address-readiness (≤3) → review ⇄ address-review (≤3)
   → if review cycles changed files: one readiness re-check (no loop)
 ```
 
-Verify first because spec gaps drive the most code movement; review last because it is the most expensive and `/lsi:review` requires readiness `Ready` (if readiness is not Ready after its budget, review runs with the documented skip reason "bot session: readiness NEEDS HUMAN"). `/lsi:review` already auto-chains `/lsi:address-prowler`; no separate Prowler step. Pass conditions: verify `Aligned`; readiness `Ready`; review `Approve` or `Approve with nits` (nits still addressed under `--fix`); senior `Sound`, or `Acceptable with follow-ups` when every follow-up is captured in `tasks.md`. Exhausted budget → session verdict **NEEDS HUMAN**, continue to summary / close.
+Order for pr-bot-docs (Mode A):
+
+```
+readiness ⇄ address-readiness (≤3) → senior ⇄ address-senior (≤3) → plan-gap (shares senior budget)
+```
+
+Verify first on B/C because spec gaps drive the most code movement; review last because it is the most expensive and `/lsi:review` requires readiness `Ready` (if readiness is not Ready after its budget, later gates run with the documented skip reason "bot session: readiness NEEDS HUMAN"). `/lsi:review` already auto-chains `/lsi:address-prowler`; no separate Prowler step. Pass conditions: verify `Aligned`; readiness `Ready`; review `Approve` or `Approve with nits` (nits still addressed under `--fix`); senior `Sound`, or `Acceptable with follow-ups` when every follow-up is captured in `tasks.md`; plan-gap `Plan ready`. Exhausted budget → session verdict **NEEDS HUMAN**, continue to summary / close.
 
 ### D3. `--fix` semantics
 

@@ -68,7 +68,9 @@ python3 snippets/adopt.py --target ../my-repo --config patches/my-repo.yaml --ac
 python3 snippets/verify-adopters.py --repo-root ../my-repo
 ```
 
-Checks: `.lsi/workflows/`, 3 always-on rules, `/lsi:*` slash commands, `CLAUDE.md` symlink, `PROJECT.md`, `scripts/check_version.py`, link verify, audit.
+Checks: `.lsi/workflows/`, always-on rules, `/lsi:*` slash commands (Cursor + `.claude/commands/lsi/`), `.lsi/bin/lsi-bitbucket` executable, adopt-managed `.gitignore` `lsi:local-artifacts` block, `.claude/settings.json` bot permissions, `CLAUDE.md` symlink, `PROJECT.md`, `scripts/check_version.py`, link verify, audit. OpenCode full bodies + `opencode.json` permissions when `agents_opencode.enabled`.
+
+**Bot secrets (adopter machine, not in git):** create a Bitbucket access token (repo-scoped preferred → `BB_ACCESS_TOKEN_<WS>_<REPO>`; else workspace → `BB_ACCESS_TOKEN`), write `~/.bitbucket_secrets` (`chmod 600`), install `bash`/`curl`/`jq`, allowlist `.lsi/bin/lsi-bitbucket` and network hosts `api.bitbucket.org` / `bitbucket.org`. See [integrations.md](workflows/integrations.md). **`.lsi/bin/` is wipe-managed** on `/lsi:update` — do not store custom tools there.
 
 For accuracy (hallucinated PROJECT/AGENTS claims), run **`/lsi:adopt-verify`** in the adopter.
 ## CI: version gate

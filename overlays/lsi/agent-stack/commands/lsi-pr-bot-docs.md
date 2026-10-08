@@ -2,17 +2,18 @@
 name: /lsi-pr-bot-docs
 id: lsi-pr-bot-docs
 category: Workflow
-description: Unattended Mode A openspec PR review (senior + plan-gap)
+description: Unattended Mode A openspec PR review (readiness + senior + plan-gap)
 ---
 
-Unattended review session for a **Mode A** (`openspec/`-only) Bitbucket PR. Nested senior + plan-gap are this command's deliverable.
+Unattended review session for a **Mode A** (`openspec/`-only) Bitbucket PR. Nested readiness, senior, and plan-gap are this command's deliverable. `/lsi:readiness` is required for Mode **A**, **B**, and **C** reviews (Mode B/C → `/lsi:pr-bot`).
 
-**Canonical source:** [bot-sessions.md](../bot-sessions.md) · [senior-analysis.md](../../docs/workflows/senior-analysis.md) · [integrations.md](../../docs/workflows/integrations.md)
+**Canonical source:** [bot-sessions.md](../bot-sessions.md) · [pr-production-readiness.md](../../docs/workflows/pr-production-readiness.md) · [senior-analysis.md](../../docs/workflows/senior-analysis.md) · [integrations.md](../../docs/workflows/integrations.md)
 
 **Input:** `<PR>` (number or `https://bitbucket.org/<workspace>/<repo>/pull-requests/123`). Optional `--fix`.
 
 | | default | `--fix` |
 |---|---|---|
+| readiness | one `/lsi:readiness` | readiness ⇄ `/lsi:address-readiness` (≤3) |
 | senior | one Deep run, full report posted | Deep ⇄ `/lsi:address-senior` (≤3) |
 | plan-gap | table + verdict | remediates via **same** 3-cycle senior budget (no second budget) |
 | access token | optional | **required** (`whoami` bot) |
@@ -21,11 +22,12 @@ Unattended review session for a **Mode A** (`openspec/`-only) Bitbucket PR. Nest
 
 Re-read this file and [bot-sessions.md](../bot-sessions.md) at the start of every step.
 
-1. **Setup** — bot-sessions Setup (`kind=review-docs`). Refuse if any diff path is outside `openspec/` (Mode B → `/lsi:pr-bot`).
-2. **Senior loop** — `/lsi:senior` at **Deep** tier. Post the **full** report each iteration (helper multi-part). Save under `.senior-analyses/<ts>_<slug>.md`.
+1. **Setup** — bot-sessions Setup (`kind=review-docs`). Refuse if any diff path is outside `openspec/` (Mode B/C → `/lsi:pr-bot`).
+2. **Readiness loop** — `/lsi:readiness` ⇄ `/lsi:address-readiness` (budget 3 when `--fix`). Docs-only `TEST_COMMAND` may be **N/A**. If not `Ready` after budget, continue with skip reason `bot session: readiness NEEDS HUMAN`.
+3. **Senior loop** — `/lsi:senior` at **Deep** tier. Post the **full** report each iteration (helper multi-part). Save under `.senior-analyses/<ts>_<slug>.md`.
    - Verdict `Rethink` → no address cycle; session verdict `NEEDS HUMAN`; continue to plan-gap then Close.
    - With `--fix`: `/lsi:address-senior` until `Sound`, or `Acceptable with follow-ups` with every follow-up in `tasks.md`, max **3** address cycles.
-3. **Plan-gap check** — emit checklist table:
+4. **Plan-gap check** — emit checklist table:
 
    | # | Check | Result |
    |---|-------|--------|
@@ -40,7 +42,7 @@ Re-read this file and [bot-sessions.md](../bot-sessions.md) at the start of ever
    Verdict: **Plan ready** | **Plan gaps**.
 
    With `--fix`, remediate gaps via `/lsi:address-senior` against the **same** 3-cycle budget already used by the senior loop. Cycles already spent count. If budget exhausted and gaps remain → `NEEDS HUMAN` (do not start a fresh loop).
-4. **Close** — bot-sessions Close. `PASS` only if senior pass condition met **and** plan-gap is `Plan ready`.
+5. **Close** — bot-sessions Close. `PASS` only if readiness is `Ready`, senior pass condition met, **and** plan-gap is `Plan ready`.
 
 **Output**
 
@@ -48,10 +50,9 @@ Re-read this file and [bot-sessions.md](../bot-sessions.md) at the start of ever
 ## PR bot docs: <PR> (<slug>)
 
 **Mode:** A · **Fix:** <yes|no>
-**Senior:** <Sound | Acceptable with follow-ups | Rethink | …>
-**Plan-gap:** <Plan ready | Plan gaps>
+**Gates:** readiness=<…> senior=<…> plan-gap=<…>
 **Session verdict:** <PASS | NEEDS HUMAN | STOPPED>
-**Address cycles used:** <n>/3
+**Address cycles:** readiness a/3 · senior b/3
 **Log:** `.reviews/<file>`
 **Senior save:** `.senior-analyses/<file>`
 ```
@@ -67,9 +68,9 @@ Re-read this file and [bot-sessions.md](../bot-sessions.md) at the start of ever
 
 **Guardrails**
 
-- Nested `/lsi:senior` + `/lsi:address-senior` + plan-gap are the documented deliverable
+- Nested `/lsi:readiness`, `/lsi:senior`, `/lsi:address-*`, and plan-gap are the documented deliverable
 - Never authorize: other PRs/tickets; approve; merge; decline; request-changes; force-push; history rewrite; protected-branch push; edit/delete/resolve comments
 - Full senior report always posted in this session (bot invocation = user asks)
-- Single shared address budget of 3 for senior + plan-gap; no `Next:` footer
+- Readiness has its own 3-cycle budget; senior + plan-gap share one 3-cycle senior budget; no `Next:` footer
 - Commit/push only via `.lsi/bin/lsi-bitbucket` when `--fix`
 - Redact secrets from posts and logs

@@ -12,10 +12,11 @@ Use this routing guide when the user’s request could match more than one docum
 | PR merge info, merge commit, extended description | [pull-requests.md](docs/workflows/pull-requests.md) | Default `Merge pull request #…` subject + extended description (Summary, Changes, Commits merged, Post-merge) |
 | ready for PR, production ready, ship checklist | [pr-production-readiness.md](docs/workflows/pr-production-readiness.md) | Checklist + `Ready` \| `Needs fixes` \| `Blocked` |
 | code review, review branch, review locally | [code-review.md](docs/workflows/code-review.md) | Summary, Critical, Suggestions, Tests; verdict `Ready` \| `Needs fixes` \| `Blocked` |
+| unattended PR review bot, Mode A/B bot session, apply-bot | [integrations.md](docs/workflows/integrations.md) (Bot sessions) · overlay `bot-sessions.md` | `/lsi:pr-bot`, `/lsi:pr-bot-docs`, `/lsi:apply-bot` |
 | senior analysis, design alternatives, before/after, LC-1 | [senior-analysis.md](docs/workflows/senior-analysis.md) | Full report; verdict `Sound` \| `Acceptable with follow-ups` \| `Rethink` |
 | commit plan, logical commits, commit message | [commits-logical-order.md](docs/workflows/commits-logical-order.md) | Ordered commit plan; **commit only if asked** |
 | when are tests required | [test-requirements.md](docs/workflows/test-requirements.md) | Policy + exemption wording |
-| log review to PR host or ticket tool | [integrations.md](docs/workflows/integrations.md) | Optional adapters |
+| log review to PR host or ticket tool | [integrations.md](docs/workflows/integrations.md) | Optional adapters; bot sessions are the scoped exception |
 | LSI OpenSpec + Trello slash commands | [overlays/lsi/docs/workflows/openspec-git-integration.md](overlays/lsi/docs/workflows/openspec-git-integration.md) | `/lsi:card`, `/lsi:card-link`, `/lsi:trello-*`, full lifecycle; Discovery: `/lsi:help` (overlay) |
 | what did the agent do wrong | [common-mistakes.md](docs/workflows/common-mistakes.md) | Anti-patterns |
 
@@ -23,8 +24,9 @@ Use this routing guide when the user’s request could match more than one docum
 
 1. **PR conventions vs readiness vs code review** — [pull-requests.md](docs/workflows/pull-requests.md) defines title/body format and merge-commit extended description. [pr-production-readiness.md](docs/workflows/pr-production-readiness.md) is the readiness checklist and verdict. [code-review.md](docs/workflows/code-review.md) walks logic, security, performance, and tests in depth. Run readiness before opening a PR; run code review before merge.
 2. **Senior analysis vs code review** — Senior analysis explains design and alternatives; it does **not** replace security/performance/test gates. Use different verdict words (never `Ready` for senior analysis).
-3. **Ticket card vs implementation** — Card drafting does not authorize coding on a protected branch. Branch + ticket first, then Agent mode work.
-4. **Commit plan vs commit execution** — Always show a plan before the first commit on a branch when multiple logical changes exist. Run `git commit` only when the user explicitly asks.
+3. **Bot session vs standalone review** — `/lsi:pr-bot` / `/lsi:pr-bot-docs` / `/lsi:apply-bot` authorize posting (and with `--fix`/apply, commit/push) for one PR/change that session only. Standalone `/lsi:review` / `/lsi:senior` keep “ask before post” defaults.
+4. **Ticket card vs implementation** — Card drafting does not authorize coding on a protected branch. Branch + ticket first, then Agent mode work.
+5. **Commit plan vs commit execution** — Always show a plan before the first commit on a branch when multiple logical changes exist. Run `git commit` only when the user explicitly asks (bot sessions: via `.lsi/bin/lsi-bitbucket`).
 
 ## Flowchart
 
