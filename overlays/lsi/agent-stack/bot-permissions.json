@@ -1,0 +1,39 @@
+{
+  "claude": {
+    "permissions_allow": [
+      "Bash(.lsi/bin/lsi-bitbucket:*)",
+      "Bash(openspec:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
+    ],
+    "sandbox_network_allowed_domains": [
+      "api.bitbucket.org",
+      "bitbucket.org"
+    ]
+  },
+  "opencode": {
+    "permission_bash": {
+      ".lsi/bin/lsi-bitbucket *": "allow",
+      "openspec *": "allow",
+      "git status *": "allow",
+      "git diff *": "allow",
+      "git log *": "allow",
+      "git add *": "allow",
+      "git fetch *": "allow",
+      "git checkout *": "allow",
+      "git merge *": "allow"
+    }
+  },
+  "forbidden_substrings": [
+    "git push",
+    "git commit",
+    "curl",
+    "Bash(*)",
+    "\"*\""
+  ]
+}

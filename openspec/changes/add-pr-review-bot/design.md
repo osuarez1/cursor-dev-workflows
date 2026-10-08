@@ -160,3 +160,8 @@ Rollback: revert adopter sync commit; helper and commands are additive.
 ## Open Questions
 
 - Exact Claude Code settings key for sandbox network allowlisting and OpenCode `permission` schema — confirm against current docs during implementation (tasks 3.1 / 3.2) and amend this design if keys differ from D10.
+
+### Confirmed settings keys (tasks 3.1 / 3.2)
+
+- **Claude Code** (project `.claude/settings.json`): `permissions.allow` (string patterns such as `Bash(.lsi/bin/lsi-bitbucket:*)`); sandbox network allowlist is `sandbox.network.allowedDomains` (not under `permissions`). Adopt merges both. `sandbox.network.strictAllowlist` is user/managed-scope only — not written by adopt.
+- **OpenCode** (current docs, v1 shape): `permission.bash` as a map of command patterns → `allow` | `ask` | `deny` (e.g. `".lsi/bin/lsi-bitbucket *": "allow"`). OpenCode v2 uses a `permissions` array with `action: "shell"`; this change targets the v1 `permission.bash` object still documented at opencode.ai/docs/permissions. Adopt only creates/modifies `opencode.json` when `agents_opencode.enabled`.

@@ -14,6 +14,12 @@ import shutil
 import sys
 from pathlib import Path
 
+_SNIPPETS = Path(__file__).resolve().parent
+if str(_SNIPPETS) not in sys.path:
+    sys.path.insert(0, str(_SNIPPETS))
+
+from agent_emit import claude_frontmatter, claude_subdir  # noqa: E402
+
 BUNDLE_ROOT = Path(__file__).resolve().parents[1]
 OVERLAY_COMMANDS = BUNDLE_ROOT / "overlays" / "lsi" / "agent-stack" / "commands"
 OVERLAY_RULES = BUNDLE_ROOT / "overlays" / "lsi" / "agent-stack"
@@ -56,33 +62,11 @@ COMMAND_REWRITES: list[tuple[re.Pattern[str], str]] = [
     ),
 ]
 
-_FRONTMATTER_RE = re.compile(r"^---\n.*?\n---\n", re.DOTALL)
-_DESCRIPTION_RE = re.compile(r"^description:\s*(.+)$", re.MULTILINE)
-
 
 def transform_command(text: str) -> str:
     for pattern, repl in COMMAND_REWRITES:
         text = pattern.sub(repl, text)
     return text
-
-
-def _claude_frontmatter(text: str) -> str:
-    """Replace multi-field cursor frontmatter with minimal Claude description-only header."""
-    m = _FRONTMATTER_RE.match(text)
-    if not m:
-        return text
-    frontmatter = m.group(0)
-    desc_m = _DESCRIPTION_RE.search(frontmatter)
-    description = desc_m.group(1).strip() if desc_m else ""
-    body = text[m.end():]
-    return f"---\ndescription: {description}\n---\n{body}"
-
-
-def _claude_subdir(stem: str) -> tuple[str, str]:
-    """Return (subdir, filename) for a command stem like 'lsi-branch' → ('lsi', 'branch')."""
-    if stem.startswith("lsi-"):
-        return "lsi", stem[len("lsi-"):]
-    return "", stem
 
 
 def install_commands() -> int:
@@ -111,8 +95,8 @@ def install_claude_commands() -> int:
     count = 0
     for src in sorted(OVERLAY_COMMANDS.glob("lsi-*.md")):
         raw = src.read_text(encoding="utf-8")
-        content = _claude_frontmatter(transform_command(raw))
-        subdir, name = _claude_subdir(src.stem)
+        content = claude_frontmatter(transform_command(raw))
+        subdir, name = claude_subdir(src.stem)
         dst_dir = CLAUDE_COMMANDS / subdir if subdir else CLAUDE_COMMANDS
         dst_dir.mkdir(parents=True, exist_ok=True)
         (dst_dir / f"{name}.md").write_text(content, encoding="utf-8")
