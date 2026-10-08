@@ -3,6 +3,8 @@ MAINTAINER.md
 AGENTS-LOCAL.md
 maintainer-adopters.local.yaml
 .git-trello/
+.reviews/
+
 
 # Local Cursor install (see gitignored MAINTAINER.md)
 .cursor/
