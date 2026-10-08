@@ -104,7 +104,7 @@ Push via (remote only):
 .lsi/bin/lsi-bitbucket push
 ```
 
-With **`--local --fix`**: commit via the helper (or `git commit` if the helper is unavailable) under the local git identity; **skip push** and record `Skipped — --local: no push` in the step file/chat. Do not require bot `whoami`.
+With **`--local --fix`**: commit only via `.lsi/bin/lsi-bitbucket commit` (no Bitbucket auth/remote required); **skip push** and record `Skipped — --local: no push` in the step file/chat. Do not require bot `whoami`. Never call `git commit` directly.
 
 **Never stage:** `.reviews/`, `.senior-analyses/`, `.lsi/`, `.cursor/`, `.claude/`, `.opencode/`, `opencode.json`, `.env*`.
 
