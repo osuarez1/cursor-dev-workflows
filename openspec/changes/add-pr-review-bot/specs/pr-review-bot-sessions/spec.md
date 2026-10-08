@@ -159,4 +159,4 @@ Remote sessions: every step, including skipped steps, SHALL be posted through `l
 
 - **WHEN** a STOP condition occurs at any step
 - **THEN** the Close comment is posted with `STOPPED — <reason>`
-- **AND** `.reviews/.tmp/` is removed and the log path is printed in chat
+- **AND** the log path is printed in chat

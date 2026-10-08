@@ -14,7 +14,7 @@ Review and implementation gates (`/lsi:senior`, `/lsi:readiness`, `/lsi:review`,
 - **Add** Claude Code adopter emit: `.claude/commands/lsi/<name>.md` (`/lsi:<name>`) for every `lsi-*` command.
 - **Change** OpenCode opt-in emit from pointer stubs to full command bodies under `.opencode/commands/`.
 - **Change** credential docs to one variable scheme (`BB_*`), including how to create a bot access token; align `/lsi:address-prowler`.
-- **Update** routing (`which-workflow.md`, overlay router, README, `code-review.md`, `bot-lane.md`, `openspec-git-integration.md`), `/lsi:help`, expected agent stack, verify-adopters, tests, CHANGELOG, VERSION (MINOR → 2.1.0).
+- **Update** routing (`which-workflow.md`, overlay router, README, `code-review.md`, `bot-lane.md`, `openspec-git-integration.md`), `/lsi:help`, expected agent stack, verify-adopters, and tests. VERSION / CHANGELOG (MINOR → 2.1.0) land via `/lsi:release-train` on `main` after close — not apply tasks.
 
 ## Capabilities
 
@@ -36,6 +36,6 @@ Review and implementation gates (`/lsi:senior`, `/lsi:readiness`, `/lsi:review`,
 
 ## Impact
 
-- **Bundle:** `overlays/lsi/agent-stack/commands/` (3 new, edits to `lsi-senior`, `lsi-pr`, `lsi-address-*`, `lsi-help`), `overlays/lsi/agent-stack/bot-lane.md`, new `overlays/lsi/snippets/bin/lsi-bitbucket`, `snippets/adopt.py`, `snippets/install-maintainer-local.py` (shared Claude transform), `snippets/expected_agent_stack.py`, `snippets/verify-adopters.py`, `snippets/gitignore-local-artifacts.txt`, tests, `docs/workflows/{integrations,common-mistakes,code-review}.md`, `which-workflow.md`, overlay router + `openspec-git-integration.md`, `README.md`, `patches/README.md`, `CHANGELOG.md`, `VERSION`.
+- **Bundle:** `overlays/lsi/agent-stack/commands/` (3 new, edits to `lsi-senior`, `lsi-pr`, `lsi-address-*`, `lsi-help`), `overlays/lsi/agent-stack/bot-lane.md`, new `overlays/lsi/snippets/bin/lsi-bitbucket`, `snippets/adopt.py`, `snippets/install-maintainer-local.py` (shared Claude transform), `snippets/expected_agent_stack.py`, `snippets/verify-adopters.py`, `snippets/gitignore-local-artifacts.txt`, tests, `docs/workflows/{integrations,common-mistakes,code-review}.md`, `which-workflow.md`, overlay router + `openspec-git-integration.md`, `README.md`, `patches/README.md`. `CHANGELOG.md` / `VERSION` via release-train after close.
 - **Adopters:** `/lsi:update` required. New files: `.lsi/bin/lsi-bitbucket`, `.claude/commands/lsi/*`, managed `.gitignore` block, permission entries in `.claude/settings.json` (and `opencode.json` when opted in). `.lsi/bin/` is wipe-managed — not for custom tools. New local prerequisites: `bash`, `curl`, `jq`; `~/.bitbucket_secrets` with a bot access token (repo-scoped preferred, else workspace as `BB_ACCESS_TOKEN`); network access to `api.bitbucket.org` and `bitbucket.org`; Cursor auto-run allowlist for the helper (user-level, documented only).
 - **Out of scope:** GitHub / GitLab hosts (commands refuse unless `PR_HOST` is Bitbucket); approving, merging, declining, or resolving PR comments; application code in adopter repos.
