@@ -48,7 +48,7 @@ Fix blocking contradictions or record decisions in `patches/files/<repo>/audit-r
 Common fixes:
 
 - Staging-first PR target vs prose in `CLAUDE.md` / `CONTRIBUTING.md`
-- `/opsx:archive` after merge → `/lsi:close` on the **ticket branch** after staging QA (before promote)
+- `/opsx:archive` after merge → `/lsi:close` on **`main`** only after the promotion PR merges
 - `CLAUDE.md` regular file → merge into `AGENTS.md`, then symlink
 
 ## 3. Run adopt

@@ -4,7 +4,7 @@
   note: "Merge CLAUDE.md domain into AGENTS.md; symlink after reconcile"
 - id: openspec_archive_timing
   choice: close_after_promote_on_main
-  note: "Retire docs/workflows/openspec.md; use .lsi/workflows/openspec-git-integration.md"
+  note: "Close on main after promote; remove docs/agents/openspec.md (use docs/ai/openspec.md + .lsi/workflows)"
 - id: pr_target
   choice: staging_first
   note: "Feature PRs target staging; /lsi:promote to main"

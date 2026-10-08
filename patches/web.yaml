@@ -40,6 +40,8 @@ remove_after_adopt:
   - docs/workflows/git-trello-task-cards.md
   - .cursor/rules/git-trello-task-cards.mdc
   - .cursor/rules/openspec.mdc
+  # Stale 2.0.0 close-before-promote pointer; canonical is docs/ai/openspec.md
+  - docs/agents/openspec.md
 agents_claude:
   canonical: AGENTS.md
   claude_symlink: true

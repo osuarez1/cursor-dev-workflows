@@ -699,6 +699,47 @@ def merge_convention(target: Path) -> None:
         conv.write_text("# Conventions\n\n" + block + "\n", encoding="utf-8")
 
 
+# Pre-marker leftover from early LSI adopts (duplicate of AGENTS.workflow.md.template).
+_ORPHAN_LSI_WORKFLOWS = re.compile(
+    r"^## Workflows \(LSI — adopt-managed\)\n"
+    r".*?"
+    r"^Do not edit files under `\.lsi/workflows/`[^\n]*\n?",
+    re.MULTILINE | re.DOTALL,
+)
+# Stale 2.0.0 close-before-promote Staging-first one-liner (superseded in 2.1.0).
+_STALE_STAGING_FIRST_CLOSE = re.compile(
+    r"^\*\*Staging-first:\*\*[^\n]*/lsi:close[^\n]*"
+    r"(?:ticket branch|before\s+/lsi:promote)[^\n]*$",
+    re.MULTILINE | re.IGNORECASE,
+)
+_CORRECT_STAGING_FIRST = (
+    "**Staging-first:** feature PRs target `staging`; after staging QA "
+    "`/lsi:promote` to `main`, then `/lsi:close` on **`main`** after the "
+    "promotion merges."
+)
+
+
+def strip_orphan_lsi_workflow_sections(text: str) -> str:
+    """Remove unmarked duplicate LSI workflow blocks; keep <!-- lsi:workflows -->."""
+    protected: list[str] = []
+
+    def _protect(match: re.Match[str]) -> str:
+        protected.append(match.group(0))
+        return f"\0LSI_WF_{len(protected) - 1}\0"
+
+    out = re.sub(
+        r"<!-- lsi:workflows:start -->.*?<!-- lsi:workflows:end -->",
+        _protect,
+        text,
+        flags=re.DOTALL,
+    )
+    out = _ORPHAN_LSI_WORKFLOWS.sub("\n", out)
+    out = _STALE_STAGING_FIRST_CLOSE.sub(_CORRECT_STAGING_FIRST, out)
+    for i, block in enumerate(protected):
+        out = out.replace(f"\0LSI_WF_{i}\0", block)
+    return re.sub(r"\n{3,}", "\n\n", out)
+
+
 def merge_agents_markers(target: Path) -> None:
     agents = target / "AGENTS.md"
     template = OVERLAY_ROOT / "agent-stack" / "AGENTS.workflow.md.template"
@@ -716,6 +757,7 @@ def merge_agents_markers(target: Path) -> None:
             )
         else:
             text = text.rstrip() + "\n\n<!-- lsi:workflows:start -->\n" + block + "\n<!-- lsi:workflows:end -->\n"
+        text = strip_orphan_lsi_workflow_sections(text)
         agents.write_text(text, encoding="utf-8")
     else:
         agents.write_text(

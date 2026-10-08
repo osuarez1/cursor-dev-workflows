@@ -7,6 +7,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Fixed
+
+- **Web adopt verify** — strip orphan unmarked LSI workflow blocks in `AGENTS.md` (stale close-before-promote), remove `docs/agents/openspec.md` after adopt, and correct adopt-new-repo close-timing guidance so `openspec_archive_timing` verify passes
+
 ## [2.1.0] - 2026-10-07
 
 ### Adopters
