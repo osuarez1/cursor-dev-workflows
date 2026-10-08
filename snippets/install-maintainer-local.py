@@ -1,14 +1,25 @@
 #!/usr/bin/env python3
-"""Install gitignored .cursor/ stack and tracked .claude/commands/ for bundle maintainers.
+"""Install local agent stacks for bundle maintainers.
 
 Copies slash commands from overlays/lsi/agent-stack/commands/ with path rewrites
-for the bundle repo layout. Re-run after overlay command changes:
+for the bundle repo layout into:
+
+- `.cursor/commands/` (gitignored)
+- `.claude/commands/` (tracked dogfood)
+- `.opencode/commands/lsi-*.md` (gitignored) — **bundle special case**
+
+Adopters enable OpenCode via patch `agents_opencode: { enabled: true }`. This
+repo is not adopted onto itself, so bootstrap always emits OpenCode LSI commands
+here for local OpenCode dogfooding.
+
+Re-run after overlay command changes:
 
     ./snippets/bootstrap-maintainer-local.sh
 """
 
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import sys
@@ -18,16 +29,26 @@ _SNIPPETS = Path(__file__).resolve().parent
 if str(_SNIPPETS) not in sys.path:
     sys.path.insert(0, str(_SNIPPETS))
 
-from agent_emit import claude_frontmatter, claude_subdir  # noqa: E402
+from agent_emit import (  # noqa: E402
+    claude_frontmatter,
+    claude_subdir,
+    opencode_bind_arguments,
+    opencode_frontmatter,
+)
 
 BUNDLE_ROOT = Path(__file__).resolve().parents[1]
 OVERLAY_COMMANDS = BUNDLE_ROOT / "overlays" / "lsi" / "agent-stack" / "commands"
 OVERLAY_RULES = BUNDLE_ROOT / "overlays" / "lsi" / "agent-stack"
 MAINTAINER_RULES = BUNDLE_ROOT / "snippets" / "maintainer-local" / "rules"
 CURSOR_RULES_SNIPPETS = BUNDLE_ROOT / "snippets" / "cursor-rules"
+BOT_PERMISSIONS = (
+    BUNDLE_ROOT / "overlays" / "lsi" / "agent-stack" / "bot-permissions.json"
+)
 CURSOR_COMMANDS = BUNDLE_ROOT / ".cursor" / "commands"
 CURSOR_RULES = BUNDLE_ROOT / ".cursor" / "rules"
 CLAUDE_COMMANDS = BUNDLE_ROOT / ".claude" / "commands"
+OPENCODE_COMMANDS = BUNDLE_ROOT / ".opencode" / "commands"
+OPENCODE_JSON = BUNDLE_ROOT / "opencode.json"
 
 # Overlay commands use paths relative to overlays/lsi/agent-stack/commands/.
 # From .cursor/commands/ at repo root, rewrite LSI-only and template paths.
@@ -105,6 +126,67 @@ def install_claude_commands() -> int:
     return 0
 
 
+def install_opencode_commands() -> int:
+    """Emit LSI commands for OpenCode (bundle-maintainer special case; gitignored)."""
+    if not OVERLAY_COMMANDS.is_dir():
+        print(f"Missing overlay commands: {OVERLAY_COMMANDS}", file=sys.stderr)
+        return 1
+    OPENCODE_COMMANDS.mkdir(parents=True, exist_ok=True)
+    count = 0
+    index_lines = [
+        "# OpenCode LSI commands (bundle maintainer)",
+        "",
+        "This repo enables OpenCode as a **special case** via "
+        "`./snippets/bootstrap-maintainer-local.sh` (not `agents_opencode` adopt).",
+        "OpenSpec `opsx-*` commands may also live under `.opencode/commands/`.",
+        "",
+        "## LSI commands",
+        "",
+    ]
+    for src in sorted(OVERLAY_COMMANDS.glob("lsi-*.md")):
+        content = transform_command(src.read_text(encoding="utf-8"))
+        content = opencode_frontmatter(content)
+        content = opencode_bind_arguments(content)
+        (OPENCODE_COMMANDS / src.name).write_text(content, encoding="utf-8")
+        slash = "/" + src.stem.replace("lsi-", "lsi:", 1)
+        index_lines.append(f"- `{slash}` → `.opencode/commands/{src.name}`")
+        count += 1
+    index_lines.append("")
+    (BUNDLE_ROOT / ".opencode" / "LSI.md").write_text(
+        "\n".join(index_lines), encoding="utf-8"
+    )
+    print(f"Installed {count} OpenCode LSI commands → .opencode/commands/")
+    return 0
+
+
+def merge_opencode_bot_permissions_local() -> None:
+    """Idempotent merge of bot bash allows into gitignored `opencode.json`."""
+    if not BOT_PERMISSIONS.is_file():
+        return
+    perms = json.loads(BOT_PERMISSIONS.read_text(encoding="utf-8"))
+    bash_allows: dict[str, str] = dict(perms["opencode"]["permission_bash"])
+    data: dict = {}
+    if OPENCODE_JSON.is_file():
+        raw = json.loads(OPENCODE_JSON.read_text(encoding="utf-8"))
+        if isinstance(raw, dict):
+            data = raw
+    permission = data.setdefault("permission", {})
+    if not isinstance(permission, dict):
+        permission = {}
+        data["permission"] = permission
+    bash = permission.get("bash")
+    if bash is None or isinstance(bash, str):
+        bash = {} if bash is None else {"*": bash}
+        permission["bash"] = bash
+    if not isinstance(bash, dict):
+        bash = {}
+        permission["bash"] = bash
+    for pattern, effect in bash_allows.items():
+        bash[pattern] = effect
+    OPENCODE_JSON.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    print("Merged bot permissions → opencode.json")
+
+
 def install_rules() -> int:
     CURSOR_RULES.mkdir(parents=True, exist_ok=True)
 
@@ -128,6 +210,10 @@ def main() -> int:
     code = install_claude_commands()
     if code:
         return code
+    code = install_opencode_commands()
+    if code:
+        return code
+    merge_opencode_bot_permissions_local()
     return install_rules()
 
 

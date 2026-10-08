@@ -14,8 +14,10 @@ maintainer-adopters.local.yaml
 # Local Cursor install (see gitignored MAINTAINER.md)
 .cursor/
 
-# Unsupported agent tool dirs (Cursor + Claude only)
+# OpenCode: gitignored local install (bundle bootstrap emits LSI commands here;
+# adopters opt in via agents_opencode). Root opencode.json is local-only too.
 .opencode/
+opencode.json
 .aiassistant/
 .junie/
 bin/
